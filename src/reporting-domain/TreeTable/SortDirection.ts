@@ -1,11 +1,13 @@
-/** Represents a Sort Direction. */
+/**
+ * Enum representing a Sort Direction.
+ */
 export enum SortDirection {
-  /** None. */
+  /** No sort direction. */
   None       = 0,
 
-  /** Ascending */
+  /** Ascending sort direction. */
   Ascending  = -1,
 
-  /** Descending */
+  /** Descending sort direction. */
   Descending = 1,
 }

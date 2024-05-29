@@ -1,5 +1,13 @@
+/**
+ * Enum representing the buttons on the title bar of a report pane.
+ */
 export enum ReportPaneTitleBarButtons {
-  None     = 0,
+  /** Represents no button. */
+  None = 0,
+
+  /** Represents the maximize button. */
   Maximize = 1,
-  Close    = 2,
+
+  /** Represents the close button. */
+  Close = 2,
 }

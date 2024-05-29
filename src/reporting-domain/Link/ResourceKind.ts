@@ -1,71 +1,46 @@
+/**
+ * Enum representing the kind of resource.
+ */
 export enum ResourceKind {
-  /// <summary>
-  /// Unknown (default).
-  /// </summary>
+  /** Unknown (default). */
   Unknown,
 
-  /// <summary>
-  /// A <see cref="Report"/>.
-  /// </summary>
+  /** A Report. */
   Report,
 
-  /// <summary>
-  /// JSON document.
-  /// </summary>
+  /** JSON document. */
   Json,
 
-  /// <summary>
-  /// An image.
-  /// </summary>
+  /** An image. */
   Image,
 
-  /// <summary>
-  /// Audio.
-  /// </summary>
+  /** Audio. */
   Audio,
 
-  /// <summary>
-  /// Video.
-  /// </summary>
+  /** Video. */
   Video,
 
-  /// <summary>
-  /// HTML.
-  /// </summary>
+  /** HTML. */
   Html,
 
-  /// <summary>
-  /// A Microsoft Excel file.
-  /// </summary>
+  /** A Microsoft Excel file. */
   Excel,
 
-  /// <summary>
-  /// A CSV file.
-  /// </summary>
+  /** A CSV file. */
   Csv,
 
-  /// <summary>
-  /// A PDF file.
-  /// </summary>
+  /** A PDF file. */
   Pdf,
 
-  /// <summary>
-  /// A Zip file.
-  /// </summary>
+  /** A Zip file. */
   Zip,
 
-  /// <summary>
-  /// Text.
-  /// </summary>
+  /** Text. */
   Text,
 
-  /// <summary>
-  /// BSON as text.
-  /// </summary>
+  /** BSON as text. */
   BsonAsText,
 
-  /// <summary>
-  /// BSON as bytes.
-  /// </summary>
+  /** BSON as bytes. */
   BsonAsBytes,
 }

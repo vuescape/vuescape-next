@@ -1,3 +1,6 @@
+/**
+ * Enum for presentation formats.
+ */
 export enum PresentationFormatKind {
   Currency   = 'currency',
   Percentage = 'percentage',

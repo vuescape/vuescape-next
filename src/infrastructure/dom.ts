@@ -1,3 +1,8 @@
+/**
+ * Selects the contents of an HTML element with the given ID.
+
+ * @param elementId - The ID of the HTML element.
+ */
 export function selectElementContents(elementId: string) {
   const element = document.getElementById(elementId)
   const body    = document.body as unknown as { createTextRange: () => any }

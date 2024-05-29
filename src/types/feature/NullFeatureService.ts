@@ -8,6 +8,7 @@ import type { FeatureNavigationRegistration } from './FeatureNavigationRegistrat
 import type { FeatureService } from './FeatureService'
 
 export class NullFeatureService implements FeatureService {
+  // @ts-ignore-once: TS6133
   public async fetch(forceLoad?: boolean): Promise<void> {
     // noop
   }
@@ -20,6 +21,7 @@ export class NullFeatureService implements FeatureService {
     return []
   }
 
+  // @ts-ignore-once: TS6133
   public async getFeature(featureId: string): Promise<Feature | undefined> {
     return undefined
   }
@@ -28,6 +30,7 @@ export class NullFeatureService implements FeatureService {
     return []
   }
 
+  // @ts-ignore-once: TS6133
   public async getChiclets(router: Router): Promise<Array<Chiclet>> {
     return []
   }

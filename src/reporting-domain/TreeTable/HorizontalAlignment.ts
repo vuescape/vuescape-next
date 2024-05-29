@@ -1,14 +1,17 @@
-/** Represents a Horizontal Alignment which will typically map to text-align CSS property. */
+/**
+ * Enum representing a Horizontal Alignment.
+ * Typically maps to the text-align CSS property.
+ */
 export enum HorizontalAlignment {
-  /** Unknown. */
+  /** Unknown alignment. */
   Unknown = 0,
 
-  /** Left alignment */
+  /** Left alignment. */
   Left,
 
-  /** Center alignment */
+  /** Center alignment. */
   Center,
 
-  /** Right alignment */
+  /** Right alignment. */
   Right,
 }

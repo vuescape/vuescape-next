@@ -1,11 +1,10 @@
+/**
+ * Enum representing a PayloadEncodingKind.
+ */
 export enum PayloadEncodingKind {
-  /// <summary>
-  /// No encoding. Suitable for text.
-  /// </summary>
+  /** Represents no encoding. Suitable for text. */
   None = 0,
 
-  /// <summary>
-  /// Base64 encoding.
-  /// </summary>
+  /** Represents Base64 encoding. */
   Base64,
 }

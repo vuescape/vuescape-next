@@ -1,5 +1,10 @@
 import { SortDirection, type TreeTableHeaderCell, type TreeTableHeaderRow } from '../TreeTable'
 
+/**
+ * Function to get the sorted header cell with its index.
+ * @param headers - An array of TreeTableHeaderRow.
+ * @returns An object containing the sorted header cell and its index, or undefined if no headers are provided or no sorted header is found.
+ */
 export function getSortedHeaderCellWithIndex(headers: Array<TreeTableHeaderRow>) {
   let sortHeader: Array<{ cell: TreeTableHeaderCell; index: number }>
 

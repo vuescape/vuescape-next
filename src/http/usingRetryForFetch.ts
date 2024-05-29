@@ -1,6 +1,32 @@
+/**
+ * Maximum number of retries for the fetch operation.
+ */
 const MAX_NUMBER_RETRIES = 3
-const RETRY_DELAY_MS     = 250
 
+/**
+ * Delay between retries in milliseconds.
+ */
+const RETRY_DELAY_MS = 250
+
+
+/**
+ * Creates a promise that resolves after a specified delay.
+ *
+ * @param delay - The delay in milliseconds.
+ * @returns A promise that resolves after the specified delay.
+ */
+const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, delay))
+
+/**
+ * Performs a fetch operation with retries.
+ * If the fetch operation fails, it will be retried up to MAX_NUMBER_RETRIES times.
+ * A delay of RETRY_DELAY_MS milliseconds is added between each retry.
+ * If all retries fail, it logs an error and returns the last received response.
+ *
+ * @param url - The URL to fetch.
+ * @param [init] - The options for the fetch operation.
+ * @returns The response from the fetch operation.
+ */
 export async function usingRetryForFetch(url: string, init?: RequestInit) {
   let retryNumber        = 0
   let response: Response = new Response(undefined,
@@ -27,8 +53,4 @@ export async function usingRetryForFetch(url: string, init?: RequestInit) {
 
   console.error(`Max retries exceeded calling ${url}. Returning:`, response)
   return response
-}
-
-function sleep(delay: number) {
-  return new Promise(resolve => setTimeout(resolve, delay))
 }

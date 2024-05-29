@@ -1,14 +1,16 @@
-/** Represents cell wrapping behavior. */
+/**
+ * Enum representing the wrapping behavior of a cell.
+ */
 export enum ColumnWrapBehavior {
-  /** None. */
+  /** No wrapping behavior. */
   None = 0,
 
-  /** Wrap the contents of the cell. */
+  /** Wraps the contents of the cell. */
   Wrap,
 
-  /** Don't wrap the contents of the cell and truncate if it doesn't fit. */
+  /** Doesn't wrap the contents of the cell and truncates if it doesn't fit. */
   NoWrapAndTruncate,
 
-  /** Don't wrap the contents of the cell and display an ellipsis if it doesn't fit. */
+  /** Doesn't wrap the contents of the cell and displays an ellipsis if it doesn't fit. */
   NoWrapAndDisplayEllipsis,
 }

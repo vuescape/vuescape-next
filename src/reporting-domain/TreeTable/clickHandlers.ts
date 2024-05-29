@@ -1,7 +1,13 @@
-import { LinkName, LinkTarget } from '@vuescape/reporting-domain/Link'
+import { LinkName, LinkTarget } from '../../reporting-domain/'
 import { type TreeTableCell } from './TreeTableCell'
 import { type TreeTableRow } from './TreeTableRow'
 
+/**
+ * Handles the click event on a self link.
+ * @param row - The row of the tree table.
+ * @param cell - The cell of the tree table.
+ */
+// @ts-ignore-once: TS6133
 export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
   if (!cell || !cell.links) {
     return
@@ -9,7 +15,7 @@ export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
 
   const selfLink = cell.links[LinkName.Self]
   if (selfLink) {
-    const source = selfLink.source
+    // const source = selfLink.source
     const target = selfLink.linkTarget
 
     switch (target) {

@@ -1,2 +1,7 @@
-// TODO: Move to Auth
-export interface InitFunctionResult { redirectUrl: string }
+/**
+ * Interface representing the result of an initialization function.
+ */
+export interface InitFunctionResult {
+  /** The URL to redirect to. */
+  redirectUrl: string
+}

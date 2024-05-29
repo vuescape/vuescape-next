@@ -1,11 +1,13 @@
-/** What level in the hierarchy to sort on. */
+/**
+ * Enum representing the level in the hierarchy to sort on.
+ */
 export enum SortLevel {
-  /** None. */
+  /** No sorting. */
   None = 0,
 
-  /** Sort at the Parent level */
+  /** Sorting at the Parent level. */
   Parent,
 
-  /** Sort at the Children level */
+  /** Sorting at the Children level. */
   Children,
 }

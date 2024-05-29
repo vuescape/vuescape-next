@@ -1,6 +1,8 @@
-/** Represents the width behavior of a cell. */
+/**
+ * Enum representing the width behavior of a cell.
+ */
 export enum ColumnWidthBehavior {
-  /** None. */
+  /** No width behavior. */
   None = 0,
 
   /** Fit the cell width to the content. */

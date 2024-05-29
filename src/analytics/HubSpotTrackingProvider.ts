@@ -1,17 +1,35 @@
 import type { TrackingProvider } from './TrackingProvider'
 
+/**
+ * HubSpot Tracking Provider.
+ * This class implements the TrackingProvider interface.
+ * It provides methods to initialize the provider, identify the user, track page views, and send events.
+ */
 export class HubSpotTrackingProvider implements TrackingProvider {
   private readonly hubId: string
   private isInitialized = false
 
+  /**
+   * Creates a new instance of the GoogleAnalytics4TrackingProvider.
+   * @param hubId - The tracking ID for Google Analytics.
+   */
   constructor(hubId: string) {
     this.hubId = hubId
   }
 
+  /**
+   * Gets the name of the tracking provider.
+   * @returns The name of the tracking provider.
+   */
   public get name() {
     return 'hubspot-tracking'
   }
 
+  /**
+   * Identifies the user.
+   * @param user - The user to identify.
+   */
+  // @ts-ignore-once: TS6133
   public identify(user: string): void {
     if (!this.isInitialized) {
       this.getHsq().push(['identify', {
@@ -22,6 +40,9 @@ export class HubSpotTrackingProvider implements TrackingProvider {
     }
   }
 
+  /**
+   *  Initializes the tracking provider.
+   */
   public init(): void {
     // Only init once
     if (!this.isInitialized) {
@@ -37,6 +58,10 @@ export class HubSpotTrackingProvider implements TrackingProvider {
     }
   }
 
+  /**
+   * Tracks the page view.
+   * @param urlFragment - The URL fragment of the page view.
+   */
   public trackPageView(urlFragment: string): void {
     // Only track pages once the user is known
     if (this.isInitialized) {
@@ -46,6 +71,12 @@ export class HubSpotTrackingProvider implements TrackingProvider {
     }
   }
 
+  /**
+   * Sends an event.
+   * @param eventName - The name of the event.
+   * @param payload - The payload of the event.
+   */
+  // @ts-ignore-once: TS6133
   public sendEvent(eventName: string, payload: any): void {
     // no-op
   }

@@ -1,11 +1,13 @@
-/** Represents the kind of content. */
+/**
+ * Enum representing the kind of content for a Hover.
+ */
 export enum HoverContentKind {
-  /** None. */
+  /** No content. */
   None = 0,
 
-  /** Plaintext */
+  /** Plain text content. */
   Plaintext,
 
-  /** Html */
+  /** HTML content. */
   Html,
 }

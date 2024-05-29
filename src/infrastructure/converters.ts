@@ -1,3 +1,13 @@
+/**
+ * Tries to convert a string to an enum value.
+ * If the string is undefined, it returns undefined.
+ * Otherwise, it calls the `toEnum` function to perform the conversion.
+ *
+ * @param enumType - The enum type.
+ * @param enumString - The string to convert.
+ * @param [shouldCapitalizeFirstCharacter=true] - Whether to capitalize the first character of the string.
+ * @returns The enum value, or undefined if the string is undefined.
+ */
 export function tryToEnum<T>(enumType: T,
   enumString: string | undefined,
   shouldCapitalizeFirstCharacter = true,
@@ -9,6 +19,18 @@ export function tryToEnum<T>(enumType: T,
   return toEnum(enumType, enumString, shouldCapitalizeFirstCharacter)
 }
 
+/**
+ * Converts a string to an enum value.
+ * It splits the string by the '|' character to handle flags.
+ * It then iterates over the split strings and adds the corresponding enum values to the result.
+ * If the result is still null after the iteration, it throws an error.
+ *
+ * @param enumType - The enum type.
+ * @param enumString - The string to convert.
+ * @param [shouldCapitalizeFirstCharacter=true] - Whether to capitalize the first character of the string.
+ * @returns The enum value.
+ * @throws If the string does not correspond to any enum value.
+ */
 export function toEnum<T>(enumType: T, enumString: string, shouldCapitalizeFirstCharacter = true): T[keyof T] {
   // Split to handle flags
   const enumStrings = enumString
@@ -40,6 +62,12 @@ export function toEnum<T>(enumType: T, enumString: string, shouldCapitalizeFirst
   return result
 }
 
+/**
+ * Decodes a base64 string to a Uint8Array.
+ *
+ * @param base64String - The base64 string to decode.
+ * @returns The decoded Uint8Array.
+ */
 export function decodeBase64String(base64String: string) {
   const byteCharacters = atob(base64String)
   const byteNumbers    = new Array(byteCharacters.length)

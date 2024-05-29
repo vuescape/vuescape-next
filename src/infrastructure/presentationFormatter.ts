@@ -3,17 +3,11 @@ import { PresentationFormatKind } from './PresentationFormatKind'
 export const DEFAULT_EMPTY_DISPLAY = '-'
 
 /**
- * @callback formatResult
- * @param {number} value - The value to format for display.
- * @returns {string} - The formatted result value.
- */
-
-/**
  * Validates data and converts it into a number, then calls formatResult with the number to get the formatted result.
  * @param value - The value to attempt to convert into a number.
- * @param {formatResult} formatResult - The function that will format the result for valid numbers.
+ * @param formatResult - The function that will format the result for valid numbers.
  * @param emptyDisplay - The value to return if the input value is empty.
- * @returns {string} - The formatted result value from formatResult or an empty result.
+ * @returns The formatted result value from formatResult or an empty result.
  */
 const formatWithNumber = (value: string, formatResult: (value: number) => string, emptyDisplay: string): string => {
   if (value == null || value === '') {
@@ -28,10 +22,10 @@ const formatWithNumber = (value: string, formatResult: (value: number) => string
 /**
  * Converts a value to a formatted number with optional decimal places.
  *
- * @param {any} value - The value to be converted to a number.
- * @param {number} places - The number of decimal places to display (optional).
+ * @param value - The value to be converted to a number.
+ * @param places - The number of decimal places to display (optional).
  *
- * @returns {string} The formatted number as a string.
+ * @returns The formatted number as a string.
  */
 const toNumber = (value: any, places: number) => {
   let p = places || 0
@@ -60,10 +54,10 @@ const toNumber = (value: any, places: number) => {
 /**
  * Formats a value for accounting display.
  *
- * @param {string} value - The value to format.
- * @param {number} places - The number of decimal places to round the value to. Default is 1.
- * @param {string} emptyDisplay - The display value to use when the input value is empty.
- * @returns {string} The formatted value for accounting display.
+ * @param value - The value to format.
+ * @param places - The number of decimal places to round the value to. Default is 1.
+ * @param emptyDisplay - The display value to use when the input value is empty.
+ * @returns The formatted value for accounting display.
  */
 const toAccountingDisplay = (value: string, places: number, emptyDisplay: string) => {
   const p         = places || 1
@@ -76,10 +70,10 @@ const toAccountingDisplay = (value: string, places: number, emptyDisplay: string
  * Formats a currency value to display with the specified number of decimal places.
  * If the value is not a number or if it is NaN, the empty display value will be returned.
  *
- * @param {string} value - The currency value to format.
- * @param {number} places - The number of decimal places to include in the display.
- * @param {string} emptyDisplay - The value to display if the currency value is not valid or NaN.
- * @returns {string} - The formatted currency value, or the empty display value if the currency value is not valid.
+ * @param value - The currency value to format.
+ * @param places - The number of decimal places to include in the display.
+ * @param emptyDisplay - The value to display if the currency value is not valid or NaN.
+ * @returns The formatted currency value, or the empty display value if the currency value is not valid.
  */
 const toCurrencyDisplay = (value: string, places: number, emptyDisplay: string) => {
   const formatter = (numberValue: number) => round(numberValue, places) >= 0.0 ? '$' + toNumber(numberValue, places) :
@@ -91,11 +85,11 @@ const toCurrencyDisplay = (value: string, places: number, emptyDisplay: string) 
 /**
  * Formats a number value as a currency display with millimeter (mm) units.
  *
- * @param {string} value - The number value to format as a currency display.
- * @param {number} places - The number of decimal places to round the value to (default is 1).
- * @param {string} emptyDisplay - The display value to return if the input value is empty.
+ * @param value - The number value to format as a currency display.
+ * @param places - The number of decimal places to round the value to (default is 1).
+ * @param emptyDisplay - The display value to return if the input value is empty.
  *
- * @returns {string} The formatted currency display string in the format of '$valuemm' or '-$valuemm'.
+ * @returns The formatted currency display string in the format of '$valuemm' or '-$valuemm'.
  */
 const toMMCurrencyDisplay = (value: string, places: number, emptyDisplay: string) => {
   const formatter = (numberValue: number) => {
@@ -109,10 +103,10 @@ const toMMCurrencyDisplay = (value: string, places: number, emptyDisplay: string
 /**
  * Displays a value as a percentage string with a specified number of decimal places.
  *
- * @param {string} value - The value to be displayed as a percentage. Must be a valid numeric string.
- * @param {number} places - The number of decimal places to display in the percentage.
- * @param {string} emptyDisplay - The string to be displayed when the value is empty or not a valid numeric string.
- * @returns {string} The value formatted as a percentage string.
+ * @param value - The value to be displayed as a percentage. Must be a valid numeric string.
+ * @param places - The number of decimal places to display in the percentage.
+ * @param emptyDisplay - The string to be displayed when the value is empty or not a valid numeric string.
+ * @returns The value formatted as a percentage string.
  */
 const toPercentageDisplay = (value: string, places: number, emptyDisplay: string) => {
   const formatter = (numberValue: number) => {
@@ -126,10 +120,10 @@ const toPercentageDisplay = (value: string, places: number, emptyDisplay: string
 /**
  * Formats a string value into a number display with the specified number of places and an empty display.
  *
- * @param {string} value - The string value to be formatted.
- * @param {number} places - The number of decimal places to display.
- * @param {string} emptyDisplay - The display to use for an empty value.
- * @returns {string} - The formatted number display.
+ * @param value - The string value to be formatted.
+ * @param places - The number of decimal places to display.
+ * @param emptyDisplay - The display to use for an empty value.
+ * @returns The formatted number display.
  */
 const toNumberDisplay = (value: string, places: number, emptyDisplay: string) => {
   const formatter = (numberValue: number) => round(numberValue, places) >= 0.0 ? toNumber(numberValue, places) :
@@ -141,9 +135,9 @@ const toNumberDisplay = (value: string, places: number, emptyDisplay: string) =>
 /**
  * Converts a given value to a formatted date string.
  *
- * @param {any} value - The value to be converted to a date.
- * @param {string=} [emptyValue='-'] - The default value to return if the input value is null or undefined.
- * @returns {string} The formatted date string.
+ * @param value - The value to be converted to a date.
+ * @param [emptyValue='-'] - The default value to return if the input value is null or undefined.
+ * @returns The formatted date string.
  */
 export const toDateDisplay = (value: any, emptyValue = '-') => {
   if (value == null) {
@@ -167,9 +161,9 @@ export const toDateDisplay = (value: any, emptyValue = '-') => {
  * Returns a formatted string representation of a date and time value.
  * If the value is null or undefined, it returns the emptyValue parameter.
  *
- * @param {*} value - The date and time value to be formatted.
- * @param {string=} [emptyValue = '-'] - The value to be returned if the input value is null or undefined.
- * @returns {string} - The formatted string representation of the date and time value.
+ * @param value - The date and time value to be formatted.
+ * @param [emptyValue = '-'] - The value to be returned if the input value is null or undefined.
+ * @returns The formatted string representation of the date and time value.
  */
 export const toDateTimeDisplay = (value: any, emptyValue = '-') => {
   if (value == null) {
@@ -199,12 +193,11 @@ export const toDateTimeDisplay = (value: any, emptyValue = '-') => {
 
 /**
  * Converts a value to a text display.
- * If the value is a non-empty string, it is returned as is.
- * Otherwise, returns the specified empty display value.
+ * If the value is a non-empty string, it is returned as is. Otherwise, returns the specified empty display value.
  *
- * @param {any} value - The value to convert.
- * @param {string=} [emptyDisplay='-'] - The empty display value to return.
- * @returns {string} - The converted text display.
+ * @param value - The value to convert.
+ * @param [emptyDisplay='-'] - The empty display value to return.
+ * @returns The converted text display.
  */
 export const toTextDisplay = (value: any, emptyDisplay = '-') => {
   if (typeof value === 'string' && value.length > 0) {
@@ -227,8 +220,6 @@ export const presentationFormatMap: Record<string, DisplayFunction> = {
 
 /**
  * A map that maps PresentationFormatKind to their corresponding symbols.
- *
- * @type {Map<PresentationFormatKind, string>}
  */
 export const presentationFormatKindToSymbolMap = new Map<PresentationFormatKind, string>(
   [[PresentationFormatKind.Currency, '$'],
@@ -241,10 +232,10 @@ export const presentationFormatKindToSymbolMap = new Map<PresentationFormatKind,
 /**
  * Rounds a given number to the specified number of decimal places.
  *
- * @param {number} value - The number to be rounded.
- * @param {number} [places=0] - The number of decimal places to round to. Defaults to 0.
+ * @param value - The number to be rounded.
+ * @param [places=0] - The number of decimal places to round to. Defaults to 0.
  *
- * @return {number} - The rounded number.
+ * @returns The rounded number.
  */
 export function round(value: number, places: number = 0) {
   let p = places || 0
@@ -259,11 +250,11 @@ export function round(value: number, places: number = 0) {
 /**
  * Formats the given value according to the specified presentation format.
  *
- * @param {PresentationFormatKind} presentationFormat - The presentation format to use.
- * @param {string} value - The value to format.
- * @param {number} numberOfDecimalPlaces - The number of decimal places to display.
- * @param {string=} [emptyDisplay=DEFAULT_EMPTY_DISPLAY] - The value to display when the input value is empty.
- * @returns {string} The formatted value.
+ * @param presentationFormat - The presentation format to use.
+ * @param value - The value to format.
+ * @param numberOfDecimalPlaces - The number of decimal places to display.
+ * @param [emptyDisplay=DEFAULT_EMPTY_DISPLAY] - The value to display when the input value is empty.
+ * @returns The formatted value.
  */
 export function formatValue(
   presentationFormat: PresentationFormatKind,

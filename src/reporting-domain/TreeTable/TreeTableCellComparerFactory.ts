@@ -1,13 +1,22 @@
+import { SortComparisonStrategy } from '../../infrastructure'
 import { SortDirection } from './SortDirection'
 import { type TreeTableRow } from './TreeTableRow'
 
-import { SortComparisonStrategy } from '../../infrastructure'
-
+/**
+ * Creates a comparison function for TreeTableCell properties.
+ *
+ * @param sortOnIndex - The index of the cell to sort on.
+ * @param sortDirection - The direction to sort in.
+ * @param sortComparisonStrategy - The strategy to use when comparing values for sorting.
+ * @param doNotSortValue - A value that, if encountered, should not affect the sort order.
+ * @throws If the sortDirection is None.
+ * @returns A comparison function for use in Array.prototype.sort.
+ */
 export function makeTreeTableCellPropertyCompare(
   sortOnIndex: number,
   sortDirection: SortDirection,
   sortComparisonStrategy: SortComparisonStrategy = SortComparisonStrategy.Default,
-  doNotSortValue?: any | undefined,
+  doNotSortValue?: any | undefined
 ) {
   if (sortDirection === SortDirection.None) {
     throw new Error('Cannot perform a sort with a SortDirection value of None.')
@@ -25,7 +34,7 @@ export function makeTreeTableCellPropertyCompare(
       return 1
     }
 
-    const leftItem  = (left as TreeTableRow).cells
+    const leftItem = (left as TreeTableRow).cells
       .filter(_ => _.isVisible !== false)
       .filter((_, index) => index === sortOnIndex)
     const rightItem = (right as TreeTableRow).cells
@@ -44,7 +53,7 @@ export function makeTreeTableCellPropertyCompare(
       return 1
     }
 
-    const leftItemValue  = leftItem[0].value != null ? leftItem[0].value : leftItem[0].displayValue
+    const leftItemValue = leftItem[0].value != null ? leftItem[0].value : leftItem[0].displayValue
     const rightItemValue = rightItem[0].value != null ? rightItem[0].value : rightItem[0].displayValue
 
     if (doNotSortValue != null) {

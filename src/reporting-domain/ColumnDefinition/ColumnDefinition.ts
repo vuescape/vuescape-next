@@ -1,16 +1,23 @@
+import { UnitOfMeasure } from '../UnitOfMeasure'
 import { ColumnWidthBehavior } from './ColumnWidthBehavior'
 import { ColumnWrapBehavior } from './ColumnWrapBehavior'
 
-import { UnitOfMeasure } from '../UnitOfMeasure'
-
+/**
+ * Interface representing a ColumnDefinition.
+ */
 export interface ColumnDefinition {
-  /** The cell width behavior */
+  /** The behavior of the column width. */
   columnWidthBehavior: ColumnWidthBehavior
-  /** The cell wrap behavior. */
+
+  /** The behavior of the cell/column wrap. */
   columnWrapBehavior: ColumnWrapBehavior
-  /** The cell width. */
+
+  /** The width of the column. Optional. */
   width?: number
-  /** The unit of measure for the width. */
+
+  /** The unit of measure for the width of the column. Optional. */
   widthUnitOfMeasure?: UnitOfMeasure
+
+  /** Indicates whether the column is frozen. */
   isFrozen: boolean
 }
