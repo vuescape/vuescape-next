@@ -1,4 +1,4 @@
-import { LinkName, LinkTarget } from '../../reporting-domain/'
+import { LinkName, LinkTarget } from '@/reporting-domain'
 import { type TreeTableCell } from './TreeTableCell'
 import { type TreeTableRow } from './TreeTableRow'
 
@@ -45,6 +45,7 @@ export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
         break
       default:
         throw Error('Invalid linkTarget: ' + target)
+        // noinspection UnreachableCodeJS
         break
     }
   }

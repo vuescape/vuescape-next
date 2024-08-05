@@ -1,4 +1,4 @@
-import type { CssStyles } from '../Css'
+import type { CssStyles } from '@/reporting-domain/Css'
 import { LinkTarget } from './LinkTarget'
 import { ResourceKind } from './ResourceKind'
 

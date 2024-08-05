@@ -1,4 +1,4 @@
-import type { LinkedResourceOpBase } from './LinkedResourceOpBase'
+import type { LinkedResourceOpBase } from '@/types'
 
 /**
  * Interface representing a feature.

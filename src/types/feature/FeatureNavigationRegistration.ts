@@ -1,4 +1,4 @@
-import type { NavigationItemBase } from './NavigationItemBase'
+import type { NavigationItemBase } from '@/types'
 
 /**
  * Interface representing a feature navigation registration.

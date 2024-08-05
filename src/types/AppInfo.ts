@@ -8,14 +8,12 @@ export interface AppInfo {
   version: string
 
   /**
-   * Indicates whether the site is in maintenance mode.
+   * Global messages to display.  e.g. notification of upcoming maintenance
    */
-  isSiteInMaintenanceMode: boolean
-
-  /**
-   * The message to display when the site is in maintenance mode.
-   */
-  siteMaintenanceMessage: string
+  messages?: Array<{
+    text: string
+    severity: 'info' | 'warn' | 'error' | 'success'
+  }>
 
   /**
    * The list of features that are disabled.

@@ -1,10 +1,5 @@
+import type { Chiclet, Feature, FeatureNavigationRegistration, Menu } from '@/types'
 import type { Router } from 'vue-router'
-
-import type { Chiclet } from '../Chiclet'
-import type { Menu } from '../Menu'
-
-import type { Feature } from './Feature'
-import type { FeatureNavigationRegistration } from './FeatureNavigationRegistration'
 
 /**
  * Interface representing a feature service.

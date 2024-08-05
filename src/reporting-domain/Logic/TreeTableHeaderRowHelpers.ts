@@ -1,4 +1,4 @@
-import { SortDirection, type TreeTableHeaderCell, type TreeTableHeaderRow } from '../TreeTable'
+import { SortDirection, type TreeTableHeaderCell, type TreeTableHeaderRow } from '@/reporting-domain/TreeTable'
 
 /**
  * Function to get the sorted header cell with its index.

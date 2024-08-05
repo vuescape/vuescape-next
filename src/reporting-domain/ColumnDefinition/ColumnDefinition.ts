@@ -1,6 +1,4 @@
-import { UnitOfMeasure } from '../UnitOfMeasure'
-import { ColumnWidthBehavior } from './ColumnWidthBehavior'
-import { ColumnWrapBehavior } from './ColumnWrapBehavior'
+import { ColumnWidthBehavior, ColumnWrapBehavior, UnitOfMeasure } from '@/reporting-domain'
 
 /**
  * Interface representing a ColumnDefinition.

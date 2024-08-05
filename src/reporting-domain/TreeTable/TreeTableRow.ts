@@ -1,6 +1,6 @@
-import { type Link } from '../../reporting-domain'
+import { type Link } from '@/reporting-domain'
 import { type TreeTableCell } from './TreeTableCell'
-import { type TreeTableRowDependency } from './TreeTableRowDependency'
+import { type TreeTableRowDependency } from '@/reporting-domain'
 
 /**
  * Interface representing a TreeTableRow.

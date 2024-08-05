@@ -1,4 +1,4 @@
-import type { Link } from '../index'
+import type { Link } from '@/reporting-domain/Link'
 import type { Section } from './Section'
 
 /**

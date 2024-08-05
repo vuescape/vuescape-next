@@ -1,4 +1,4 @@
-import { type ColumnDefinition } from '..'
+import { type ColumnDefinition } from '@/reporting-domain'
 import { ClientBehavior, type TreeTableContent } from './index'
 
 /**

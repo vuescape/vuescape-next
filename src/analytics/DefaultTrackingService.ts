@@ -46,9 +46,9 @@ export class DefaultTrackingService implements TrackingService {
    * @param name - The name of the tracking provider.
    * @returns The tracking provider.
    */
-  public getTrackingProvider(name?: string): TrackingProvider | undefined {
+  public getTrackingProvider(name?: string) {
     const nameToFind = name || this.trackingProviders[0].name
-    const result = this.trackingProviders.find(_ => _.name === nameToFind)
+    const result = this.trackingProviders.find(_ => _.name === nameToFind) as TrackingProvider
     return result
   }
 }

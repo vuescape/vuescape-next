@@ -1,3 +1,5 @@
+import { sleepAsync } from '@/infrastructure'
+
 /**
  * Maximum number of retries for the fetch operation.
  */
@@ -7,15 +9,6 @@ const MAX_NUMBER_RETRIES = 3
  * Delay between retries in milliseconds.
  */
 const RETRY_DELAY_MS = 250
-
-
-/**
- * Creates a promise that resolves after a specified delay.
- *
- * @param delay - The delay in milliseconds.
- * @returns A promise that resolves after the specified delay.
- */
-const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, delay))
 
 /**
  * Performs a fetch operation with retries.
@@ -28,29 +21,26 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
  * @returns The response from the fetch operation.
  */
 export async function usingRetryForFetch(url: string, init?: RequestInit) {
-  let retryNumber        = 0
-  let response: Response = new Response(undefined,
-    {
-      status: 418,
-      statusText: 'Default response value',
-    },
-  )
+  let retryNumber = 0
+  let response: Response = new Response(null, {
+    status: 418,
+    statusText: 'Default response value',
+  })
+
   while (retryNumber <= MAX_NUMBER_RETRIES) {
     try {
       response = await fetch(url, init)
       if (response.ok || response.status === 400 || response.status === 401) {
         return response
       }
-    }
-    catch (err) {
-      // Swallow error and retry
-    }
-    finally {
+      // noinspection ExceptionCaughtLocallyJS - We want to retry on any other error
+      throw Error(`Failed to fetch. Status: ${response.status}, StatusText: ${response.statusText}`)
+    } catch (err) {
       retryNumber++
-      await sleep(RETRY_DELAY_MS)
+      await sleepAsync(RETRY_DELAY_MS)
     }
   }
 
-  console.error(`Max retries exceeded calling ${url}. Returning:`, response)
+  console.error(`Failed to fetch ${url} after ${MAX_NUMBER_RETRIES} retries. Status: ${response.status}, StatusText: ${response.statusText}`)
   return response
 }

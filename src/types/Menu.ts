@@ -1,4 +1,4 @@
-import { HorizontalAlignment } from '../reporting-domain/TreeTable/HorizontalAlignment'
+import { HorizontalAlignment } from '@/reporting-domain'
 
 /**
  * Interface representing a Menu.

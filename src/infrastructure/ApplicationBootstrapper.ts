@@ -1,24 +1,26 @@
-import { type ComponentPublicInstance, createApp, type DefineComponent } from 'vue'
-// tslint:disable: member-ordering
-import type { Router }  from 'vue-router'
-
 // TODO: Remove ignore when working
 // @ts-ignore-once: TS6133
-import { createPinia, type Pinia, type Store } from 'pinia'
+import { type Pinia } from 'pinia'
 
-import {NullTrackingService, type TrackingService,} from '../analytics'
+import PrimeVue from 'primevue/config'
+import { type ComponentPublicInstance, createApp } from 'vue'
+// tslint:disable: member-ordering
+import type { Router } from 'vue-router'
+
+import { NullTrackingService, type TrackingService } from '@/analytics'
+import type { AppComponentProps } from '@/components/AppComponentProps'
+import type { BootstrappedComponent } from '@/components/BootstrappedComponent'
 // import { Axios, CacheOptions } from '../http'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'
 // import { RootState } from '../store/RootState'
-import  {type FeatureService, type InitFunctionResult } from '../types'
-
-import { NullFeatureService} from '../types/feature'
+import { type FeatureService, type InitFunctionResult } from '@/types'
 
 // TODO: how to handle resize in vue 3? check VueUse for a composable
 // import 'vue-resize/dist/vue-resize.css'
+import type { ErrorHandler } from '@/types/ErrorHandler'
 
-import type { ErrorHandler } from '../types/ErrorHandler'
+import { NullFeatureService } from '@/types'
 
 /**
  * Application Bootstrapper is responsible for setting up and initializing the application.
@@ -26,52 +28,22 @@ import type { ErrorHandler } from '../types/ErrorHandler'
  * It also includes a method to bootstrap the application which validates the configuration, initializes the application, and handles any errors that occur during initialization.
  */
 export class ApplicationBootstrapper {
-  // TODO: Use a theme object to set colors, etc.
-  // @ts-ignore-once: TS6133
-  private theme                     = {}
+  private theme: any = {}
+
   private errorHandler!: ErrorHandler
   // private storeModules                     = {}
   // private vuexStore: Store<any>
   private router!: Router
-  private rootComponentOptions!: { cssSelector: string; rootComponent: DefineComponent; props: any }
+  private rootComponentOptions!: { cssSelector: string; rootComponent: BootstrappedComponent }
+  private bootstrappedHeaderComponent!: BootstrappedComponent
+  private bootstrappedFooterComponent!: BootstrappedComponent
+  private navigationComponent?: BootstrappedComponent
+  private additionalAppComponents?: Array<BootstrappedComponent>
   private trackingService: TrackingService = new NullTrackingService()
-  private featureService: FeatureService   = new NullFeatureService()
+  private featureService: FeatureService = new NullFeatureService()
   private globalClickHandler!: (e: MouseEvent) => void
 
-  private navigationComponent?:  DefineComponent
-  private additionalAppComponents?: Array<DefineComponent>
-
   private piniaStore!: Pinia
-
-
-  private initFunction: () => Promise<InitFunctionResult> = async () => {
-    return { redirectUrl: '' }
-  }
-
-  private validate() {
-    if (!this.router) {
-      console.warn('Router not set in ApplicationBootstrapper. ' + 'Call withRouter() with the router if a router is needed.')
-    }
-    if (!this.piniaStore) {
-      console.warn(
-        'Pinia store not defined.  Call withPiniaStore() to set the Pinia Store.')
-    }
-    if (!this.rootComponentOptions) {
-      console.warn('No Vue root component defined.  Call withRootComponent() to set the root component.')
-    }
-  }
-
-  private defaultErrorHandler = (
-    err: unknown,
-    instance: ComponentPublicInstance | null,
-    // `info` is a Vue-specific error info,
-    // e.g. which lifecycle hook the error was thrown in
-    info: string
-  ) => {
-    console.error(`Vue threw an error.
-  Usually this is caused by an error during rendering but could be at any point during the component lifecycle.`)
-    console.error(err, instance, info)
-  }
 
   /**
    * Sets the initialization function for the application.
@@ -80,7 +52,7 @@ export class ApplicationBootstrapper {
    * @param initFunction - The initialization function.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withInit(initFunction: () => Promise<InitFunctionResult>) {
+  public withInit(initFunction: () => Promise<InitFunctionResult | undefined>) {
     this.initFunction = initFunction
     return this
   }
@@ -108,26 +80,6 @@ export class ApplicationBootstrapper {
     this.errorHandler = errorHandler
     return this
   }
-
-  // public withVuexStore(store: Store<any>) {
-  //   this.vuexStore = store
-  //   return this
-  // }
-
-  // public withStoreModules(storeModules: Record<string, () => StoreModule<any, ModuleState<any, any>, RootState, any>>) {
-  //   Object.assign(this.storeModules, storeModules)
-  //   return this
-  // }
-
-  // public withIconfont(iconFont: string) {
-  //   this.iconfont = iconFont
-  //   return this
-  // }
-
-  // public withTheme(theme: Partial<VuetifyTheme>) {
-  //   this.vuetifyTheme = theme
-  //   return this
-  // }
 
   /**
    * Sets the router for the application.
@@ -162,13 +114,18 @@ export class ApplicationBootstrapper {
     return this
   }
 
+  // public withIconfont(iconFont: string) {
+  //   this.iconfont = iconFont
+  //   return this
+  // }
+
   /**
    * Sets the navigation component for the application.
    *
    * @param navigationComponent - The navigation component.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withNavigationComponent(navigationComponent: DefineComponent) {
+  public withNavigationComponent(navigationComponent: BootstrappedComponent) {
     this.navigationComponent = navigationComponent
     return this
   }
@@ -179,7 +136,7 @@ export class ApplicationBootstrapper {
    * @param additionalAppComponents - The additional components.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withAdditionalComponents(additionalAppComponents: Array<DefineComponent>) {
+  public withAdditionalComponents(additionalAppComponents: Array<BootstrappedComponent>) {
     this.additionalAppComponents = additionalAppComponents
     return this
   }
@@ -188,16 +145,47 @@ export class ApplicationBootstrapper {
    * Sets the root component for the application.
    *
    * @param cssSelector - The CSS selector.
-   * @param rootComponent - The root component.
-   * @param [props] - The props.
+   * @param bootstrappedComponent - The root component to bootstrap.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withRootComponent(cssSelector: string, rootComponent: DefineComponent, props?: any) {
+  public withRootComponent(cssSelector: string, bootstrappedComponent: BootstrappedComponent) {
     this.rootComponentOptions = {
       cssSelector,
-      rootComponent,
-      props,
+      rootComponent: bootstrappedComponent,
     }
+    return this
+  }
+
+  /**
+   * Sets the root component for the application.
+   *
+   * @param bootstrappedHeaderComponent - The header component to bootstrap.
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withHeaderComponent(bootstrappedHeaderComponent: BootstrappedComponent) {
+    this.bootstrappedHeaderComponent = bootstrappedHeaderComponent
+    return this
+  }
+
+  /**
+   * Sets the root component for the application.
+   *
+   * @param bootstrappedFooterComponent - The header component to bootstrap.
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withFooterComponent(bootstrappedFooterComponent: BootstrappedComponent) {
+    this.bootstrappedFooterComponent = bootstrappedFooterComponent
+    return this
+  }
+
+  /**
+   * Sets the root component for the application.
+   *
+   * @param theme - The PrimeVue theme to use. This includes a theme preset as well as options.
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withTheme(theme: any) {
+    this.theme = theme
     return this
   }
 
@@ -213,71 +201,50 @@ export class ApplicationBootstrapper {
   }
 
   /**
-  * Bootstraps the application.
-  * This method validates the configuration, initializes the application, and handles any errors that occur during initialization.
-  * It sets up the Vue application with the configured router, Pinia store, error handler, tracking service, feature service, navigation component, global click handler, and additional components.
-  * It also mounts the root component to the specified CSS selector.
-  * If the initialization function returns a redirect URL, it redirects the window to that URL.
-  * If an error occurs during initialization, it logs the error and its details.
-  */
+   * Bootstraps the application.
+   * This method validates the configuration, initializes the application, and handles any errors that occur during initialization.
+   * It sets up the Vue application with the configured router, Pinia store, error handler, tracking service, feature service, navigation component, global click handler, and additional components.
+   * It also mounts the root component to the specified CSS selector.
+   * If the initialization function returns a redirect URL, it redirects the window to that URL.
+   * If an error occurs during initialization, it logs the error and its details.
+   */
   public async bootstrap() {
-    debugger
     this.validate()
 
-    // Leave resize handling to root component and child components
+    // Leave resize handling to root component and child components but use vueUse resize composable
 
     // TODO: Setup theme -- button colors etc. -- should this be done here or in the root component?
-
-    // const VueResize: any = (await import('vue-resize')).default
-    //
-    // Vue.use(VueResize)
-
-    // const vuetifyOptions: any = { theme: this.vuetifyTheme }
-    // if (this.iconfont) {
-    //   vuetifyOptions.iconfont = this.iconfont
-    // }
-    // else {
-    //   vuetifyOptions.iconfont = 'fa'
-    // }
-    // Vue.use(Vuetify, vuetifyOptions)
-
     try {
-      // Does this hook into auth?
+      const rootComponentProps: AppComponentProps = {
+        navigationBootstrappedComponent: this.navigationComponent,
+        headerBootstrappedComponent: this.bootstrappedHeaderComponent,
+        footerBootstrappedComponent: this.bootstrappedFooterComponent,
+        trackingService: this.trackingService,
+        globalClickHandler: this.globalClickHandler,
+        additionalComponents: this.additionalAppComponents,
+      }
+
+      // Spread rootComponentProps to satisfy Vue typing
+      const app = createApp(this.rootComponentOptions.rootComponent.component, { ...rootComponentProps })
+      app.use(this.piniaStore)
+      app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
+      app.provide('featureService', this.featureService)
+      // app.provide('trackingService', this.trackingService)
+      // app.provide('navigationComponent', this.navigationComponent)
+      // app.provide('globalClickHandler', this.globalClickHandler)
+      // app.provide('additionalAppComponents', this.additionalAppComponents)
+
       const result = await this.initFunction()
       if (result?.redirectUrl) {
         window.location.href = result.redirectUrl
         return
       }
 
-      const app = createApp(this.rootComponentOptions.rootComponent, this.rootComponentOptions.props)
+      app.use(PrimeVue, this.theme)
+
       app.use(this.router)
-      app.use(this.piniaStore)
-      app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
-      app.provide('trackingService', this.trackingService)
-      app.provide('featureService', this.featureService)
-      app.provide('navigationComponent', this.navigationComponent)
-      app.provide('globalClickHandler', this.globalClickHandler)
-      app.provide('additionalAppComponents', this.additionalAppComponents)
-
       app.mount(this.rootComponentOptions.cssSelector)
-
-      // tslint:disable-next-line:no-unused-expression
-      // new Vue({
-      //   provide   : () => ({
-      //     trackingService        : this.trackingService,
-      //     featureService         : this.featureService,
-      //     navigationComponent    : this.navigationComponent,
-      //     globalClickHandler     : this.globalClickHandler,
-      //     additionalAppComponents: this.additionalAppComponents,
-      //   }),
-      //   el        : this.rootComponentOptions.el,
-      //   store     : this.vuexStore,
-      //   router    : this.router,
-      //   render    : (h: CreateElement) => h(this.rootComponentOptions.rootComponent),
-      //   components: { [this.rootComponentOptions.componentName]: this.rootComponentOptions.rootComponent },
-      // })
-    }
-    catch (error) {
+    } catch (error) {
       const err = error as any
       console.error('catch error handler', error)
       if (err.response) {
@@ -286,18 +253,45 @@ export class ApplicationBootstrapper {
         console.error(err.response.data)
         console.error(err.response.status)
         console.error(err.response.headers)
-      }
-      else if (err.request) {
+      } else if (err.request) {
         // The request was made but no response was received
         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
         // http.ClientRequest in node.js
         console.error(err.request)
-      }
-      else {
+      } else {
         // Something happened in setting up the request that triggered an Error
         console.error('Error', err.message)
       }
       console.error(err.config)
     }
+  }
+
+  private initFunction: () => Promise<InitFunctionResult | undefined> = async () => {
+    return { redirectUrl: '' }
+  }
+
+  private validate() {
+    if (!this.router) {
+      console.warn('Router not set in ApplicationBootstrapper. ' + 'Call withRouter() with the router if a router is needed.')
+    }
+    if (!this.piniaStore) {
+      console.warn(
+        'Pinia store not defined.  Call withPiniaStore() to set the Pinia Store.')
+    }
+    if (!this.rootComponentOptions) {
+      console.warn('No Vue root component defined.  Call withRootComponent() to set the root component.')
+    }
+  }
+
+  private defaultErrorHandler = (
+    err: unknown,
+    instance: ComponentPublicInstance | null,
+    // `info` is a Vue-specific error info,
+    // e.g. which lifecycle hook the error was thrown in
+    info: string,
+  ) => {
+    console.error(`Vue threw an error.
+  Usually this is caused by an error during rendering but could be at any point during the component lifecycle.`)
+    console.error(err, instance, info)
   }
 }
