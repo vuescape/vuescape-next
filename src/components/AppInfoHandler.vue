@@ -34,11 +34,11 @@ onUnmounted(() => {
 
 watch(
   () => appInfoStore.state.version,
+    // @ts-ignore-once: TS6133
   (newValue: string, oldValue: string) => {
     // If oldValue exists then it means the version has been updated
     // after version was populated during app start.
     if (oldValue) {
-      console.log('version updated', newValue, oldValue)
       isVisible.value = true
     }
   },
@@ -47,8 +47,8 @@ watch(
 
 <template>
   <VuescapeDialog
-    :closable="false"
     v-model:modelValue="isVisible"
+    :closable="false"
     headerText="Updates Available"
     okButtonText="Refresh Now"
     @update:visible="reload">
