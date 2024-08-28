@@ -1,0 +1,1 @@
+export { useAppInfoStore } from './useAppInfoStore'
