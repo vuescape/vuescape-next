@@ -10,6 +10,8 @@ import type { Router } from 'vue-router'
 import { NullTrackingService, type TrackingService } from '@/analytics'
 import type { AppComponentProps } from '@/components/AppComponentProps'
 import type { BootstrappedComponent } from '@/components/BootstrappedComponent'
+
+import LoadingDirective from '@/directives/loading.ts'
 // import { Axios, CacheOptions } from '../http'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'
@@ -226,6 +228,8 @@ export class ApplicationBootstrapper {
 
       // Spread rootComponentProps to satisfy Vue typing
       const app = createApp(this.rootComponentOptions.rootComponent.component, { ...rootComponentProps })
+      app.directive('loading', LoadingDirective)
+
       app.use(this.piniaStore)
       app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
       app.provide('featureService', this.featureService)

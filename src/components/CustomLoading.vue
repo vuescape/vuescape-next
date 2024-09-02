@@ -1,0 +1,37 @@
+<script lang="ts" setup>
+import { defineProps } from 'vue'
+
+const props = defineProps({
+  isVisible: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+})
+</script>
+
+<template>
+  <div v-if="props.isVisible" class="custom-loading-wrapper">
+    <img alt="Loading" class="custom-loading" src="@/assets/thin-broken-ring-335.gif" />
+  </div>
+</template>
+
+<style scoped>
+.custom-loading-wrapper {
+  position: fixed; /* Use fixed positioning to overlay entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it overlays other content */
+}
+
+.custom-loading {
+  /* Image is 64px */
+  width: 64px;
+  height: 64px;
+}
+</style>
