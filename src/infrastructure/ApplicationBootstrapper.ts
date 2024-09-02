@@ -1,12 +1,4 @@
 // TODO: Remove ignore when working
-// @ts-ignore-once: TS6133
-import { type Pinia } from 'pinia'
-
-import PrimeVue from 'primevue/config'
-import { type ComponentPublicInstance, createApp } from 'vue'
-// tslint:disable: member-ordering
-import type { Router } from 'vue-router'
-
 import { NullTrackingService, type TrackingService } from '@/analytics'
 import type { AppComponentProps } from '@/components/AppComponentProps'
 import type { BootstrappedComponent } from '@/components/BootstrappedComponent'
@@ -16,13 +8,18 @@ import LoadingDirective from '@/directives/loading.ts'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'
 // import { RootState } from '../store/RootState'
-import { type FeatureService, type InitFunctionResult } from '@/types'
+import { type FeatureService, type InitFunctionResult, NullFeatureService } from '@/types'
 
 // TODO: how to handle resize in vue 3? check VueUse for a composable
 // import 'vue-resize/dist/vue-resize.css'
 import type { ErrorHandler } from '@/types/ErrorHandler'
+// @ts-ignore-once: TS6133
+import { type Pinia } from 'pinia'
 
-import { NullFeatureService } from '@/types'
+import PrimeVue from 'primevue/config'
+import { type ComponentPublicInstance, createApp } from 'vue'
+// tslint:disable: member-ordering
+import type { Router } from 'vue-router'
 
 /**
  * Application Bootstrapper is responsible for setting up and initializing the application.

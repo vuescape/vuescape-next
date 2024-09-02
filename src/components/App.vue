@@ -1,14 +1,47 @@
 <script lang="ts" setup>
 import { RouterView } from 'vue-router'
+// import CustomLoading  from './CustomLoading.vue'
+import { useNotificationsStore } from '../stores/useNotificationsStore'
+import { NotificationSeverity } from '../types/NotificationSeverity'
 import type { AppComponentProps } from './AppComponentProps'
+import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
+
+const notificationsStore = useNotificationsStore()
 
 const props = defineProps<AppComponentProps>()
 
-console.info(props)
-
 // import TheFooter from './components/TheFooter.vue'
 // import TheHeader from './components/TheHeader.vue'
+
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+}, 5000)
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+}, 1000)
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '22', text: 'test22', severity: NotificationSeverity.Info })
+}, 10000)
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '3333', text: 'test2222', severity: NotificationSeverity.Warning })
+}, 1000)
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '22222', text: 'test22222', severity: NotificationSeverity.Warning })
+}, 1000)
+setTimeout(() => {
+  notificationsStore.messages.push({ id: '3', text: 'test3', severity: NotificationSeverity.Success })
+}, 1000)
+
+// Function to remove a message from the list
+const removeMessage = (id: string) => {
+  const index = notificationsStore.messages.findIndex((msg) => msg.id === id)
+  if (index === -1) {
+    return
+  }
+  notificationsStore.messages.splice(index, 1)
+  console.info('removed index ' + index, notificationsStore.messages)
+}
 </script>
 
 <template>
@@ -24,14 +57,23 @@ console.info(props)
     <!--    TODO: manage height -->
     <div
       ref="appContainer"
+      v-loading="false"
       class="app__container--scroll"
     >
+      <!--      <CustomLoading :isVisible="true" />-->
+
       <!-- TODO: notifications -->
       <transition
         mode="out-in"
         name="app__component--transition"
       >
         <main ref="main">
+          <NotificationMessages v-if="notificationsStore.messages.length" :messages="notificationsStore.messages"
+                                @remove="removeMessage" />
+          <!--          Style margin-bottom used because icon throws alignment off by 1px -->
+          <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
+
+          <VuescapeButton icon="fad fa-trash-alt" iconPos="right" />
           <VuescapeButton />
 
           <!--          Maybe need to do instance management using key -->
@@ -77,7 +119,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #111111;
   line-height: 1.7em;
-  margin: 0;}
+  margin: 0;
+}
 
 /*
 html {
