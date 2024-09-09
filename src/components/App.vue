@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 // import CustomLoading  from './CustomLoading.vue'
 import { useNotificationsStore } from '../stores/useNotificationsStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
@@ -42,6 +42,13 @@ const removeMessage = (id: string) => {
   notificationsStore.messages.splice(index, 1)
   console.info('removed index ' + index, notificationsStore.messages)
 }
+
+const route = useRoute()
+const router = useRouter()
+
+async function signOut() {
+  await router.push('/sign-out')
+}
 </script>
 
 <template>
@@ -50,7 +57,7 @@ const removeMessage = (id: string) => {
   >
     <component
       :is="props.headerBootstrappedComponent.component"
-      v-if="props.headerBootstrappedComponent?.component"
+      v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
       ref="theHeader"
       v-bind="props.headerBootstrappedComponent.props"
     ></component>
@@ -68,16 +75,20 @@ const removeMessage = (id: string) => {
         name="app__component--transition"
       >
         <main ref="main">
-          <NotificationMessages v-if="notificationsStore.messages.length" :messages="notificationsStore.messages"
+          <NotificationMessages v-if="notificationsStore.messages.length &&  !route.meta.hideLayout"
+                                :messages="notificationsStore.messages"
                                 @remove="removeMessage" />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
           <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
 
-          <VuescapeButton icon="fad fa-trash-alt" iconPos="right" />
+          <VuescapeButton icon="fad fa-trash-alt" iconPos="right" @click="signOut" />
           <VuescapeButton />
 
           <!--          Maybe need to do instance management using key -->
-          <RouterView />
+          <Suspense>
+            <RouterView />
+          </Suspense>
+
         </main>
       </transition>
     </div>
