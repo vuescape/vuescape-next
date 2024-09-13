@@ -1,4 +1,4 @@
-import { HorizontalAlignment } from '@/reporting-domain'
+import { HorizontalAlignment } from '../../reporting-domain'
 
 /**
  * Interface representing the format of a cell.

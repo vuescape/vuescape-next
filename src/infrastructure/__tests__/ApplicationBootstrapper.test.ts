@@ -1,4 +1,4 @@
-import { ApplicationBootstrapper } from '@/infrastructure'
+import { ApplicationBootstrapper } from '../../infrastructure'
 import { expect, suite, test } from 'vitest'
 
 suite('ApplicationBootstrapper', () => {

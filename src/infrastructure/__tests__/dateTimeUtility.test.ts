@@ -1,4 +1,4 @@
-import { formatUtcDateTimeString } from '@/infrastructure'
+import { formatUtcDateTimeString } from '../../infrastructure'
 import { describe, expect, it } from 'vitest'
 
 describe('formatUtcDateTimeString', () => {

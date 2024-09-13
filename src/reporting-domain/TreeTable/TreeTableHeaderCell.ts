@@ -1,4 +1,4 @@
-import { type ColumnSorter, type TreeTableCell } from '@/reporting-domain'
+import { type ColumnSorter, type TreeTableCell } from '../../reporting-domain'
 
 /**
  * Interface representing a TreeTableHeaderCell.

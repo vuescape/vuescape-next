@@ -1,4 +1,4 @@
-import type { Chiclet, Feature, FeatureNavigationRegistration, Menu } from '@/types'
+import type { Chiclet, Feature, FeatureNavigationRegistration, Menu } from '../../types'
 import type { Router } from 'vue-router'
 
 /**

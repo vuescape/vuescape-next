@@ -1,5 +1,5 @@
-import { usingRetryForFetch } from '@/http'
-import type { AppInfo } from '@/types'
+import { usingRetryForFetch } from '../http'
+import type { AppInfo } from '../types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

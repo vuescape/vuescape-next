@@ -1,18 +1,18 @@
 // TODO: Remove ignore when working
-import { NullTrackingService, type TrackingService } from '@/analytics'
-import type { AppComponentProps } from '@/components/AppComponentProps'
-import type { BootstrappedComponent } from '@/components/BootstrappedComponent'
+import { NullTrackingService, type TrackingService } from '../analytics'
+import type { AppComponentProps } from '../components/AppComponentProps'
+import type { BootstrappedComponent } from '../components/BootstrappedComponent'
 
-import LoadingDirective from '@/directives/loading.ts'
+import LoadingDirective from '../directives/loading.ts'
 // import { Axios, CacheOptions } from '../http'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'
 // import { RootState } from '../store/RootState'
-import { type FeatureService, type InitFunctionResult, NullFeatureService } from '@/types'
+import { type FeatureService, type InitFunctionResult, NullFeatureService } from '../types'
 
 // TODO: how to handle resize in vue 3? check VueUse for a composable
 // import 'vue-resize/dist/vue-resize.css'
-import type { ErrorHandler } from '@/types/ErrorHandler'
+import type { ErrorHandler } from '../types/ErrorHandler'
 // @ts-ignore-once: TS6133
 import { type Pinia } from 'pinia'
 

@@ -1,4 +1,4 @@
-import { type Hover, type  Link } from '@/reporting-domain'
+import { type Hover, type  Link } from '../../reporting-domain'
 import { type CellFormat } from './CellFormat'
 import { type Slots } from './Slots'
 import { type TreeTableRow } from './TreeTableRow'

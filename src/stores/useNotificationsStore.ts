@@ -1,4 +1,4 @@
-import type { NotificationMessage } from '@/types/NotificationMessage'
+import type { NotificationMessage } from '../types/NotificationMessage'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

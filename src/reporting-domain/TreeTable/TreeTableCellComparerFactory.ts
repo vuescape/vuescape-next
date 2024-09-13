@@ -1,4 +1,4 @@
-import { SortComparisonStrategy } from '@/infrastructure'
+import { SortComparisonStrategy } from '../../infrastructure'
 import { SortDirection } from './SortDirection'
 import { type TreeTableRow } from './TreeTableRow'
 

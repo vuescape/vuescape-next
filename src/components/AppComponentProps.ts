@@ -1,4 +1,4 @@
-import type { TrackingService } from '@/analytics'
+import type { TrackingService } from '../analytics'
 import type { BootstrappedComponent } from './BootstrappedComponent'
 
 export interface AppComponentProps {

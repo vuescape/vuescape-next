@@ -1,4 +1,4 @@
-import type { TreeTable } from '@/reporting-domain/TreeTable'
+import type { TreeTable } from '../../reporting-domain/TreeTable'
 
 /**
  * Interface representing a Section.

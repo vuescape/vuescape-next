@@ -1,4 +1,4 @@
-import { SortDirection, type TreeTableHeaderCell, type TreeTableHeaderRow } from '@/reporting-domain/TreeTable'
+import { SortDirection, type TreeTableHeaderCell, type TreeTableHeaderRow } from '../../reporting-domain/TreeTable'
 
 /**
  * Function to get the sorted header cell with its index.
@@ -21,7 +21,7 @@ export function getSortedHeaderCellWithIndex(headers: Array<TreeTableHeaderRow>)
       }
       return result
     })
-    .filter(_ => _.cell.columnSorter && _.cell.columnSorter.sortDirection !== SortDirection.None)
+    .filter((_: { index: number; cell: TreeTableHeaderCell }) => _.cell.columnSorter && _.cell.columnSorter.sortDirection !== SortDirection.None)
 
   return sortHeader[0]
 }

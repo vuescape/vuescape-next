@@ -1,4 +1,4 @@
-import { LinkName, LinkTarget } from '@/reporting-domain'
+import { LinkName, LinkTarget } from '../../reporting-domain'
 import { type TreeTableCell } from './TreeTableCell'
 import { type TreeTableRow } from './TreeTableRow'
 

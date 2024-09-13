@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { getSortedHeaderCellWithIndex } from '@/reporting-domain'
-import { SortDirection } from '@/reporting-domain/TreeTable'
+import { getSortedHeaderCellWithIndex } from '../../../reporting-domain'
+import { SortDirection } from '../../../reporting-domain/TreeTable'
 import { describe, expect, it } from 'vitest'
 
 describe('getSortedHeaderCellWithIndex', () => {

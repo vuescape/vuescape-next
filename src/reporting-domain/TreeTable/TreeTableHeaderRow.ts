@@ -1,4 +1,4 @@
-import { type TreeTableHeaderCell } from '@/reporting-domain'
+import { type TreeTableHeaderCell } from '../../reporting-domain'
 
 /**
  * Interface representing a TreeTableHeaderRow.

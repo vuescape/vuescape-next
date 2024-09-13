@@ -1,4 +1,4 @@
-import { sleepAsync } from '@/infrastructure'
+import { sleepAsync } from '../infrastructure'
 
 /**
  * Maximum number of retries for the fetch operation.

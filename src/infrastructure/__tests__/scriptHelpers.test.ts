@@ -1,4 +1,4 @@
-import { addScript, loadScriptFromUrl } from '@/infrastructure'
+import { addScript, loadScriptFromUrl } from '../../infrastructure'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('scriptHelpers', () => {

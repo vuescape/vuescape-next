@@ -1,4 +1,4 @@
-import { addScript, loadScriptFromUrl } from '@/infrastructure'
+import { addScript, loadScriptFromUrl } from '../infrastructure'
 import type { TrackingProvider } from './TrackingProvider'
 
 declare var gtag: Function

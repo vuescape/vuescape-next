@@ -12,7 +12,7 @@ const notificationsStore = useNotificationsStore()
 const props = defineProps<AppComponentProps>()
 
 // import TheFooter from './components/TheFooter.vue'
-// import TheHeader from './components/TheHeader.vue'
+//  import TheHeader from './components/TheHeader.vue'
 
 setTimeout(() => {
   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
@@ -127,7 +127,7 @@ async function signOut() {
 <style>
 /* TODO: Set this as css variable for theme */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+/*  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
   color: #111111;
   line-height: 1.7em;
   margin: 0;

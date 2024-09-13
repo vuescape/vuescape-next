@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import VuescapeDialog from '@/components/VuescapeDialog.vue'
-import { useAppInfoStore } from '@/stores/useAppInfoStore'
+import VuescapeDialog from './VuescapeDialog.vue'
+import { useAppInfoStore } from '../stores/useAppInfoStore'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 const isVisible = ref(true)

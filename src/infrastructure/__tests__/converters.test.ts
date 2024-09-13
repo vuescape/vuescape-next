@@ -1,4 +1,4 @@
-import { Guid } from '@/types'
+import { Guid } from '../../types'
 import { describe, expect, it } from 'vitest'
 
 import { base64ToBase64Url, base64UrlToBase64, decodeBase64String, encodeBase64String } from '../converters.ts'

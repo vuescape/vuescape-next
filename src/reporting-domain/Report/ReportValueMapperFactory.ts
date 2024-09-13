@@ -3,7 +3,7 @@
 // // TODO: change vuex store to pinia
 // import { Store } from 'vuex'
 //
-// import { PaneKind } from '@/reporting-domain/PaneKind'
+// import { PaneKind } from '../reporting-domain/PaneKind'
 //
 // import {
 //   type Guid,
@@ -13,7 +13,7 @@
 // } from '@/types'
 //
 // import { HttpMethod } from '@/http'
-// import { SortComparisonStrategy } from '@/infrastructure'
+// import { SortComparisonStrategy } from '../infrastructure'
 //
 // import {
 //   ClientBehavior,
@@ -36,7 +36,7 @@
 //   type TreeTableRow,
 //   UiObjectType,
 //   UnitOfMeasure,
-// } from '@/reporting-domain'
+// } from '../reporting-domain'
 //
 // import { ValueMapper } from '@/store/modules/types'
 // import { dispatchAndAwaitAction, registerStoreModule } from '@/store/storeHelpers'

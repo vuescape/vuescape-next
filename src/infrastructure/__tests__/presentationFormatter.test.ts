@@ -1,7 +1,7 @@
 import {
   DEFAULT_EMPTY_DISPLAY, formatValue, round, toDateDisplay, toDateTimeDisplay, toTextDisplay,
-} from '@/infrastructure'
-import { PresentationFormatKind } from '@/infrastructure/PresentationFormatKind.ts'
+} from '../../infrastructure'
+import { PresentationFormatKind } from '../../infrastructure/PresentationFormatKind.ts'
 import { describe, expect, it } from 'vitest'
 
 describe('presentationFormatter', () => {
