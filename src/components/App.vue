@@ -16,8 +16,30 @@ const props = defineProps<AppComponentProps>()
 
 setTimeout(() => {
   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
 }, 5000)
 setTimeout(() => {
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
 }, 1000)
 setTimeout(() => {
@@ -52,13 +74,14 @@ async function signOut() {
 </script>
 
 <template>
-  <div
-    v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
+  <div class="flex flex-column min-h-screen"
+       v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
     <component
       :is="props.headerBootstrappedComponent.component"
       v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
       ref="theHeader"
+      class="fixed header-component"
       v-bind="props.headerBootstrappedComponent.props"
     ></component>
     <!--    TODO: manage height -->
@@ -74,15 +97,14 @@ async function signOut() {
         mode="out-in"
         name="app__component--transition"
       >
-        <main ref="main">
+        <main ref="main" class="main-div flex-grow-1 overflow-y-auto">
           <NotificationMessages v-if="notificationsStore.messages.length &&  !route.meta.hideLayout"
                                 :messages="notificationsStore.messages"
                                 @remove="removeMessage" />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
           <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
 
-          <VuescapeButton icon="fad fa-trash-alt" iconPos="right" @click="signOut" />
-          <VuescapeButton />
+          <VuescapeButton v-if="!route.meta.hideLayout" icon="fad fa-trash-alt" iconPos="right" @click="signOut" />
 
           <!--          Maybe need to do instance management using key -->
           <Suspense>
@@ -96,6 +118,7 @@ async function signOut() {
       :is="props.footerBootstrappedComponent.component"
       v-if="props.footerBootstrappedComponent?.component"
       ref="theFooter"
+      class="footer-component fixed w-full"
       v-bind="props.footerBootstrappedComponent.props"
     ></component>
 
@@ -127,7 +150,7 @@ async function signOut() {
 <style>
 /* TODO: Set this as css variable for theme */
 body {
-/*  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
+  /*  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
   color: #111111;
   line-height: 1.7em;
   margin: 0;
@@ -236,5 +259,32 @@ nav a:first-of-type {
   height: calc(100vh - 72px);
   padding: 0 var(--section-gap);
 }*/
+.header-component {
+  height: 36px; /* Adjust height as needed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
 
+.main {
+  /*  margin-top: 60px; !* Same height as header *!*/
+  margin-bottom: 36px; /* Same height as footer */
+}
+
+.footer-component {
+  height: 36px; /* Adjust height as needed */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+/*TODO: this sizing depends on the height of the header and footer. Should make dynamic? */
+.main-div {
+  margin-top: 44px;
+  margin-bottom: 44px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
 </style>
