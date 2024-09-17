@@ -3,12 +3,12 @@ import VuescapeDialog from './VuescapeDialog.vue'
 import { useAppInfoStore } from '../stores/useAppInfoStore'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 
-const isVisible = ref(true)
+const isVisible = ref(false)
 const appInfoStore = useAppInfoStore()
 
 const reload = () => {
   isVisible.value = false
-  // document.location.reload()
+  document.location.reload()
 }
 const startPolling = () => {
   console.info('startPolling')
