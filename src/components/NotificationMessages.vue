@@ -1,18 +1,3 @@
-<template>
-  <div>
-    <Message
-      v-for="msg in messages"
-      :key="msg.id"
-      :closable="true"
-      :severity="msg.severity.toString()"
-      class="mb-2"
-      @close="handleClose (msg.id, $event)"
-    >
-      {{ msg.text }}
-    </Message>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import Message from 'primevue/message'
 import { ref, watch } from 'vue'
@@ -32,7 +17,7 @@ const handleClose = (id: string, event: Event) => {
   event.preventDefault()
 }
 
-const emit = defineEmits<{(e: 'remove', id: string): void}>()
+const emit = defineEmits<{ (e: 'remove', id: string): void }>()
 
 watch(
   () => props.messages,
@@ -43,8 +28,17 @@ watch(
 
 </script>
 
-<style scoped>
-.mb-2 {
-  margin-bottom: 0.5rem;
-}
-</style>
+<template>
+  <div>
+    <Message
+      v-for="msg in messages"
+      :key="msg.id"
+      :closable="true"
+      :severity="msg.severity.toString()"
+      class="mt-2 mb-2"
+      @close="handleClose (msg.id, $event)"
+    >
+      {{ msg.text }}
+    </Message>
+  </div>
+</template>

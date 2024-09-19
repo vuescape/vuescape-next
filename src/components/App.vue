@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { RouterView, useRoute, useRouter } from 'vue-router'
+// import VuescapeDialog from './VuescapeDialog.vue'
+import { RouterView, useRoute } from 'vue-router'
 // import CustomLoading  from './CustomLoading.vue'
 import { useNotificationsStore } from '../stores/useNotificationsStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
@@ -10,50 +11,58 @@ import VuescapeButton from './VuescapeButton.vue'
 const notificationsStore = useNotificationsStore()
 
 const props = defineProps<AppComponentProps>()
+const showButton = false
 
 // import TheFooter from './components/TheFooter.vue'
 //  import TheHeader from './components/TheHeader.vue'
 
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
+// }, 5000)
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
+// }, 1000)
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '22', text: 'test22', severity: NotificationSeverity.Info })
+// }, 10000)
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '3333', text: 'test2222', severity: NotificationSeverity.Warning })
+// }, 1000)
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '22222', text: 'test22222', severity: NotificationSeverity.Warning })
+// }, 1000)
+// setTimeout(() => {
+//   notificationsStore.messages.push({ id: '3', text: 'Success!!', severity: NotificationSeverity.Success })
+// }, 8000)
 setTimeout(() => {
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-  notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-}, 5000)
-setTimeout(() => {
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-  notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-}, 1000)
-setTimeout(() => {
-  notificationsStore.messages.push({ id: '22', text: 'test22', severity: NotificationSeverity.Info })
-}, 10000)
-setTimeout(() => {
-  notificationsStore.messages.push({ id: '3333', text: 'test2222', severity: NotificationSeverity.Warning })
-}, 1000)
-setTimeout(() => {
-  notificationsStore.messages.push({ id: '22222', text: 'test22222', severity: NotificationSeverity.Warning })
-}, 1000)
-setTimeout(() => {
-  notificationsStore.messages.push({ id: '3', text: 'test3', severity: NotificationSeverity.Success })
-}, 1000)
+  notificationsStore.messages.push({
+    id: '3',
+    text: 'Oh no! The  quick brown fox did NOT jump over the lazy dog :(',
+    severity: NotificationSeverity.Error,
+  })
+}, 12000)
 
 // Function to remove a message from the list
 const removeMessage = (id: string) => {
@@ -66,11 +75,7 @@ const removeMessage = (id: string) => {
 }
 
 const route = useRoute()
-const router = useRouter()
 
-async function signOut() {
-  await router.push('/sign-out')
-}
 </script>
 
 <template>
@@ -107,14 +112,12 @@ async function signOut() {
                                 @remove="removeMessage" />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
           <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
-
-          <VuescapeButton v-if="!route.meta.hideLayout" icon="fad fa-trash-alt" iconPos="right" @click="signOut" />
-
           <!--          Maybe need to do instance management using key -->
           <Suspense>
             <RouterView />
           </Suspense>
 
+          <VuescapeButton v-show="showButton" />
         </main>
       </transition>
     </div>
