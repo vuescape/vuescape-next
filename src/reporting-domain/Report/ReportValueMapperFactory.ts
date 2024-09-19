@@ -132,7 +132,7 @@
 //         dispatchAndAwaitAction(namespace, sourceUrl, this.store)
 //       }
 //       else {
-//         throw Error('Could not register store module. store or namespace not specified')
+//         throw new Error('Could not register store module. store or namespace not specified')
 //       }
 //     }
 //
@@ -333,7 +333,7 @@
 //             case undefined:
 //               break
 //             default:
-//               throw Error('Unsupported UiObjectType: ' + uiObject.uiObjectType)
+//               throw new Error('Unsupported UiObjectType: ' + uiObject.uiObjectType)
 //               break
 //           }
 //

@@ -34,7 +34,7 @@ export async function usingRetryForFetch(url: string, init?: RequestInit) {
         return response
       }
       // noinspection ExceptionCaughtLocallyJS - We want to retry on any other error
-      throw Error(`Failed to fetch. Status: ${response.status}, StatusText: ${response.statusText}`)
+      throw new Error(`Failed to fetch. Status: ${response.status}, StatusText: ${response.statusText}`)
     } catch (err) {
       retryNumber++
       await sleepAsync(RETRY_DELAY_MS)

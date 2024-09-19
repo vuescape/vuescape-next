@@ -44,7 +44,7 @@ export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
         // TODO: determine if absolute or relative url to see if we should perform a route or location.url
         break
       default:
-        throw Error('Invalid linkTarget: ' + target)
+        throw new Error('Invalid linkTarget: ' + target)
         // noinspection UnreachableCodeJS
         break
     }
