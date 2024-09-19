@@ -77,13 +77,17 @@ async function signOut() {
   <div class="flex flex-column min-h-screen"
        v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
-    <component
-      :is="props.headerBootstrappedComponent.component"
-      v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
-      ref="theHeader"
-      class="fixed header-component"
-      v-bind="props.headerBootstrappedComponent.props"
-    ></component>
+    <Suspense>
+      <div>
+        <component
+          :is="props.headerBootstrappedComponent.component"
+          v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
+          ref="theHeader"
+          class="fixed header-component"
+          v-bind="props.headerBootstrappedComponent.props"
+        ></component>
+      </div>
+    </Suspense>
     <!--    TODO: manage height -->
     <div
       ref="appContainer"
