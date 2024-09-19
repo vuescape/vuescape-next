@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Button from 'primevue/button'
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits } from 'vue'
 
 type IconPosition = 'left' | 'right' | 'top' | 'bottom';
 
