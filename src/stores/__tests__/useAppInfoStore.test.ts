@@ -2,6 +2,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import fetchMocker from 'vitest-fetch-mock'
+import type { AppInfoStore } from '../AppInfoStore'
 import { useAppInfoStore } from '../useAppInfoStore'
 
 const fetchMock = fetchMocker(vi)
@@ -31,7 +32,7 @@ describe('useAppInfoStore', () => {
     expect(store.state).toEqual({
       disabledFeatures: [],
       messages: [],
-      version: '',
+      version: ''
     })
   })
 
@@ -39,11 +40,11 @@ describe('useAppInfoStore', () => {
     const mockAppInfo = {
       disabledFeatures: ['feature1'],
       messages: ['Welcome'],
-      version: '1.0.0',
+      version: '1.0.0'
     }
     fetchMock.mockResponseOnce(JSON.stringify(mockAppInfo))
 
-    const store = useAppInfoStore()
+    const store = useAppInfoStore() as AppInfoStore
     await store.fetchAppInfoAsync()
 
     expect(store.state).toEqual(mockAppInfo)

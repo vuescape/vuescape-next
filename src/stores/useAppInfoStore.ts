@@ -44,6 +44,6 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
     poller && clearInterval(poller)
   }
 
-  const result: AppInfoStore = { state: state.value, fetchAppInfoAsync, startPolling, stopPolling }
+  const result: AppInfoStore = { state, fetchAppInfoAsync, startPolling, stopPolling }
   return result
 })

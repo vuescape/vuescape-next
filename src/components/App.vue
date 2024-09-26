@@ -9,6 +9,7 @@ import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
 
 import type { NotificationStore } from '../stores'
+import type { NotificationMessage } from '../types/NotificationMessage'
 const notificationStore: NotificationStore = useNotificationStore()
 
 const props = defineProps<AppComponentProps>()
@@ -57,8 +58,9 @@ const showButton = false
 // setTimeout(() => {
 //   notificationsStore.messages.push({ id: '3', text: 'Success!!', severity: NotificationSeverity.Success })
 // }, 8000)
+const messages = notificationStore.messages as Array<NotificationMessage>
 setTimeout(() => {
-  notificationStore.messages.push({
+  messages.push({
     id: '3',
     text: 'Oh no! The  quick brown fox did NOT jump over the lazy dog :(',
     severity: NotificationSeverity.Error
@@ -67,11 +69,11 @@ setTimeout(() => {
 
 // Function to remove a message from the list
 const removeMessage = (id: string) => {
-  const index = notificationStore.messages.findIndex((msg) => msg.id === id)
+  const index = messages.findIndex((msg) => msg.id === id)
   if (index === -1) {
     return
   }
-  notificationStore.messages.splice(index, 1)
+  messages.splice(index, 1)
   console.info('removed index ' + index, notificationStore.messages)
 }
 
@@ -102,8 +104,8 @@ const route = useRoute()
       <transition mode="out-in" name="app__component--transition">
         <main ref="main" class="main-div flex-grow-1 overflow-y-auto">
           <NotificationMessages
-            v-if="notificationStore.messages.length && !route.meta.hideLayout"
-            :messages="notificationStore.messages"
+            v-if="messages.length && !route.meta.hideLayout"
+            :messages="messages"
             @remove="removeMessage"
           />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
@@ -125,13 +127,14 @@ const route = useRoute()
       v-bind="props.footerBootstrappedComponent.props"
     ></component>
 
-    <component
-      :is="additionalComponent.component"
-      v-for="additionalComponent in props.additionalComponents"
-      v-if="props.additionalComponents?.length"
-      :key="additionalComponent.component.name"
-      v-bind="additionalComponent.props"
-    />
+    <template v-if="props.additionalComponents?.length">
+      <component
+        :is="additionalComponent.component"
+        v-for="additionalComponent in props.additionalComponents"
+        :key="additionalComponent.component.name"
+        v-bind="additionalComponent.props"
+      />
+    </template>
   </div>
   <!--  <TheHeader-->
   <!--    ref="theHeader"-->
