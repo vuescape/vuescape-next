@@ -28,7 +28,7 @@ describe('useAppInfoStore', () => {
   })
 
   it('initializes with default state', () => {
-    const store = useAppInfoStore()
+    const store = useAppInfoStore() as AppInfoStore
     expect(store.state).toEqual({
       disabledFeatures: [],
       messages: [],
@@ -52,7 +52,8 @@ describe('useAppInfoStore', () => {
 
   it('fetchAppInfoAsync does not update state on failed fetch', async () => {
     vi.spyOn(global, 'setTimeout')
-    const store = useAppInfoStore()
+    const store = useAppInfoStore() as AppInfoStore
+
     // @ts-ignore TS2339
     const initialState = store.state.value
     fetchMock.mockAbort()
@@ -66,7 +67,7 @@ describe('useAppInfoStore', () => {
 
   it('startPolling starts polling for app info', () => {
     useMockTimers(vi)
-    const store = useAppInfoStore()
+    const store = useAppInfoStore() as AppInfoStore
     store.startPolling(1000)
     expect(setInterval).toHaveBeenCalledTimes(1)
     expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 1000)
@@ -74,7 +75,7 @@ describe('useAppInfoStore', () => {
 
   it('stopPolling stops polling for app info', () => {
     useMockTimers(vi)
-    const store = useAppInfoStore()
+    const store = useAppInfoStore() as AppInfoStore
     store.startPolling(1000)
     store.stopPolling()
     expect(clearInterval).toHaveBeenCalledTimes(1)
