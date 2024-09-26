@@ -1,0 +1,49 @@
+{
+  "name": "vuescape",
+  "projectType": "library",
+  "sourceRoot": "packages/vuescape-next/src",
+  "targets": {
+    "build": {
+      "parallelism": false,
+      "executor": "@nrwl/vite:build",
+      "options": {
+        "emptyOutDir": true,
+        "skipTypeCheck": true,
+        "configFile": "packages/vuescape-next/vite.config.ts",
+        "outputPath": "packages/vuescape-next/dist"
+      },
+      "dependsOn": ["emit-types"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest --config packages/vuescape-next/vitest.config.ts"
+      }
+    },
+    "emit-types": {
+      "parallelism": false,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vue-tsc --declaration --emitDeclarationOnly --project packages/vuescape-next/tsconfig.lib.json"
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vue-tsc --declaration --declarationMap --project packages/vuescape-next/tsconfig.lib.json"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["packages/vuescape-next/**/*.{ts,tsx,js,jsx,vue}"]
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prettier --write src/"
+      }
+    }
+  }
+}
