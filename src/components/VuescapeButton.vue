@@ -1,34 +1,17 @@
 <script lang="ts" setup>
 import Button from 'primevue/button'
-import { defineEmits } from 'vue'
+import type { IconPosition, VuescapeButtonProps } from '../types/componentProps/VuescapeButtonProps'
 
-type IconPosition = 'left' | 'right' | 'top' | 'bottom';
-
-const props = defineProps({
-  label: {
-    type: String,
-    default: 'Submit',
-  },
-  icon: {
-    type: String,
-    default: '',
-  },
-  iconPos: {
-    type: String as () => IconPosition,
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  class: {
-    type: [String, Object],
-    default: '',
-  },
+const props = withDefaults(defineProps<VuescapeButtonProps>(), {
+  label: 'Submit',
+  icon: '',
+  iconPos: '' as IconPosition,
+  disabled: false,
+  class: ''
 })
 
 const emit = defineEmits<{
-  (e: 'click', event: Event): void;
+  (e: 'click', event: Event): void
 }>()
 
 // Handle the click event and emit it to the parent
@@ -39,7 +22,7 @@ const handleClick = (event: Event) => {
 
 <template>
   <Button
-    :class="[props.class, {'vuescape-button--with-icon': props.icon}]"
+    :class="[props.class, { 'vuescape-button--with-icon': props.icon }]"
     :disabled="props.disabled"
     :icon="props.icon"
     :iconPos="props.iconPos"

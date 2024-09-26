@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-const props = defineProps({
-  isVisible: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
+import type { CustomLoadingProps } from '../types/componentProps/CustomLoadingProps'
+
+const props = withDefaults(defineProps<CustomLoadingProps>(), {
+  isVisible: false
 })
 </script>
 

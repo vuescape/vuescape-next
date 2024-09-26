@@ -6,7 +6,9 @@ export type { Chiclet } from './Chiclet'
 export type { InitFunctionResult } from './InitFunctionResult'
 export type { Menu } from './Menu'
 
-export { MenuSources } from './MenuSources'
 export { Guid } from './Guid'
+export { MenuSources } from './MenuSources'
 
 export * from './feature'
+
+export * from './componentProps'

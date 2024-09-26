@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-// import VuescapeDialog from './VuescapeDialog.vue'
 import { RouterView, useRoute } from 'vue-router'
-// import CustomLoading  from './CustomLoading.vue'
 import { useNotificationStore } from '../stores/useNotificationStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
-import type { AppComponentProps } from './AppComponentProps'
+import type { AppComponentProps } from '../types/componentProps/AppComponentProps'
 import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
 

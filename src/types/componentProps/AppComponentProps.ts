@@ -1,5 +1,5 @@
-import type { TrackingService } from '../analytics'
-import type { BootstrappedComponent } from './BootstrappedComponent'
+import type { TrackingService } from '../../analytics'
+import type { BootstrappedComponent } from '../BootstrappedComponent'
 
 export interface AppComponentProps {
   navigationBootstrappedComponent?: BootstrappedComponent,

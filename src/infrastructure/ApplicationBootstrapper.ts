@@ -1,7 +1,7 @@
 // TODO: Remove ignore when working
 import { NullTrackingService, type TrackingService } from '../analytics'
-import type { AppComponentProps } from '../components/AppComponentProps'
-import type { BootstrappedComponent } from '../components/BootstrappedComponent'
+import type { BootstrappedComponent } from '../types/BootstrappedComponent'
+import type { AppComponentProps } from '../types/componentProps/AppComponentProps'
 
 import LoadingDirective from '../directives/loading'
 // import { Axios, CacheOptions } from '../http'
