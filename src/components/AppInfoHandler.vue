@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+import type { AppInfoStore } from '../stores'
 import { useAppInfoStore } from '../stores/useAppInfoStore'
+import type { AppInfo } from '../types'
 import VuescapeDialog from './VuescapeDialog.vue'
 
 const isVisible = ref(false)
-const appInfoStore = useAppInfoStore()
+const appInfoStore = useAppInfoStore() as AppInfoStore
+const state = appInfoStore.state as AppInfo
 
 const reload = () => {
   isVisible.value = false
@@ -33,7 +36,7 @@ onUnmounted(() => {
 })
 
 watch(
-  () => appInfoStore.state.version,
+  () => state.version,
   // @ts-ignore-once: TS6133
   (newValue: string, oldValue: string) => {
     // If oldValue exists then it means the version has been updated
@@ -60,7 +63,7 @@ watch(
       <br />
       <p>
         Click the Refresh Now button below to load the new features in version
-        {{ appInfoStore.state.version }}.
+        {{ state.version }}.
       </p>
     </div>
   </VuescapeDialog>

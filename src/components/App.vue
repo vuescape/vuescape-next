@@ -10,7 +10,7 @@ import VuescapeButton from './VuescapeButton.vue'
 
 import type { NotificationStore } from '../stores'
 import type { NotificationMessage } from '../types/NotificationMessage'
-const notificationStore: NotificationStore = useNotificationStore()
+const notificationStore = useNotificationStore() as NotificationStore
 
 const props = defineProps<AppComponentProps>()
 const showButton = false
