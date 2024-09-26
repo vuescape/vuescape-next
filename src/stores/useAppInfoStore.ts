@@ -7,23 +7,23 @@ import type { AppInfoStore } from './AppInfoStore'
 const POLLING_INTERVAL_MILLISECONDS: number = 60000
 
 export const useAppInfoStore = defineStore('useAppInfoStore', () => {
+  // Property order matters here because of the use of JSON.stringify in fetchAppInfoAsync
   const state = ref<AppInfo>({
-    disabledFeatures: [],
+    version: '',
     messages: [],
-    version: ''
+    disabledFeatures: []
   })
 
   let poller: any = null
 
   async function fetchAppInfoAsync() {
-    // const response = await fetch('/appInfo.json', undefined)
     const response = await usingRetryForFetch('/appInfo.json')
     console.info(response)
     if (response.ok) {
       const appInfo = await response.json()
       console.info(appInfo)
       if (JSON.stringify(appInfo) !== JSON.stringify(state.value)) {
-        state.value = appInfo
+        setAppInfoState(appInfo)
       }
     } else {
       // Ignore error since app can still work if app info is not available
@@ -44,6 +44,18 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
     poller && clearInterval(poller)
   }
 
-  const result: AppInfoStore = { state, fetchAppInfoAsync, startPolling, stopPolling }
+  function setAppInfoState(appInfo: AppInfo) {
+    state.value.disabledFeatures = appInfo.disabledFeatures
+    state.value.messages = appInfo.messages
+    state.value.version = appInfo.version
+  }
+
+  const result: AppInfoStore = {
+    state,
+    fetchAppInfoAsync,
+    startPolling,
+    stopPolling,
+    setAppInfoState
+  }
   return result
 })

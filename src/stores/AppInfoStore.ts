@@ -9,4 +9,5 @@ export interface AppInfoStore {
   fetchAppInfoAsync: () => Promise<void> // Method to fetch app info
   startPolling: (pollingIntervalMilliseconds?: number) => void // Method to start polling
   stopPolling: () => void // Method to stop polling
+  setAppInfoState: (appInfo: AppInfo) => void
 }
