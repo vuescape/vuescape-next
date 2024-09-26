@@ -2,13 +2,14 @@
 // import VuescapeDialog from './VuescapeDialog.vue'
 import { RouterView, useRoute } from 'vue-router'
 // import CustomLoading  from './CustomLoading.vue'
-import { useNotificationsStore } from '../stores/useNotificationsStore'
+import { useNotificationStore } from '../stores/useNotificationStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
 import type { AppComponentProps } from './AppComponentProps'
 import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
 
-const notificationsStore = useNotificationsStore()
+import type { NotificationStore } from '../stores'
+const notificationStore: NotificationStore = useNotificationStore()
 
 const props = defineProps<AppComponentProps>()
 const showButton = false
@@ -57,30 +58,30 @@ const showButton = false
 //   notificationsStore.messages.push({ id: '3', text: 'Success!!', severity: NotificationSeverity.Success })
 // }, 8000)
 setTimeout(() => {
-  notificationsStore.messages.push({
+  notificationStore.messages.push({
     id: '3',
     text: 'Oh no! The  quick brown fox did NOT jump over the lazy dog :(',
-    severity: NotificationSeverity.Error,
+    severity: NotificationSeverity.Error
   })
 }, 12000)
 
 // Function to remove a message from the list
 const removeMessage = (id: string) => {
-  const index = notificationsStore.messages.findIndex((msg) => msg.id === id)
+  const index = notificationStore.messages.findIndex((msg) => msg.id === id)
   if (index === -1) {
     return
   }
-  notificationsStore.messages.splice(index, 1)
-  console.info('removed index ' + index, notificationsStore.messages)
+  notificationStore.messages.splice(index, 1)
+  console.info('removed index ' + index, notificationStore.messages)
 }
 
 const route = useRoute()
-
 </script>
 
 <template>
-  <div class="flex flex-column min-h-screen"
-       v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
+  <div
+    class="flex flex-column min-h-screen"
+    v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
     <Suspense>
       <div>
@@ -94,22 +95,17 @@ const route = useRoute()
       </div>
     </Suspense>
     <!--    TODO: manage height -->
-    <div
-      ref="appContainer"
-      v-loading="false"
-      class="app__container--scroll"
-    >
+    <div ref="appContainer" v-loading="false" class="app__container--scroll">
       <!--      <CustomLoading :isVisible="true" />-->
 
       <!-- TODO: notifications -->
-      <transition
-        mode="out-in"
-        name="app__component--transition"
-      >
+      <transition mode="out-in" name="app__component--transition">
         <main ref="main" class="main-div flex-grow-1 overflow-y-auto">
-          <NotificationMessages v-if="notificationsStore.messages.length &&  !route.meta.hideLayout"
-                                :messages="notificationsStore.messages"
-                                @remove="removeMessage" />
+          <NotificationMessages
+            v-if="notificationStore.messages.length && !route.meta.hideLayout"
+            :messages="notificationStore.messages"
+            @remove="removeMessage"
+          />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
           <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
           <!--          Maybe need to do instance management using key -->
@@ -136,7 +132,6 @@ const route = useRoute()
       :key="additionalComponent.component.name"
       v-bind="additionalComponent.props"
     />
-
   </div>
   <!--  <TheHeader-->
   <!--    ref="theHeader"-->
