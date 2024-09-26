@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import VuescapeDialog from './VuescapeDialog.vue'
-import { useAppInfoStore } from '../stores/useAppInfoStore'
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useAppInfoStore } from '../stores/useAppInfoStore'
+import VuescapeDialog from './VuescapeDialog.vue'
 
 const isVisible = ref(false)
 const appInfoStore = useAppInfoStore()
@@ -34,14 +34,14 @@ onUnmounted(() => {
 
 watch(
   () => appInfoStore.state.version,
-    // @ts-ignore-once: TS6133
+  // @ts-ignore-once: TS6133
   (newValue: string, oldValue: string) => {
     // If oldValue exists then it means the version has been updated
     // after version was populated during app start.
     if (oldValue) {
       isVisible.value = true
     }
-  },
+  }
 )
 </script>
 
@@ -51,15 +51,12 @@ watch(
     :closable="false"
     headerText="Updates Available"
     okButtonText="Refresh Now"
-    @update:visible="reload">
+    @update:visible="reload"
+  >
     <div>
-      <p>
-        We've been hard at work adding features and fixing issues!
-      </p>
+      <p>We've been hard at work adding features and fixing issues!</p>
       <br />
-      <p>
-        To load these updates we do require a refresh of the browser.
-      </p>
+      <p>To load these updates we do require a refresh of the browser.</p>
       <br />
       <p>
         Click the Refresh Now button below to load the new features in version

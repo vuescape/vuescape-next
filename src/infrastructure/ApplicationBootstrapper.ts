@@ -3,7 +3,7 @@ import { NullTrackingService, type TrackingService } from '../analytics'
 import type { AppComponentProps } from '../components/AppComponentProps'
 import type { BootstrappedComponent } from '../components/BootstrappedComponent'
 
-import LoadingDirective from '../directives/loading.ts'
+import LoadingDirective from '../directives/loading'
 // import { Axios, CacheOptions } from '../http'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'

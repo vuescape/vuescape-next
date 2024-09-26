@@ -1,8 +1,8 @@
+import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_EMPTY_DISPLAY, formatValue, round, toDateDisplay, toDateTimeDisplay, toTextDisplay,
 } from '../../infrastructure'
-import { PresentationFormatKind } from '../../infrastructure/PresentationFormatKind.ts'
-import { describe, expect, it } from 'vitest'
+import { PresentationFormatKind } from '../../infrastructure/PresentationFormatKind'
 
 describe('presentationFormatter', () => {
   // Decodes a base64 string to a Uint8Array.

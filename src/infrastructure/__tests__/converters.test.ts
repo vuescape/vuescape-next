@@ -1,7 +1,7 @@
-import { Guid } from '../../types'
 import { describe, expect, it } from 'vitest'
+import { Guid } from '../../types'
 
-import { base64ToBase64Url, base64UrlToBase64, decodeBase64String, encodeBase64String } from '../converters.ts'
+import { base64ToBase64Url, base64UrlToBase64, decodeBase64String, encodeBase64String } from '../converters'
 
 describe('decodeBase64String', () => {
   // Decodes a base64 string to a Uint8Array.
