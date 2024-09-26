@@ -6,7 +6,9 @@ import type { AppComponentProps } from '../types/componentProps/AppComponentProp
 import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
 
-import type { NotificationStore } from '../stores'
+import { computed } from 'vue'
+import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
+import { Guid, type AppInfo } from '../types'
 import type { NotificationMessage } from '../types/NotificationMessage'
 const notificationStore = useNotificationStore() as NotificationStore
 
@@ -73,6 +75,21 @@ const removeMessage = (id: string) => {
 }
 
 const route = useRoute()
+
+const appInfoStore = useAppInfoStore() as AppInfoStore
+const appInfo = appInfoStore.state as AppInfo
+
+const appInfoMessages = computed(
+  () =>
+    appInfo.messages?.map(
+      (msg) =>
+        ({
+          id: Guid.newGuid(),
+          severity: msg.severity,
+          text: msg.text
+        }) as NotificationMessage
+    ) || []
+)
 </script>
 
 <template>
@@ -101,6 +118,11 @@ const route = useRoute()
           <NotificationMessages
             v-if="messages.length && !route.meta.hideLayout"
             :messages="messages"
+            @remove="removeMessage"
+          />
+          <NotificationMessages
+            v-if="appInfoMessages.length && !route.meta.hideLayout"
+            :messages="appInfoMessages"
             @remove="removeMessage"
           />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
