@@ -15,9 +15,6 @@ const notificationStore = useNotificationStore() as NotificationStore
 const props = defineProps<AppComponentProps>()
 const showButton = false
 
-// import TheFooter from './components/TheFooter.vue'
-//  import TheHeader from './components/TheHeader.vue'
-
 // setTimeout(() => {
 //   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
 //   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
@@ -136,134 +133,15 @@ const route = useRoute()
       />
     </template>
   </div>
-  <!--  <TheHeader-->
-  <!--    ref="theHeader"-->
-  <!--    style="height: 36px; background-color: #f5f5f5; top: 0; border-bottom: 1px solid #9bdddb"-->
-  <!--  ></TheHeader>-->
-  <!--  <TheFooter-->
-  <!--    ref="theFooter"-->
-  <!--    style="-->
-  <!--      height: 36px;-->
-  <!--      background-color: #f5f5f5;-->
-  <!--      top: calc(100vh - 36px);-->
-  <!--      width: 100%;-->
-  <!--      border-top: 1px solid #9bdddb;-->
-  <!--    "-->
-  <!--  ></TheFooter>-->
 </template>
 
 <style>
-/* TODO: Set this as css variable for theme */
-body {
-  /*  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
-  color: #111111;
-  line-height: 1.7em;
-  margin: 0;
-}
-
-/*
-html {
-  overflow-y: hidden;
-}
-
 body {
   color: #111111;
   line-height: 1.7em;
   margin: 0;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background-color: #f5f5f5;
-}
-
-::-webkit-scrollbar-thumb {
-  border-radius: 8px;
-  background-color: #b4b4b4;
-}
-
-main {
-  min-height: calc(100vh - 72px);
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-
-.app__component--transition-enter-active,
-.app__component--transition-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.app__component--transition-enter,
-.app__component--transition-leave-to {
-  opacity: 0;
-}
-*/
-
-/*.app__container--scroll {
-  overflow-y: auto;
-  height: calc(100vh - 72px);
-  padding: 0 var(--section-gap);
-}*/
 .header-component {
   height: 36px; /* Adjust height as needed */
   top: 0;
