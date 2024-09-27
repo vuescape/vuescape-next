@@ -1,14 +1,14 @@
 export type { AppInfo } from './AppInfo'
-// export type { AppOptions } from './AppOptions'
+export type { BootstrappedComponent } from './BootstrappedComponent'
 export type { Chiclet } from './Chiclet'
-// export type { Dictionary } from './Dictionary'
-// TODO: Move to Auth
+export type { ErrorHandler } from './ErrorHandler'
+export { Guid } from './Guid'
 export type { InitFunctionResult } from './InitFunctionResult'
 export type { Menu } from './Menu'
-
-export { Guid } from './Guid'
 export { MenuSources } from './MenuSources'
-
-export * from './feature'
+export type { NotificationMessage } from './NotificationMessage'
+export { NotificationSeverity } from './NotificationSeverity'
 
 export * from './componentProps'
+export * from './feature'
+
