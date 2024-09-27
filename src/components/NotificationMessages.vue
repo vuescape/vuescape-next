@@ -10,9 +10,13 @@ const props = defineProps<{
 
 const messages = ref([...props.messages])
 
-const handleClose = (id: string, event: Event) => {
+const handleClose = (msg: NotificationMessage, event: Event) => {
+  if (msg.closeable === false) {
+    return
+  }
+
   // We are  managing the list of messages and not PrimeVue so stop the event from propagating
-  emit('remove', id)
+  emit('remove', msg.id)
   event.stopPropagation()
   event.preventDefault()
 }
@@ -33,10 +37,10 @@ watch(
     <Message
       v-for="msg in messages"
       :key="msg.id"
-      :closable="true"
       :severity="msg.severity.toString()"
       class="mt-2 mb-2"
-      @close="handleClose (msg.id, $event)"
+      @close="handleClose (msg, $event)"
+      :closable="msg.closeable ?? true"
     >
       {{ msg.text }}
     </Message>

@@ -13,6 +13,7 @@ export interface AppInfo {
   messages?: Array<{
     text: string
     severity: 'info' | 'warn' | 'error' | 'success'
+    closeable?: boolean
   }>
 
   /**

@@ -86,7 +86,8 @@ const appInfoMessages = computed(
         ({
           id: Guid.newGuid(),
           severity: msg.severity,
-          text: msg.text
+          text: msg.text,
+          closeable: msg?.closeable ?? true
         }) as NotificationMessage
     ) || []
 )
