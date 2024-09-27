@@ -117,13 +117,13 @@ const appInfoMessages = computed(
       <transition mode="out-in" name="app__component--transition">
         <main ref="main" class="main-div flex-grow-1 overflow-y-auto">
           <NotificationMessages
-            v-if="messages.length && !route.meta.hideLayout"
-            :messages="messages"
-            @remove="removeMessage"
-          />
-          <NotificationMessages
             v-if="appInfoMessages.length && !route.meta.hideLayout"
             :messages="appInfoMessages"
+            @remove="removeMessage"            
+          />
+          <NotificationMessages
+            v-if="messages.length && !route.meta.hideLayout"
+            :messages="messages"
             @remove="removeMessage"
           />
           <!--          Style margin-bottom used because icon throws alignment off by 1px -->
