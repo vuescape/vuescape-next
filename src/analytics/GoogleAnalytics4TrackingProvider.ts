@@ -1,6 +1,7 @@
 import { addScript, loadScriptFromUrl } from '../infrastructure'
 import type { TrackingProvider } from './TrackingProvider'
 
+// eslint-disable-next-line no-var
 declare var gtag: Function
 
 /**
@@ -33,6 +34,7 @@ export class GoogleAnalytics4TrackingProvider implements TrackingProvider {
    * @param user - The user to identify.
    */
   // @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public identify(user: string): void {
     // Not using Google Analytics to identify so just init the provider
     this.init()

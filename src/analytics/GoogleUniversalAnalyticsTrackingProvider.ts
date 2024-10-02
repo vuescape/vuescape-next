@@ -1,6 +1,6 @@
 import type { TrackingProvider } from './TrackingProvider'
 
-// tslint:disable-next-line: ban-types
+// eslint-disable-next-line no-var
 declare var ga: Function
 
 /**

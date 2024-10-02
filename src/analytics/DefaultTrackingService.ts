@@ -20,7 +20,7 @@ export class DefaultTrackingService implements TrackingService {
 
   /** Initializes the tracking providers. */
   public initializeProvider(): void {
-    this.trackingProviders.forEach(_ => _.init())
+    this.trackingProviders.forEach((_) => _.init())
   }
 
   /**
@@ -28,7 +28,7 @@ export class DefaultTrackingService implements TrackingService {
    * @param user - The user to identify.
    */
   public identifyUser(user: any): void {
-    this.trackingProviders.forEach(_ => _.identify(user))
+    this.trackingProviders.forEach((_) => _.identify(user))
   }
 
   /**
@@ -36,9 +36,11 @@ export class DefaultTrackingService implements TrackingService {
    * @param to - The new route.
    * @param from - The previous route.
    */
-  public handleRouteChanged(to: RouteLocationNormalized, // @ts-ignore-once: TS6133 unused parameter
-                            from: RouteLocationNormalized): void {
-    this.trackingProviders.forEach(_ => _.trackPageView(to.path))
+  public handleRouteChanged(
+    to: RouteLocationNormalized, // @ts-ignore-once: TS6133 unused parameter
+    from: RouteLocationNormalized
+  ): void {
+    this.trackingProviders.forEach((_) => _.trackPageView(to.path))
   }
 
   /**
@@ -48,7 +50,7 @@ export class DefaultTrackingService implements TrackingService {
    */
   public getTrackingProvider(name?: string) {
     const nameToFind = name || this.trackingProviders[0].name
-    const result = this.trackingProviders.find(_ => _.name === nameToFind) as TrackingProvider
+    const result = this.trackingProviders.find((_) => _.name === nameToFind) as TrackingProvider
     return result
   }
 }

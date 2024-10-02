@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { RouterView, useRoute } from 'vue-router'
+import { onMounted, watch } from 'vue'
+import {
+  RouterView,
+  useRoute,
+  type RouteLocationNormalizedLoaded,
+  type RouteLocationNormalizedLoadedGeneric
+} from 'vue-router'
 import { useNotificationStore } from '../stores/useNotificationStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
 import type { AppComponentProps } from '../types/componentProps/AppComponentProps'
@@ -14,6 +20,35 @@ const notificationStore = useNotificationStore() as NotificationStore
 
 const props = defineProps<AppComponentProps>()
 const showButton = false
+
+const route = useRoute()
+
+watch(
+  () => route,
+  (to: RouteLocationNormalizedLoaded, from: RouteLocationNormalizedLoaded | undefined) => {
+    debugger
+    props.trackingService?.handleRouteChanged(to, from ?? to)
+  }
+)
+
+onMounted(() => {
+  const to = route
+  const from: RouteLocationNormalizedLoadedGeneric = {
+    name: '',
+    path: '',
+    fullPath: '',
+    hash: '',
+    query: {},
+    params: {},
+    matched: [],
+    redirectedFrom: undefined,
+    meta: {}
+  }
+  if (props.trackingService) {
+    props.trackingService.initializeProvider()
+    props.trackingService.handleRouteChanged(to, from)
+  }
+})
 
 // setTimeout(() => {
 //   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
@@ -59,7 +94,7 @@ const messages = notificationStore.messages as Array<NotificationMessage>
 setTimeout(() => {
   messages.push({
     id: '3',
-    text: 'Oh no! The  quick brown fox did NOT jump over the lazy dog :(',
+    text: 'The  quick brown fox did NOT jump over the lazy dog :(',
     severity: NotificationSeverity.Error
   })
 }, 12000)
@@ -73,8 +108,6 @@ const removeMessage = (id: string) => {
   messages.splice(index, 1)
   console.info('removed index ' + index, notificationStore.messages)
 }
-
-const route = useRoute()
 
 const appInfoStore = useAppInfoStore() as AppInfoStore
 const appInfo = appInfoStore.state as AppInfo
@@ -119,7 +152,7 @@ const appInfoMessages = computed(
           <NotificationMessages
             v-if="appInfoMessages.length && !route.meta.hideLayout"
             :messages="appInfoMessages"
-            @remove="removeMessage"            
+            @remove="removeMessage"
           />
           <NotificationMessages
             v-if="messages.length && !route.meta.hideLayout"
