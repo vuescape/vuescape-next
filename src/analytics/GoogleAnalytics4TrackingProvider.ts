@@ -66,6 +66,9 @@ gtag('config', '${this.trackingId}', { send_page_view: false })
     if (this.isInitialized) {
       gtag('config', `${this.trackingId}`, { page_path: urlFragment })
     }
+    else {
+      console.warn('GoogleAnalytics4TrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.')
+    }
   }
 
   /**
