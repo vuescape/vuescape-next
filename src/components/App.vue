@@ -26,7 +26,6 @@ const route = useRoute()
 watch(
   () => route,
   (to: RouteLocationNormalizedLoaded, from: RouteLocationNormalizedLoaded | undefined) => {
-    debugger
     props.trackingService?.handleRouteChanged(to, from ?? to)
   }
 )
