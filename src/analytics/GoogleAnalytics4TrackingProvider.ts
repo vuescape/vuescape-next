@@ -20,7 +20,6 @@ export class GoogleAnalytics4TrackingProvider implements TrackingProvider {
     this.trackingId = trackingId
   }
 
-
   /**
    * Gets the name of the tracking provider.
    * @returns The name of the tracking provider.
@@ -65,9 +64,13 @@ gtag('config', '${this.trackingId}', { send_page_view: false })
   public trackPageView(urlFragment: string): void {
     if (this.isInitialized) {
       gtag('config', `${this.trackingId}`, { page_path: urlFragment })
-    }
-    else {
-      console.warn('GoogleAnalytics4TrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.')
+    } else {
+      const self = this
+      const callback = () => self.trackPageView(urlFragment)
+      setTimeout(callback, 500)
+      console.warn(
+        'GoogleAnalytics4TrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.'
+      )
     }
   }
 

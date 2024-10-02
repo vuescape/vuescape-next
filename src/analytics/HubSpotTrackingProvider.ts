@@ -71,9 +71,13 @@ export class HubSpotTrackingProvider implements TrackingProvider {
       const hsq = this.getHsq()
       hsq.push(['setPath', urlFragment])
       hsq.push(['trackPageView', true])
-    }
-    else {
-      console.warn('HubSpotTrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.')
+    } else {
+      const self = this
+      const callback = () => self.trackPageView(urlFragment)
+      setTimeout(callback, 500)
+      console.warn(
+        'HubSpotTrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.'
+      )
     }
   }
 
