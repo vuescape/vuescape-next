@@ -1,11 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, watch } from 'vue'
-import {
-  RouterView,
-  useRoute,
-  type RouteLocationNormalizedLoaded,
-  type RouteLocationNormalizedLoadedGeneric
-} from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useNotificationStore } from '../stores/useNotificationStore'
 import { NotificationSeverity } from '../types/NotificationSeverity'
 import type { AppComponentProps } from '../types/componentProps/AppComponentProps'
@@ -21,33 +15,17 @@ const notificationStore = useNotificationStore() as NotificationStore
 const props = defineProps<AppComponentProps>()
 const showButton = false
 
+const router = useRouter()
 const route = useRoute()
 
-watch(
-  () => route,
-  (to: RouteLocationNormalizedLoaded, from: RouteLocationNormalizedLoaded | undefined) => {
-    props.trackingService?.handleRouteChanged(to, from ?? to)
-  }
-)
-
-onMounted(() => {
-  const to = route
-  const from: RouteLocationNormalizedLoadedGeneric = {
-    name: '',
-    path: '',
-    fullPath: '',
-    hash: '',
-    query: {},
-    params: {},
-    matched: [],
-    redirectedFrom: undefined,
-    meta: {}
-  }
-  if (props.trackingService) {
-    props.trackingService.initializeProvider()
-    props.trackingService.handleRouteChanged(to, from)
-  }
+router.afterEach((to, from) => {
+  document.title = typeof to.meta.title === 'string' ? to.meta.title : 'CoMetrics'
+  props.trackingService?.handleRouteChanged(to, from ?? to)
 })
+
+if (props.trackingService) {
+  props.trackingService.initializeProvider()
+}
 
 // setTimeout(() => {
 //   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
