@@ -151,7 +151,7 @@ const appInfoMessages = computed(
       :is="props.footerBootstrappedComponent.component"
       v-if="props.footerBootstrappedComponent?.component"
       ref="theFooter"
-      class="footer-component fixed w-full"
+      class="footer-component fixed"
       v-bind="props.footerBootstrappedComponent.props"
     ></component>
 
