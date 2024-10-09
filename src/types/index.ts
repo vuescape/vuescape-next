@@ -1,6 +1,7 @@
 export type { AppInfo } from './AppInfo'
 export type { BootstrappedComponent } from './BootstrappedComponent'
 export type { Chiclet } from './Chiclet'
+export type { CookieLock } from './CookieLock'
 export type { ErrorHandler } from './ErrorHandler'
 export { Guid } from './Guid'
 export type { InitFunctionResult } from './InitFunctionResult'
