@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import Message from 'primevue/message'
 import { ref, watch } from 'vue'
-import type { NotificationMessage } from '../types/NotificationMessage'
+import type { NotificationMessage } from '../models/NotificationMessage'
 
 // Accept messages as a prop
 const props = defineProps<{

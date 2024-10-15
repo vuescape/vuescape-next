@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Guid } from '../../types'
+import { Guid } from '../../models'
 
 import { base64ToBase64Url, base64UrlToBase64, decodeBase64String, encodeBase64String } from '../converters'
 

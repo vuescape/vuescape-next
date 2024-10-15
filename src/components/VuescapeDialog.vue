@@ -2,7 +2,7 @@
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import Divider from 'primevue/divider'
-import type { VuescapeDialogProps } from '../types/componentProps/VuescapeDialogProps'
+import type { VuescapeDialogProps } from '../models/componentProps/VuescapeDialogProps'
 
 withDefaults(defineProps<VuescapeDialogProps>(), {
   closable: true,

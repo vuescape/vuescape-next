@@ -2,7 +2,7 @@ import {
   type LinkedResourceOpBase,
   ReportPaneKind,
   ReportPaneTitleBarButtons,
-} from '../../types'
+} from '..'
 
 /**
  * Interface representing a display report operation.

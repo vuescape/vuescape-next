@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { AppInfo } from '../types'
+import type { AppInfo } from '../models'
 
 // Define an interface for the AppInfo store
 export interface AppInfoStore {

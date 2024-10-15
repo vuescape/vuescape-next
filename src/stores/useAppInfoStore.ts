@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { usingRetryForFetch } from '../http'
-import type { AppInfo } from '../types'
+import type { AppInfo } from '../models'
 import type { AppInfoStore } from './AppInfoStore'
 
 const POLLING_INTERVAL_MILLISECONDS: number = 60000

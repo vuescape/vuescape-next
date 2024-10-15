@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import type { AppInfoStore } from '../stores'
 import { useAppInfoStore } from '../stores/useAppInfoStore'
-import type { AppInfo } from '../types'
+import type { AppInfo } from '../models'
 import VuescapeDialog from './VuescapeDialog.vue'
 
 const isVisible = ref(false)

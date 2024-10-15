@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { CustomLoadingProps } from '../types/componentProps/CustomLoadingProps'
+import type { CustomLoadingProps } from '../models/componentProps/CustomLoadingProps'
 
 const props = withDefaults(defineProps<CustomLoadingProps>(), {
   isVisible: false

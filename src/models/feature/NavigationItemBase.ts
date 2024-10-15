@@ -1,4 +1,4 @@
-import { NavigationItemKind, type NavigationLink } from '../../types'
+import { NavigationItemKind, type NavigationLink } from '..'
 
 /**
  * Interface representing a base navigation item.

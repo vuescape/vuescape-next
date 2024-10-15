@@ -1,5 +1,5 @@
 import { useCookies } from '@vueuse/integrations/useCookies'
-import type { CookieLock } from '../types'
+import type { CookieLock } from '../models'
 
 /**
  * Executes a given action with a lock mechanism to ensure that the action is not performed concurrently.

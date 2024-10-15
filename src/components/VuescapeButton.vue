@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Button from 'primevue/button'
-import type { IconPosition, VuescapeButtonProps } from '../types/componentProps/VuescapeButtonProps'
+import type { IconPosition, VuescapeButtonProps } from '../models/componentProps/VuescapeButtonProps'
 
 const props = withDefaults(defineProps<VuescapeButtonProps>(), {
   label: 'Submit',

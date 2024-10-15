@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { NotificationMessage } from '../types/NotificationMessage'
+import type { NotificationMessage } from '../models/NotificationMessage'
 
 // Define an interface for the Notifications store
 export interface NotificationStore {

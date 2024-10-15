@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useNotificationStore } from '../stores/useNotificationStore'
-import { NotificationSeverity } from '../types/NotificationSeverity'
-import type { AppComponentProps } from '../types/componentProps/AppComponentProps'
+import { NotificationSeverity } from '../models/NotificationSeverity'
+import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
 import NotificationMessages from './NotificationMessages.vue'
 import VuescapeButton from './VuescapeButton.vue'
 
 import { computed } from 'vue'
 import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
-import { Guid, type AppInfo } from '../types'
-import type { NotificationMessage } from '../types/NotificationMessage'
+import { Guid, type AppInfo } from '../models'
+import type { NotificationMessage } from '../models/NotificationMessage'
 const notificationStore = useNotificationStore() as NotificationStore
 
 const props = defineProps<AppComponentProps>()
