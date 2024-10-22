@@ -1,6 +1,22 @@
+<script lang="ts">
+/**
+ * VuescapeButton @component
+ *
+ * This is a Vue Single File Component (SFC) that renders a button with an optional icon.
+ *
+ * @prop {VuescapeButtonProps} - the VuescapeButtonProps
+ *
+ * @emits {click} - the click event for the parent to handle
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
 import Button from 'primevue/button'
-import type { IconPosition, VuescapeButtonProps } from '../models/componentProps/VuescapeButtonProps'
+import type {
+  IconPosition,
+  VuescapeButtonProps
+} from '../models/componentProps/VuescapeButtonProps'
 
 const props = withDefaults(defineProps<VuescapeButtonProps>(), {
   label: 'Submit',

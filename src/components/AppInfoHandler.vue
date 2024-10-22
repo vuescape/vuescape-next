@@ -1,5 +1,18 @@
+<script lang="ts">
+/**
+ * AppInfoHandler @component
+ *
+ * This is a Vue Single File Component (SFC) that fetches data from appInfo.json
+ * on the web server and responds to changes.
+ * If the version changes, a dialog is displayed to the user forcing a refresh.
+ *
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue'
+
 import type { AppInfoStore } from '../stores'
 import { useAppInfoStore } from '../stores/useAppInfoStore'
 import type { AppInfo } from '../models'

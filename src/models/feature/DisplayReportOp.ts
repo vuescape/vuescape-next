@@ -1,8 +1,4 @@
-import {
-  type LinkedResourceOpBase,
-  ReportPaneKind,
-  ReportPaneTitleBarButtons,
-} from '..'
+import { type LinkedResourceOpBase, ReportPaneKind, ReportPaneTitleBarButtons } from '.'
 
 /**
  * Interface representing a display report operation.

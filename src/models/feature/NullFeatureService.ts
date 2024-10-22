@@ -1,5 +1,6 @@
-import type { Chiclet, Feature, FeatureNavigationRegistration, FeatureService, Menu } from '..'
+import type { Feature, FeatureNavigationRegistration, FeatureService} from '.'
 import type { Router } from 'vue-router'
+import type { Menu } from '../Menu'
 
 export class NullFeatureService implements FeatureService {
   // @ts-ignore-once: TS6133

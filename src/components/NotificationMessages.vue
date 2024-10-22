@@ -1,3 +1,16 @@
+<script lang="ts">
+/**
+ * NotificationMessage @component
+ *
+ * This is a Vue Single File Component (SFC) that displays a list of messages
+ *
+ * @prop {Array<NotificationMessage>} messages - The list of messages to display
+ *
+ * @emit remove: {id: string} - Event emitted when a message is removed
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
 import Message from 'primevue/message'
 import { ref, watch } from 'vue'

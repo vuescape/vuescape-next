@@ -11,7 +11,7 @@ suite('ApplicationBootstrapper', () => {
     expect(bootstrapper).to.respondTo('withErrorHandler')
     expect(bootstrapper).to.respondTo('withRouter')
     expect(bootstrapper).to.respondTo('withTrackingService')
-    expect(bootstrapper).to.respondTo('withFeatureService')
+    // expect(bootstrapper).to.respondTo('withFeatureService')
     expect(bootstrapper).to.respondTo('withNavigationComponent')
     expect(bootstrapper).to.respondTo('withAdditionalComponents')
     expect(bootstrapper).to.respondTo('withRootComponent')

@@ -1,3 +1,19 @@
+<script lang="ts">
+/**
+ * VuescapeDialog @component
+ *
+ * This is a Vue Single File Component (SFC) that renders a modal Dialog
+ *
+ * @prop {VuescapeDialogProps} - the VuescapeDialogProps
+ *
+ * @emits {update:visible} - event emitted when the dialog is closed
+ *
+ * @slot default - the content of the dialog
+ * @slot footer - the footer content of the dialog
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'

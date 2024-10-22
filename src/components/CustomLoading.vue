@@ -1,3 +1,15 @@
+<script lang="ts">
+/**
+ * CustomLoading @component
+ *
+ * This is a Vue Single File Component (SFC) that displays a loading overlay and spinner image
+ *
+ * @prop {CustomLoadingProps} - defaults to isVisible: false
+ *
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
 import type { CustomLoadingProps } from '../models/componentProps/CustomLoadingProps'
 

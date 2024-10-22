@@ -8,7 +8,7 @@ import LoadingDirective from '../directives/loading'
 // import { setStore } from '../store'
 // import { ModuleState, StoreModule } from '../store/modules/types'
 // import { RootState } from '../store/RootState'
-import { type FeatureService, type InitFunctionResult, NullFeatureService } from '../models'
+// import { type FeatureService, type InitFunctionResult, NullFeatureService } from '../models'
 
 // TODO: how to handle resize in vue 3? check VueUse for a composable
 // import 'vue-resize/dist/vue-resize.css'
@@ -20,6 +20,7 @@ import PrimeVue from 'primevue/config'
 import { type ComponentPublicInstance, createApp } from 'vue'
 // tslint:disable: member-ordering
 import type { Router } from 'vue-router'
+import type { InitFunctionResult } from '../models'
 
 /**
  * Application Bootstrapper is responsible for setting up and initializing the application.
@@ -39,7 +40,7 @@ export class ApplicationBootstrapper {
   private navigationComponent?: BootstrappedComponent
   private additionalAppComponents?: Array<BootstrappedComponent>
   private trackingService: TrackingService = new NullTrackingService()
-  private featureService: FeatureService = new NullFeatureService()
+  // private featureService: FeatureService = new NullFeatureService()
   private globalClickHandler!: (e: MouseEvent) => void
 
   private piniaStore!: Pinia
@@ -108,10 +109,10 @@ export class ApplicationBootstrapper {
    * @param featureService - The feature service.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withFeatureService(featureService: FeatureService) {
-    this.featureService = featureService
-    return this
-  }
+  // public withFeatureService(featureService: FeatureService) {
+  //   this.featureService = featureService
+  //   return this
+  // }
 
   // public withIconfont(iconFont: string) {
   //   this.iconfont = iconFont
@@ -229,7 +230,7 @@ export class ApplicationBootstrapper {
 
       app.use(this.piniaStore)
       app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
-      app.provide('featureService', this.featureService)
+      // app.provide('featureService', this.featureService)
       // app.provide('trackingService', this.trackingService)
       // app.provide('navigationComponent', this.navigationComponent)
       // app.provide('globalClickHandler', this.globalClickHandler)

@@ -1,23 +1,34 @@
+<script lang="ts">
+/**
+ * App @component
+ *
+ * This is a Vue Single File Component (SFC) that is the root of a Vue application.
+ * It provides a layout for the application, including a header, footer, and main content area.
+ * It also can display messages from the appInfo store and the notification store.
+ *
+ * @props {AppComponentProps}
+ */
+export default {}
+</script>
+
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
+
 import { useNotificationStore } from '../stores/useNotificationStore'
-import { NotificationSeverity } from '../models/NotificationSeverity'
 import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
 import NotificationMessages from './NotificationMessages.vue'
-import VuescapeButton from './VuescapeButton.vue'
 
-import { computed } from 'vue'
 import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
 import { Guid, type AppInfo } from '../models'
 import type { NotificationMessage } from '../models/NotificationMessage'
-const notificationStore = useNotificationStore() as NotificationStore
 
+const notificationStore = useNotificationStore() as NotificationStore
+const messages = notificationStore.messages as Array<NotificationMessage>
 const props = defineProps<AppComponentProps>()
-const showButton = false
 
 const router = useRouter()
 const route = useRoute()
-
 router.afterEach((to, from) => {
   document.title = typeof to.meta.title === 'string' ? to.meta.title : 'CoMetrics'
   props.trackingService?.handleRouteChanged(to, from ?? to)
@@ -26,55 +37,6 @@ router.afterEach((to, from) => {
 if (props.trackingService) {
   props.trackingService.initializeProvider()
 }
-
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-//   notificationsStore.messages.push({ id: '1', text: 'test1', severity: NotificationSeverity.Error })
-// }, 5000)
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-//   notificationsStore.messages.push({ id: '2', text: 'test2', severity: NotificationSeverity.Warning })
-// }, 1000)
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '22', text: 'test22', severity: NotificationSeverity.Info })
-// }, 10000)
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '3333', text: 'test2222', severity: NotificationSeverity.Warning })
-// }, 1000)
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '22222', text: 'test22222', severity: NotificationSeverity.Warning })
-// }, 1000)
-// setTimeout(() => {
-//   notificationsStore.messages.push({ id: '3', text: 'Success!!', severity: NotificationSeverity.Success })
-// }, 8000)
-const messages = notificationStore.messages as Array<NotificationMessage>
-setTimeout(() => {
-  messages.push({
-    id: '3',
-    text: 'The  quick brown fox did NOT jump over the lazy dog :(',
-    severity: NotificationSeverity.Error
-  })
-}, 12000)
 
 // Function to remove a message from the list
 const removeMessage = (id: string) => {
@@ -88,7 +50,6 @@ const removeMessage = (id: string) => {
 
 const appInfoStore = useAppInfoStore() as AppInfoStore
 const appInfo = appInfoStore.state as AppInfo
-
 const appInfoMessages = computed(
   () =>
     appInfo.messages?.map(
@@ -119,13 +80,9 @@ const appInfoMessages = computed(
         ></component>
       </div>
     </Suspense>
-    <!--    TODO: manage height -->
     <div ref="appContainer" v-loading="false" class="app__container--scroll">
-      <!--      <CustomLoading :isVisible="true" />-->
-
-      <!-- TODO: notifications -->
       <transition mode="out-in" name="app__component--transition">
-        <main ref="main" class="main-div flex-grow-1 overflow-y-auto">
+        <main ref="main" class="main-div flex-grow-1 overflow-y-auto" v-if="true">
           <NotificationMessages
             v-if="appInfoMessages.length && !route.meta.hideLayout"
             :messages="appInfoMessages"
@@ -142,8 +99,6 @@ const appInfoMessages = computed(
           <Suspense>
             <RouterView />
           </Suspense>
-
-          <VuescapeButton v-show="showButton" />
         </main>
       </transition>
     </div>
@@ -174,7 +129,7 @@ body {
 }
 
 .header-component {
-  height: 36px; /* Adjust height as needed */
+  height: 36px;
   top: 0;
   left: 0;
   right: 0;
@@ -187,7 +142,7 @@ body {
 }
 
 .footer-component {
-  height: 36px; /* Adjust height as needed */
+  height: 36px;
   bottom: 0;
   left: 0;
   right: 0;
