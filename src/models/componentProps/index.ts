@@ -4,3 +4,5 @@ export * from './NotificationMessagesProps'
 export * from './VuescapeButtonProps'
 export * from './VuescapeDialogProps'
 
+export * from './TableProps'
+export * from './/ChicletGridProps'
