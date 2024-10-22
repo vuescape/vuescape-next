@@ -10,6 +10,7 @@
 
 export default {}
 </script>
+
 <script setup lang="ts">
 import type { ChicletGridProps } from '../models'
 import ChicletButton from './ChicletButton.vue'
