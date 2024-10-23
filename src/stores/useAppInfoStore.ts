@@ -18,10 +18,8 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
 
   async function fetchAppInfoAsync() {
     const response = await usingRetryForFetch('/appInfo.json')
-    console.info(response)
     if (response.ok) {
       const appInfo = await response.json()
-      console.info(appInfo)
       if (JSON.stringify(appInfo) !== JSON.stringify(state.value)) {
         setAppInfoState(appInfo)
       }

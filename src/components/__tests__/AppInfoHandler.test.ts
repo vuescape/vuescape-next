@@ -93,7 +93,6 @@ describe('AppInfoHandler.vue', () => {
     const refreshButton = dialog!.querySelector('button') // Use appropriate selector for the button
     expect(refreshButton).toBeTruthy() // Ensure the button exists
 
-    console.info(refreshButton, 'refreshbutton')
     // Trigger the click event on the button
     refreshButton!.click()
 
