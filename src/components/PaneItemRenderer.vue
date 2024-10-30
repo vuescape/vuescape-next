@@ -12,7 +12,6 @@ export default {}
 
 <script setup lang="ts">
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
-import { defineProps } from 'vue'
 
 // TODO: import the actual components
 import TitleComponentView from './VuescapeButton.vue'
