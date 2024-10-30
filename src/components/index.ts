@@ -7,7 +7,6 @@ export { default as NotificationMessages } from './NotificationMessages.vue'
 export { default as PaneItemRenderer } from './PaneItemRenderer.vue'
 export { default as PaneLayoutRenderer } from './PaneLayoutRenderer.vue'
 export { default as PaneSectionRenderer } from './PaneSectionRenderer.vue'
-export { default as PaneSectionsRenderer } from './PaneSectionsRenderer.vue'
 export { default as ReportLayoutRenderer } from './ReportLayoutRenderer.vue'
 
 export { default as VuescapeButton } from './VuescapeButton.vue'

@@ -64,7 +64,6 @@ describe('AppInfoHandler.vue', () => {
 
   it('should show the dialog when the version changes', async () => {
     const appInfoStore = useAppInfoStore() as unknown as AppInfoStore
-    const appInfo = appInfoStore.state as AppInfo
 
     // The dialog should be hidden initially
     expect(wrapper.vm.isVisible).toBe(false)
