@@ -11,11 +11,11 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import type { PaneSection } from '../models/dynamic-ui/PaneSection'
+import type { PaneSectionRendererProps } from '../models/componentProps/PaneSectionRendererProps'
 import PaneItemView from './PaneItemRenderer.vue'
 import { defineProps } from 'vue'
 
-const props = defineProps<{ section: PaneSection }>()
+const props = defineProps<PaneSectionRendererProps>()
 </script>
 
 <template>

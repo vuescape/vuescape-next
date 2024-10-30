@@ -1,7 +1,6 @@
-import type { ChicletGridComponentPayload } from './ChicletGridComponentPayload';
-
+import type { ChicletGridComponentPayload } from './ChicletGridComponentPayload'
 
 export interface ChicletGridComponent {
-  type: 'grid';
-  payload: ChicletGridComponentPayload;
+  type: 'chicletGrid'
+  payload: ChicletGridComponentPayload
 }

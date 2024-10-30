@@ -15,13 +15,14 @@ export default {}
 import type { ChicletGridProps } from '../models'
 import ChicletButton from './ChicletButton.vue'
 
-const props = defineProps<{ chicletGridProps: ChicletGridProps }>()
+const props = defineProps<ChicletGridProps>()
+console.info(JSON.stringify(props.chiclets))
 </script>
 
 <template>
   <div class="chiclet-grid__container">
     <div
-      v-for="chiclet in props.chicletGridProps.chiclets"
+      v-for="chiclet in props.chiclets"
       :key="chiclet.id"
       class="chiclet-grid__button-wrapper m-2"
     >

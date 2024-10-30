@@ -11,22 +11,22 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import type { PaneItem } from '../models/dynamic-ui/PaneItem'
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 import { defineProps } from 'vue'
 
 // TODO: import the actual components
 import TitleComponentView from './VuescapeButton.vue'
 import ButtonComponentView from './VuescapeButton.vue'
-import ChicletGridComponentView from './VuescapeButton.vue'
+import ChicletGridComponentView from './ChicletGrid.vue'
 import TableComponentView from './VuescapeButton.vue'
+import type { PaneItemRendererProps } from '../models/componentProps/PaneItemRendererProps'
 
-const props = defineProps<{ item: PaneItem }>()
+const props = defineProps<PaneItemRendererProps>()
 
 const componentMap: Record<PaneComponent['type'], any> = {
   title: TitleComponentView,
   button: ButtonComponentView,
-  grid: ChicletGridComponentView,
+  chicletGrid: ChicletGridComponentView,
   table: TableComponentView
 }
 </script>

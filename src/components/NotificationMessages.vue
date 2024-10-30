@@ -16,10 +16,10 @@ import Message from 'primevue/message'
 import { ref, watch } from 'vue'
 import type { NotificationMessage } from '../models/NotificationMessage'
 
+import type { NotificationMessagesProps } from '../models/componentProps/NotificationMessagesProps'
+
 // Accept messages as a prop
-const props = defineProps<{
-  messages: Array<NotificationMessage>
-}>()
+const props = defineProps<NotificationMessagesProps>()
 
 const messages = ref([...props.messages])
 
@@ -40,9 +40,9 @@ watch(
   () => props.messages,
   (newValue: Array<NotificationMessage>) => {
     messages.value = [...newValue]
-  }, { deep: true },
+  },
+  { deep: true }
 )
-
 </script>
 
 <template>
@@ -52,7 +52,7 @@ watch(
       :key="msg.id"
       :severity="msg.severity.toString()"
       class="mt-2 mb-2"
-      @close="handleClose (msg, $event)"
+      @close="handleClose(msg, $event)"
       :closable="msg.closeable ?? true"
     >
       {{ msg.text }}

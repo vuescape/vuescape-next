@@ -1,12 +1,10 @@
-import { ref, defineComponent } from 'vue'
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ChicletGrid from '../ChicletGrid.vue'
 
-import type { Chiclet } from '../../models/dynamic-ui/'
 import type { ChicletGridProps } from '../../models/componentProps/ChicletGridProps'
 
-const chicletGridProps = ref<ChicletGridProps>({
+const chicletGridProps: ChicletGridProps = {
   chiclets: [
     {
       isVisible: true,
@@ -51,12 +49,12 @@ const chicletGridProps = ref<ChicletGridProps>({
       title: 'Example3 Site'
     }
   ]
-})
+}
 
 describe('ChicletGrid.vue', () => {
   it('renders the correct number of chiclets', () => {
     const wrapper = mount(ChicletGrid, {
-      props: { chicletGridProps: chicletGridProps.value }
+      props: { chiclets: chicletGridProps.chiclets }
     })
     const chicletButtons = wrapper.findAllComponents({ name: 'ChicletButton' })
     expect(chicletButtons.length).toBe(3)
@@ -64,7 +62,7 @@ describe('ChicletGrid.vue', () => {
 
   it('renders chiclet titles correctly', () => {
     const wrapper = mount(ChicletGrid, {
-      props: { chicletGridProps: chicletGridProps.value }
+      props: { chiclets: chicletGridProps.chiclets }
     })
     const chicletLabels = wrapper.findAll('.chiclet-grid__button-label')
     expect(chicletLabels[0].text()).toBe('Example1 Site')

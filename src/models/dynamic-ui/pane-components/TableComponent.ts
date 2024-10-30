@@ -1,7 +1,6 @@
-import type { TableComponentPayload } from './TableComponentPayload';
-
+import type { TableComponentPayload } from './TableComponentPayload'
 
 export interface TableComponent {
-  type: 'table';
-  payload: TableComponentPayload;
+  type: 'table'
+  payload: TableComponentPayload
 }

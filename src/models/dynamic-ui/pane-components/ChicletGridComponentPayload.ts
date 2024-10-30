@@ -1,6 +1,5 @@
-import type { Chiclet } from "../Chiclet";
+import type { ChicletGridProps } from '../../componentProps'
 
-
-export interface ChicletGridComponentPayload {
-  chiclets: Array<Chiclet>;
+export interface ChicletGridComponentPayload extends ChicletGridProps {
+  // chicletGridProps: ChicletGridProps
 }

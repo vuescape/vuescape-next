@@ -11,15 +11,15 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import type { PaneLayout } from '../models/dynamic-ui/PaneLayout'
+import type { PaneLayoutRendererProps } from '../models/componentProps/PaneLayoutRendererProps'
 import PaneSectionRenderer from './PaneSectionRenderer.vue'
 import { defineProps } from 'vue'
 
-const props = defineProps<{ pane: PaneLayout }>()
+const props = defineProps<PaneLayoutRendererProps>()
 </script>
 
 <template>
-  <div :style="{ width: props.pane.paneWidthPercent + '%' }" class="pane-layout">
+  <div class="pane-layout">
     <PaneSectionRenderer
       v-for="section in props.pane.sections"
       :key="section.id"

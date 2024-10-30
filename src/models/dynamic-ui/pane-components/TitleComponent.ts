@@ -1,7 +1,6 @@
-import type { TitleComponentPayload } from './TitleComponentPayload';
-
+import type { TitleComponentPayload } from './TitleComponentPayload'
 
 export interface TitleComponent {
-  type: 'title';
-  payload: TitleComponentPayload;
+  type: 'title'
+  payload: TitleComponentPayload
 }

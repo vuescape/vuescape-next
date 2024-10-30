@@ -1,4 +1,3 @@
-
 export interface TitleComponentPayload {
-  text: string;
+  text: string
 }

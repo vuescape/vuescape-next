@@ -1,26 +1,15 @@
-// TODO: Remove ignore when working
+import { type Pinia } from 'pinia'
+import { type ComponentPublicInstance, createApp, type Plugin } from 'vue'
+import type { Router } from 'vue-router'
+
 import { NullTrackingService, type TrackingService } from '../analytics'
-import type { BootstrappedComponent } from '../models/BootstrappedComponent'
+import type { BootstrappedComponent, ErrorHandler, InitFunctionResult } from '../models'
 import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
 
 import LoadingDirective from '../directives/loading'
-// import { Axios, CacheOptions } from '../http'
-// import { setStore } from '../store'
-// import { ModuleState, StoreModule } from '../store/modules/types'
-// import { RootState } from '../store/RootState'
-// import { type FeatureService, type InitFunctionResult, NullFeatureService } from '../models'
 
 // TODO: how to handle resize in vue 3? check VueUse for a composable
 // import 'vue-resize/dist/vue-resize.css'
-import type { ErrorHandler } from '../models/ErrorHandler'
-// @ts-ignore-once: TS6133
-import { type Pinia } from 'pinia'
-
-import PrimeVue from 'primevue/config'
-import { type ComponentPublicInstance, createApp } from 'vue'
-// tslint:disable: member-ordering
-import type { Router } from 'vue-router'
-import type { InitFunctionResult } from '../models'
 
 /**
  * Application Bootstrapper is responsible for setting up and initializing the application.
@@ -29,6 +18,7 @@ import type { InitFunctionResult } from '../models'
  */
 export class ApplicationBootstrapper {
   private theme: any = {}
+  private primeVue?: Plugin
 
   private errorHandler!: ErrorHandler
   // private storeModules                     = {}
@@ -151,7 +141,7 @@ export class ApplicationBootstrapper {
   public withRootComponent(cssSelector: string, bootstrappedComponent: BootstrappedComponent) {
     this.rootComponentOptions = {
       cssSelector,
-      rootComponent: bootstrappedComponent,
+      rootComponent: bootstrappedComponent
     }
     return this
   }
@@ -184,8 +174,9 @@ export class ApplicationBootstrapper {
    * @param theme - The PrimeVue theme to use. This includes a theme preset as well as options.
    * @returns The `ApplicationBootstrapper` instance.
    */
-  public withTheme(theme: any) {
+  public withPrimeVueTheme(theme: any, primeVue: Plugin) {
     this.theme = theme
+    this.primeVue = primeVue
     return this
   }
 
@@ -221,11 +212,13 @@ export class ApplicationBootstrapper {
         footerBootstrappedComponent: this.bootstrappedFooterComponent,
         trackingService: this.trackingService,
         globalClickHandler: this.globalClickHandler,
-        additionalComponents: this.additionalAppComponents,
+        additionalComponents: this.additionalAppComponents
       }
 
       // Spread rootComponentProps to satisfy Vue typing
-      const app = createApp(this.rootComponentOptions.rootComponent.component, { ...rootComponentProps })
+      const app = createApp(this.rootComponentOptions.rootComponent.component, {
+        ...rootComponentProps
+      })
       app.directive('loading', LoadingDirective)
 
       app.use(this.piniaStore)
@@ -242,7 +235,9 @@ export class ApplicationBootstrapper {
         return
       }
 
-      app.use(PrimeVue, this.theme)
+      if (this.primeVue) {
+        app.use(this.primeVue, this.theme)
+      }
 
       app.use(this.router)
       app.mount(this.rootComponentOptions.cssSelector)
@@ -274,14 +269,18 @@ export class ApplicationBootstrapper {
 
   private validate() {
     if (!this.router) {
-      console.warn('Router not set in ApplicationBootstrapper. ' + 'Call withRouter() with the router if a router is needed.')
+      console.warn(
+        'Router not set in ApplicationBootstrapper. ' +
+          'Call withRouter() with the router if a router is needed.'
+      )
     }
     if (!this.piniaStore) {
-      console.warn(
-        'Pinia store not defined.  Call withPiniaStore() to set the Pinia Store.')
+      console.warn('Pinia store not defined.  Call withPiniaStore() to set the Pinia Store.')
     }
     if (!this.rootComponentOptions) {
-      console.warn('No Vue root component defined.  Call withRootComponent() to set the root component.')
+      console.warn(
+        'No Vue root component defined.  Call withRootComponent() to set the root component.'
+      )
     }
   }
 
@@ -290,7 +289,7 @@ export class ApplicationBootstrapper {
     instance: ComponentPublicInstance | null,
     // `info` is a Vue-specific error info,
     // e.g. which lifecycle hook the error was thrown in
-    info: string,
+    info: string
   ) => {
     console.error(`Vue threw an error.
   Usually this is caused by an error during rendering but could be at any point during the component lifecycle.`)

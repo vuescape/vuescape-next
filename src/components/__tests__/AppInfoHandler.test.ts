@@ -66,7 +66,6 @@ describe('AppInfoHandler.vue', () => {
     const appInfoStore = useAppInfoStore() as unknown as AppInfoStore
     const appInfo = appInfoStore.state as AppInfo
 
-    console.log('App Info:', appInfo)
     // The dialog should be hidden initially
     expect(wrapper.vm.isVisible).toBe(false)
 
