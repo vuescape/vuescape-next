@@ -1,4 +1,4 @@
 export * from './Action'
-export type { NavigateActionPayload } from './NavigateActionPayload'
+export type { NavigationActionPayload } from './NavigationActionPayload'
 export type { NavigationAction } from './NavigationAction'
-export type { UnknownAction } from './UnknownAction'
+export type { NoAction } from './NoAction'

@@ -1,4 +1,4 @@
 import type { NavigationAction } from './NavigationAction'
-import type { UnknownAction } from './UnknownAction'
+import type { NoAction } from './NoAction'
 
-export type Action = NavigationAction | UnknownAction
+export type Action = NavigationAction | NoAction

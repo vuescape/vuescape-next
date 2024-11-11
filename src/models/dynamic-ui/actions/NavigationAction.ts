@@ -1,6 +1,6 @@
-import type { NavigateActionPayload } from './NavigateActionPayload'
+import type { NavigationActionPayload } from './NavigationActionPayload'
 
 export interface NavigationAction {
   type: 'navigate'
-  payload: NavigateActionPayload
+  payload: NavigationActionPayload
 }

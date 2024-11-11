@@ -2,7 +2,6 @@ export * from './actions/'
 export * from './pane-components'
 
 export type { Chiclet } from './Chiclet'
-export type { Pane } from './Pane'
 export type { PaneItem } from './PaneItem'
 export type { PaneLayout } from './PaneLayout'
 export type { PaneSection } from './PaneSection'

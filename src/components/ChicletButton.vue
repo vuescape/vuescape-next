@@ -17,7 +17,7 @@ import { useRouter } from 'vue-router'
 
 import Button from 'primevue/button'
 
-import type { Action, Chiclet, NavigateActionPayload } from '../models/dynamic-ui/'
+import type { Action, Chiclet, NavigationActionPayload } from '../models/dynamic-ui/'
 
 /**
  * Props definition for the ChicletButton component.
@@ -44,9 +44,10 @@ const handleAction = () => {
   const { action } = props.chiclet
   switch (action.type) {
     case 'navigate': {
-      const payload = action.payload as NavigateActionPayload
+      const payload = action.payload as NavigationActionPayload
+      // Open http links in a new tab
       if (payload.url?.startsWith('http')) {
-        window.open(payload.url, payload.target ?? '_self')
+        window.open(payload.url, payload.target ?? '_blank')
       } else if (payload.url) {
         if (payload.replace === true) {
           router.replace(payload.url)
@@ -56,8 +57,8 @@ const handleAction = () => {
       }
       break
     }
-    case 'unknown':
-      console.warn('Action type is unknown')
+    case 'noAction':
+      console.info('Action type is noAction')
       break
     default:
       throw new Error('Action type is not supported: ' + (action as Action).type)

@@ -5,14 +5,14 @@
  * This is a Vue Single File Component (SFC) that renders a report layout into
  * three panes: left, center, and right.
  *
- * @prop {ReportLayout} report - the ReportLayout to render
+ * @prop {ReportLayout} reportLayout - the ReportLayout to render
  *
  */
 export default {}
 </script>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 import PaneLayoutView from './PaneLayoutRenderer.vue'
 
@@ -23,45 +23,65 @@ import type { ReportLayoutRendererProps } from '../models/componentProps/ReportL
 
 const props = defineProps<ReportLayoutRendererProps>()
 
+// Set up reactive reportLayout that initializes from props and updates reactively
 const reportLayout = ref(
   props.reportLayout || {
-    id: 'report1',
-    title: 'Sample Report',
-    leftPane: { id: 'left1', sections: [], paneWidthPercent: 33 },
-    centerPane: { id: 'center1', sections: [], paneWidthPercent: 34 },
-    rightPane: { id: 'right1', sections: [], paneWidthPercent: 33 }
+    id: 'null-report',
+    title: '',
   }
 )
 
-// Accounts for header and footer
-// TODO: get this data from somewhere else. Maybe put in state store?
-const reportHeightOffset = 136 + (reportLayout.value.title! ? 30 : 0)
-const isOnlyCenterPane =
-  reportLayout.value.leftPane.paneWidthPercent === 0 &&
-  reportLayout.value.rightPane.paneWidthPercent === 0
+// Watch for changes in props.reportLayout and update the local reportLayout ref
+watch(
+  () => props.reportLayout,
+  (newReportLayout) => {
+    if (newReportLayout) {
+      reportLayout.value = newReportLayout
+    }
+  },
+  { immediate: true, deep: true } // Syncs immediately on mount and responds to deep changes
+)
+
+// Calculate height offset based on title presence
+const reportHeightOffset = computed(() => 136 + (reportLayout.value.title ? 30 : 0))
+
+// Computed properties to check for the presence of panes with a positive width
+const leftPaneExistsWithWidth = computed(() => 
+  reportLayout.value.leftPane != null && reportLayout.value.leftPane.paneWidthPercent > 0
+)
+const rightPaneExistsWithWidth = computed(() => 
+  reportLayout.value.rightPane != null && reportLayout.value.rightPane.paneWidthPercent > 0
+)
+const centerPaneExistsWithWidth = computed(() => 
+  reportLayout.value.centerPane != null && reportLayout.value.centerPane.paneWidthPercent > 0
+)
+const isOnlyCenterPane = computed(() => 
+  !leftPaneExistsWithWidth.value && !rightPaneExistsWithWidth.value && centerPaneExistsWithWidth.value
+)
+
 </script>
 
 <template>
   <h3>{{ reportLayout.title }}</h3>
-  <PaneLayoutView v-if="isOnlyCenterPane" :pane="reportLayout.centerPane" />
+  <PaneLayoutView v-if="isOnlyCenterPane" :pane="reportLayout.centerPane!" />
   <Splitter v-else :style="`height: calc(100vh - ${reportHeightOffset}px)`">
     <SplitterPanel
-      v-if="reportLayout.leftPane.paneWidthPercent"
-      :size="reportLayout.leftPane.paneWidthPercent"
+      v-if="leftPaneExistsWithWidth"
+      :size="reportLayout.leftPane?.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.leftPane" />
+      <PaneLayoutView :pane="reportLayout.leftPane!" />
     </SplitterPanel>
     <SplitterPanel
-      v-if="reportLayout.centerPane.paneWidthPercent"
-      :size="reportLayout.centerPane.paneWidthPercent"
+      v-if="centerPaneExistsWithWidth"
+      :size="reportLayout.centerPane?.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.centerPane" />
+      <PaneLayoutView :pane="reportLayout.centerPane!" />
     </SplitterPanel>
     <SplitterPanel
-      v-if="reportLayout.rightPane.paneWidthPercent"
-      :size="reportLayout.rightPane.paneWidthPercent"
+      v-if="rightPaneExistsWithWidth"
+      :size="reportLayout.rightPane?.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.rightPane" />
+      <PaneLayoutView :pane="reportLayout.rightPane!" />
     </SplitterPanel>
   </Splitter>
 </template>
