@@ -13,11 +13,13 @@ export default {}
 <script setup lang="ts">
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 
-// TODO: import the actual components
-import TitleComponentView from './VuescapeButton.vue'
+import TitleComponentView from './TitleComponentRenderer.vue'
 import ButtonComponentView from './VuescapeButton.vue'
 import ChicletGridComponentView from './ChicletGrid.vue'
+
+// TODO: import the actual components
 import TableComponentView from './VuescapeButton.vue'
+
 import type { PaneItemRendererProps } from '../models/componentProps/PaneItemRendererProps'
 
 const props = defineProps<PaneItemRendererProps>()
@@ -43,7 +45,6 @@ const componentMap: Record<PaneComponent['type'], any> = {
       v-for="component in props.item.components"
       :key="component.type"
       :is="componentMap[component.type]"
-      :component="component"
       v-bind="component.payload"
     />
   </div>

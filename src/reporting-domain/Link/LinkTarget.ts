@@ -3,26 +3,29 @@
  */
 export enum LinkTarget {
   /** No target. */
-  None = 0,
+  None = 'none',
+
+  /** Target is the current pane. Results in navigation. To avoid navigation target left, center, or right panes. */
+  CurrentPane = 'currentPane',
 
   /** Target is the left pane. */
-  LeftPane,
+  LeftPane = 'leftPane',
 
   /** Target is the center pane. */
-  CenterPane,
+  CenterPane = 'centerPane',
 
   /** Target is the right pane. */
-  RightPane,
+  RightPane = 'rightPane',
 
   /** Target is a modal. */
-  Modal,
+  Modal = 'modal',
 
   /** Target is the current window. */
-  CurrentWindow,
+  CurrentWindow = 'currentWindow',
 
   /** Target is a new window. */
-  NewWindow,
+  NewWindow = 'newWindow',
 
   /** Target is a download. */
-  Download,
+  Download = 'download'
 }

@@ -4,6 +4,30 @@ import { mount } from '@vue/test-utils'
 import PaneSectionRenderer from '../../components/PaneSectionRenderer.vue'
 import { PaneSectionRendererProps } from '../../models/componentProps/PaneSectionRendererProps'
 import PaneItemView from '../PaneItemRenderer.vue'
+import { createPinia, setActivePinia } from 'pinia'
+
+setActivePinia(createPinia())
+
+describe('PaneSectionRenderer', () => {
+  it('renders the correct number of items', () => {
+    const wrapper = mount(PaneSectionRenderer, {
+      props: { section: props.section }
+    })
+
+    const items = wrapper.findAllComponents(PaneItemView)
+    expect(items.length).toBe(props.section.items.length)
+  })
+
+  it('passes the correct props to PaneItemView', () => {
+    const wrapper = mount(PaneSectionRenderer, {
+      props: { section: props.section }
+    })
+    const items = wrapper.findAllComponents(PaneItemView)
+    items.forEach((itemWrapper, index) => {
+      expect(itemWrapper.props().item).toEqual(props.section.items[index])
+    })
+  })
+})
 
 const props: PaneSectionRendererProps = {
   section: {
@@ -54,24 +78,3 @@ const props: PaneSectionRendererProps = {
     ]
   }
 }
-
-describe('PaneSectionRenderer', () => {
-  it('renders the correct number of items', () => {
-    const wrapper = mount(PaneSectionRenderer, {
-      props: { section: props.section }
-    })
-
-    const items = wrapper.findAllComponents(PaneItemView)
-    expect(items.length).toBe(props.section.items.length)
-  })
-
-  it('passes the correct props to PaneItemView', () => {
-    const wrapper = mount(PaneSectionRenderer, {
-      props: { section: props.section }
-    })
-    const items = wrapper.findAllComponents(PaneItemView)
-    items.forEach((itemWrapper, index) => {
-      expect(itemWrapper.props().item).toEqual(props.section.items[index])
-    })
-  })
-})

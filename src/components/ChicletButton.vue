@@ -13,11 +13,15 @@ export default {}
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 import Button from 'primevue/button'
 
-import type { Action, Chiclet, NavigationActionPayload } from '../models/dynamic-ui/'
+import type { Chiclet } from '../models/dynamic-ui/'
+
+import { useActionStore, type ActionStore } from '../stores'
+
+import { toEnum } from '../infrastructure'
+import { ReportPaneKind } from '../models/feature'
 
 /**
  * Props definition for the ChicletButton component.
@@ -29,10 +33,12 @@ const props = defineProps<{ chiclet: Chiclet }>()
 /**
  * Computed property that returns the icons used in the ChicletButton component.
  */
-const icons = computed(() => {
+const icons = computed((event: any) => {
   const result = props.chiclet.icons?.join(' ') ?? ''
   return result
 })
+
+const actionStore = useActionStore()
 
 /**
  * Handles the action when the ChicletButton is clicked.
@@ -40,32 +46,21 @@ const icons = computed(() => {
  */
 // TODO: handling an action will no doubt be used in more than one component,
 // so it should be extracted to a utility function
-const handleAction = () => {
-  const { action } = props.chiclet
-  switch (action.type) {
-    case 'navigate': {
-      const payload = action.payload as NavigationActionPayload
-      // Open http links in a new tab
-      if (payload.url?.startsWith('http')) {
-        window.open(payload.url, payload.target ?? '_blank')
-      } else if (payload.url) {
-        if (payload.replace === true) {
-          router.replace(payload.url)
-        } else {
-          router.push(payload.url)
-        }
-      }
-      break
-    }
-    case 'noAction':
-      console.info('Action type is noAction')
-      break
-    default:
-      throw new Error('Action type is not supported: ' + (action as Action).type)
-  }
-}
+const handleClick = (event: MouseEvent) => {
+  console.info(event)
+  const clickedElement = event.target as HTMLElement
+  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
 
-const router = useRouter()
+  const paneKind = paneElement ? paneElement.dataset.panekind! : ReportPaneKind.None
+
+  const state: ActionStore = {
+      action: props.chiclet.action,
+      paneKind: toEnum(ReportPaneKind, paneKind)
+    }
+
+    actionStore.action = state.action
+    actionStore.paneKind = state.paneKind
+}
 </script>
 
 <template>
@@ -75,7 +70,7 @@ const router = useRouter()
     iconPos="top"
     iconClass="chiclet-button__icon"
     :class="['chiclet-button__layout', chiclet.cssClass]"
-    @click="handleAction"
+    @click="handleClick"
   />
 </template>
 

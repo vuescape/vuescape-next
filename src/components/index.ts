@@ -9,6 +9,8 @@ export { default as PaneLayoutRenderer } from './PaneLayoutRenderer.vue'
 export { default as PaneSectionRenderer } from './PaneSectionRenderer.vue'
 export { default as ReportLayoutRenderer } from './ReportLayoutRenderer.vue'
 
+export { default as TitleComponentRenderer } from './TitleComponentRenderer.vue'
+
 export { default as VuescapeButton } from './VuescapeButton.vue'
 export { default as VuescapeDialog } from './VuescapeDialog.vue'
 

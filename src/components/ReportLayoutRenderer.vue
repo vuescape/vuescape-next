@@ -12,76 +12,138 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 
-import PaneLayoutView from './PaneLayoutRenderer.vue'
+import PaneLayoutRenderer from './PaneLayoutRenderer.vue'
 
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 
 import type { ReportLayoutRendererProps } from '../models/componentProps/ReportLayoutRendererProps'
+import { ReportPaneKind } from '../models/feature/'
+import type { ReportLayout } from '../models'
 
 const props = defineProps<ReportLayoutRendererProps>()
 
 // Set up reactive reportLayout that initializes from props and updates reactively
-const reportLayout = ref(
-  props.reportLayout || {
-    id: 'null-report',
-    title: '',
-  }
+const reportLayouts = ref(
+  props.reportLayouts || [
+    {
+      id: 'null-report',
+      title: '',
+      paneTarget: ReportPaneKind.CenterPane,
+      content: null
+    }
+  ]
 )
+
+const validateReportLayouts = (reportLayouts: Array<ReportLayout>) => {
+  const paneKinds = new Set<ReportPaneKind>()
+
+  for (const layout of reportLayouts) {
+    if (layout.targetPane && paneKinds.has(layout.targetPane)) {
+      throw new Error(`Duplicate pane target found: ${layout.targetPane}`)
+    }
+    if (layout.targetPane) {
+      paneKinds.add(layout.targetPane)
+    }
+  }
+}
 
 // Watch for changes in props.reportLayout and update the local reportLayout ref
 watch(
-  () => props.reportLayout,
-  (newReportLayout) => {
-    if (newReportLayout) {
-      reportLayout.value = newReportLayout
+  () => props.reportLayouts,
+  (newReportLayouts) => {
+    if (newReportLayouts) {
+      validateReportLayouts(newReportLayouts)
+      reportLayouts.value = newReportLayouts
     }
   },
   { immediate: true, deep: true } // Syncs immediately on mount and responds to deep changes
 )
 
-// Calculate height offset based on title presence
-const reportHeightOffset = computed(() => 136 + (reportLayout.value.title ? 30 : 0))
-
 // Computed properties to check for the presence of panes with a positive width
-const leftPaneExistsWithWidth = computed(() => 
-  reportLayout.value.leftPane != null && reportLayout.value.leftPane.paneWidthPercent > 0
+const leftReportLayout = computed(() =>
+  reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.LeftPane)
 )
-const rightPaneExistsWithWidth = computed(() => 
-  reportLayout.value.rightPane != null && reportLayout.value.rightPane.paneWidthPercent > 0
-)
-const centerPaneExistsWithWidth = computed(() => 
-  reportLayout.value.centerPane != null && reportLayout.value.centerPane.paneWidthPercent > 0
-)
-const isOnlyCenterPane = computed(() => 
-  !leftPaneExistsWithWidth.value && !rightPaneExistsWithWidth.value && centerPaneExistsWithWidth.value
+const centerReportLayout = computed(() =>
+  reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.CenterPane)
 )
 
+const rightReportLayout = computed(() =>
+  reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.RightPane)
+)
+
+const leftPaneExistsWithWidth = computed(
+  () => (leftReportLayout.value?.paneWidthPercent ?? 0) > 0
+)
+const centerPaneExistsWithWidth = computed(
+  () => (centerReportLayout.value?.paneWidthPercent ?? 0) > 0
+)
+const rightPaneExistsWithWidth = computed(
+  () => (rightReportLayout.value?.paneWidthPercent ?? 0) > 0
+)
+
+const isOnlyCenterPane = computed(
+  () =>
+    !leftPaneExistsWithWidth.value &&
+    !rightPaneExistsWithWidth.value &&
+    centerPaneExistsWithWidth.value
+)
+
+onMounted(() => {
+  let title
+  const centerReportLayout = reportLayouts.value.find(
+    (layout) => layout.targetPane === ReportPaneKind.CenterPane
+  )
+  const leftReportLayout = reportLayouts.value.find(
+    (layout) => layout.targetPane === ReportPaneKind.LeftPane
+  )
+  const rightReportLayout = reportLayouts.value.find(
+    (layout) => layout.targetPane === ReportPaneKind.RightPane
+  )
+
+  if (centerReportLayout?.title) {
+    title = centerReportLayout.title
+  } else if (leftReportLayout?.title) {
+    title = leftReportLayout.title
+  } else if (rightReportLayout?.title) {
+    title = rightReportLayout.title
+  }
+
+  if (title) {
+    document.title = title
+  }
+})
 </script>
 
 <template>
-  <h3>{{ reportLayout.title }}</h3>
-  <PaneLayoutView v-if="isOnlyCenterPane" :pane="reportLayout.centerPane!" />
-  <Splitter v-else :style="`height: calc(100vh - ${reportHeightOffset}px)`">
+  <!-- <h3>{{ reportLayout.title }}</h3> -->
+  <PaneLayoutRenderer
+  :data-paneKind="ReportPaneKind.CenterPane"
+    :class="ReportPaneKind.CenterPane"
+    v-if="isOnlyCenterPane && centerReportLayout?.content"
+    :pane="centerReportLayout.content"
+  />
+  <!-- TODO: replace style with class -->
+  <Splitter v-else style="height: 100vh">
     <SplitterPanel
-      v-if="leftPaneExistsWithWidth"
-      :size="reportLayout.leftPane?.paneWidthPercent"
+      v-if="leftPaneExistsWithWidth && leftReportLayout?.content"
+      :size="leftReportLayout.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.leftPane!" />
+      <PaneLayoutRenderer :data-paneKind="ReportPaneKind.LeftPane" :class="ReportPaneKind.LeftPane" :pane="leftReportLayout.content" />
     </SplitterPanel>
     <SplitterPanel
-      v-if="centerPaneExistsWithWidth"
-      :size="reportLayout.centerPane?.paneWidthPercent"
+      v-if="centerPaneExistsWithWidth && centerReportLayout?.content"
+      :size="centerReportLayout.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.centerPane!" />
+      <PaneLayoutRenderer :class="ReportPaneKind.CenterPane" :data-paneKind="ReportPaneKind.CenterPane" :pane="centerReportLayout.content" />
     </SplitterPanel>
     <SplitterPanel
-      v-if="rightPaneExistsWithWidth"
-      :size="reportLayout.rightPane?.paneWidthPercent"
+      v-if="rightPaneExistsWithWidth && rightReportLayout?.content"
+      :size="rightReportLayout.paneWidthPercent"
     >
-      <PaneLayoutView :pane="reportLayout.rightPane!" />
+      <PaneLayoutRenderer :class="ReportPaneKind.RightPane" :data-paneKind="ReportPaneKind.RightPane" :pane="rightReportLayout.content" />
     </SplitterPanel>
   </Splitter>
 </template>

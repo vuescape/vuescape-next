@@ -56,13 +56,12 @@ describe('useAppInfoStore', () => {
 
     // @ts-ignore TS2339
     const initialState = store.state.value
-    fetchMock.mockAbort()
-
+    fetchMock.mockImplementation(() => Promise.resolve(new Response(null, { status: 500 })))
     await store.fetchAppInfoAsync()
 
     // @ts-ignore TS2339
     expect(store.state.value).toEqual(initialState)
-    expect(setTimeout).toHaveBeenCalledTimes(4)
+    expect(setTimeout).toHaveBeenCalledTimes(2)
   })
 
   it('startPolling starts polling for app info', () => {

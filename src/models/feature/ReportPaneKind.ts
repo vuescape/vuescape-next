@@ -3,14 +3,14 @@
  */
 export enum ReportPaneKind {
   /** Represents no pane. */
-  None,
+  None = 'none',
 
   /** Represents the left pane. */
-  LeftPane,
+  LeftPane = 'leftPane',
 
   /** Represents the center pane. */
-  CenterPane,
+  CenterPane = 'centerPane',
 
   /** Represents the right pane. */
-  RightPane,
+  RightPane = 'rightPane'
 }
