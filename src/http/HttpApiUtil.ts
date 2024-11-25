@@ -114,21 +114,28 @@ export function prepareRequest(
   const defaultHeaders = {
     'Access-Control-Allow-Origin': origin,
     Origin: origin,
-    accept: 'application/json, text/plain, */*'
+    Accept: 'application/json, text/plain, */*',
+    'Content-Type': 'application/json'
   }
 
-  const mergedHeaders = { ...init?.headers, ...defaultHeaders }
+  // Convert init.headers to an object if it's a Headers instance
+  const initHeaders =
+    init?.headers instanceof Headers
+      ? Object.fromEntries(init.headers.entries()) // Convert Headers to a plain object
+      : init?.headers || {}
+
+  // Merge defaultHeaders and initHeaders
+  const mergedHeaders = { ...defaultHeaders, ...initHeaders }
+
+  // Create the final RequestInit object
   const requestInit: RequestInit = {
     method,
-    headers: {
-      ...(mergedHeaders || {})
-    },
-    ...init
+    ...init,
+    headers: mergedHeaders // Pass the merged headers as an object
   }
 
   if (method === HttpMethod.Post) {
     requestInit.headers = {
-      'Content-Type': 'application/json',
       ...requestInit.headers
     }
     requestInit.body = JSON.stringify(data || {})
