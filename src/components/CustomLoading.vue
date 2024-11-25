@@ -12,6 +12,7 @@ export default {}
 
 <script lang="ts" setup>
 import type { CustomLoadingProps } from '../models/componentProps/CustomLoadingProps'
+import loadingImage from '../assets/thin-broken-ring-335.gif'
 
 const props = withDefaults(defineProps<CustomLoadingProps>(), {
   isVisible: false
@@ -20,7 +21,7 @@ const props = withDefaults(defineProps<CustomLoadingProps>(), {
 
 <template>
   <div v-if="props.isVisible" class="custom-loading-wrapper">
-    <img alt="Loading" class="custom-loading" src="@/assets/thin-broken-ring-335.gif" />
+    <img alt="Loading" class="custom-loading" :src="loadingImage" />
   </div>
 </template>
 
