@@ -42,7 +42,7 @@ describe('HttpApiUtil', () => {
       expect(response.status).toBe(400)
       expect(mockFetch).toHaveBeenCalledTimes(1)
     })
-  }) 
+  })
 
   describe('constructUrl', () => {
     it('constructs a URL with query parameters', () => {
@@ -59,7 +59,7 @@ describe('HttpApiUtil', () => {
     it('prepares a GET request with default headers', () => {
       const request = prepareRequest(HttpMethod.Get, 'https://example.com')
       expect(request.method).toBe(HttpMethod.Get)
-      expect(request.headers).toHaveProperty('accept')
+      expect(request.headers).toHaveProperty('Accept')
     })
 
     it('prepares a POST request with JSON body', () => {
