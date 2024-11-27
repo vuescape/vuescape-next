@@ -1,5 +1,5 @@
 import { type Pinia } from 'pinia'
-import { type ComponentPublicInstance, createApp, type Plugin } from 'vue'
+import { type ComponentPublicInstance, createApp, h, type Plugin, render } from 'vue'
 import type { Router } from 'vue-router'
 
 import { NullTrackingService, type TrackingService } from '../analytics'
@@ -19,6 +19,7 @@ import LoadingDirective from '../directives/loading'
 export class ApplicationBootstrapper {
   private theme: any = {}
   private primeVue?: Plugin
+  private primeVueComponents: Array<any> = []
 
   private errorHandler!: ErrorHandler
   // private storeModules                     = {}
@@ -181,6 +182,17 @@ export class ApplicationBootstrapper {
   }
 
   /**
+   * Sets the PrimeVue components to be used in the application.
+   *
+   * @param components - An array of PrimeVue components.
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withPrimeVueComponents(components: Array<any>) {
+    this.primeVueComponents = components
+    return this
+  }
+
+  /**
    * Sets the global click handler for the application.
    *
    * @param handler - The handler.
@@ -284,6 +296,32 @@ export class ApplicationBootstrapper {
     }
   }
 
+  /**
+   * Preloads the styles for the given PrimeVue components by rendering them temporarily.
+   * This ensures that the styles are loaded and cached by the browser before they are needed.
+   * This was implemented because PrimeVue components were not loading their CSS variables into the DOM
+   * when they were rendered dynamically.
+   * @param components - An array of PrimeVue components to preload styles for.
+   */
+  private preloadPrimeVueStyles = (components: Array<any>) => {
+    const tempContainer = document.createElement('div')
+    document.body.appendChild(tempContainer)
+
+    components.forEach((component) => {
+      try {
+        const tempInstance = h(component as any, { style: 'display: none;' })
+        render(tempInstance, tempContainer)
+      } catch {
+        // Ignore non-renderable exports
+      }
+    })
+
+    // Cleanup
+    setTimeout(() => {
+      render(null, tempContainer)
+      document.body.removeChild(tempContainer)
+    }, 0)
+  }
   private defaultErrorHandler = (
     err: unknown,
     instance: ComponentPublicInstance | null,
