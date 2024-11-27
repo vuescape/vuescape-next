@@ -69,19 +69,17 @@ const appInfoMessages = computed(
     class="flex flex-column min-h-screen"
     v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
-    <Suspense>
-      <div>
-        <Suspense>
-          <component
-            :is="props.headerBootstrappedComponent.component"
-            v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
-            ref="theHeader"
-            class="fixed header-component"
-            v-bind="props.headerBootstrappedComponent.props"
-          ></component>
-        </Suspense>
-      </div>
-    </Suspense>
+    <div>
+      <Suspense>
+        <component
+          :is="props.headerBootstrappedComponent.component"
+          v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
+          ref="theHeader"
+          class="fixed header-component"
+          v-bind="props.headerBootstrappedComponent.props"
+        ></component>
+      </Suspense>
+    </div>
     <div ref="appContainer" v-loading="false" class="app__container--scroll">
       <transition mode="out-in" name="app__component--transition">
         <main ref="main" class="main-div flex-grow-1 overflow-y-auto" v-if="true">
