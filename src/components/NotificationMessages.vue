@@ -12,6 +12,7 @@ export default {}
 </script>
 
 <script lang="ts" setup>
+import Message from 'primevue/message'
 import { ref, watch } from 'vue'
 import type { NotificationMessage, NotificationMessagesProps } from '../models'
 
@@ -44,14 +45,14 @@ watch(
 <template>
   <div>
     <Message
-      v-for="msg in messages"
-      :key="msg.id"
-      :severity="msg.severity.toString()"
+      v-for="message in messages"
+      :key="message.id"
+      :severity="message.severity"
       class="mt-2 mb-2"
-      @close="handleClose(msg, $event)"
-      :closable="msg.closeable ?? true"
+      @close="handleClose(message, $event)"
+      :closable="message.closeable ?? true"
     >
-      {{ msg.text }}
+      {{ message.text }}
     </Message>
   </div>
 </template>
