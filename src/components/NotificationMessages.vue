@@ -12,15 +12,11 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import Message from 'primevue/message'
 import { ref, watch } from 'vue'
-import type { NotificationMessage } from '../models/NotificationMessage'
-
-import type { NotificationMessagesProps } from '../models/componentProps/NotificationMessagesProps'
+import type { NotificationMessage, NotificationMessagesProps } from '../models'
 
 // Accept messages as a prop
 const props = defineProps<NotificationMessagesProps>()
-
 const messages = ref([...props.messages])
 
 const handleClose = (msg: NotificationMessage, event: Event) => {
