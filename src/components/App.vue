@@ -71,13 +71,15 @@ const appInfoMessages = computed(
   >
     <Suspense>
       <div>
-        <component
-          :is="props.headerBootstrappedComponent.component"
-          v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
-          ref="theHeader"
-          class="fixed header-component"
-          v-bind="props.headerBootstrappedComponent.props"
-        ></component>
+        <Suspense>
+          <component
+            :is="props.headerBootstrappedComponent.component"
+            v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
+            ref="theHeader"
+            class="fixed header-component"
+            v-bind="props.headerBootstrappedComponent.props"
+          ></component>
+        </Suspense>
       </div>
     </Suspense>
     <div ref="appContainer" v-loading="false" class="app__container--scroll">
@@ -102,13 +104,15 @@ const appInfoMessages = computed(
         </main>
       </transition>
     </div>
-    <component
-      :is="props.footerBootstrappedComponent.component"
-      v-if="props.footerBootstrappedComponent?.component"
-      ref="theFooter"
-      class="footer-component fixed"
-      v-bind="props.footerBootstrappedComponent.props"
-    ></component>
+    <Suspense>
+      <component
+        :is="props.footerBootstrappedComponent.component"
+        v-if="props.footerBootstrappedComponent?.component"
+        ref="theFooter"
+        class="footer-component fixed"
+        v-bind="props.footerBootstrappedComponent.props"
+      ></component>
+    </Suspense>
 
     <template v-if="props.additionalComponents?.length">
       <component
