@@ -10,7 +10,6 @@ import type { TrackingService } from './TrackingService'
  * However, all these methods are no-ops.
  */
 export class NullTrackingService implements TrackingService {
-
   /**
    * Initializes the tracking provider.
    * This is a no-op in this implementation.
@@ -24,7 +23,7 @@ export class NullTrackingService implements TrackingService {
    * This is a no-op in this implementation.
    * @param user - The user to identify.
    */
-// @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public identifyUser(user: any): void {
     // no-op
   }
@@ -35,7 +34,7 @@ export class NullTrackingService implements TrackingService {
    * @param to - The new route.
    * @param from - The previous route.
    */
-// @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public handleRouteChanged(to: RouteLocationNormalized, from: RouteLocationNormalized): void {
     // no-op
   }
@@ -46,7 +45,7 @@ export class NullTrackingService implements TrackingService {
    * @param [name] - The name of the tracking provider. If not provided, returns undefined.
    * @returns The tracking provider, or undefined if not found.
    */
-// @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getTrackingProvider(name?: string): TrackingProvider | undefined {
     return undefined
   }

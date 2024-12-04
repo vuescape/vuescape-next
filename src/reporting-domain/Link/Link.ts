@@ -1,6 +1,6 @@
 import type { CssStyles } from '../../reporting-domain/Css'
-import { LinkTarget } from './LinkTarget'
-import { ResourceKind } from './ResourceKind'
+import type { LinkTarget } from './LinkTarget'
+import type { ResourceKind } from './ResourceKind'
 
 /**
  * Interface representing a Link.

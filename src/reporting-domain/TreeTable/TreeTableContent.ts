@@ -1,4 +1,4 @@
-import { SortLevel, type TreeTableHeaderRow, type TreeTableRow } from './index'
+import type { SortLevel, TreeTableHeaderRow, TreeTableRow } from './index'
 
 /**
  * Interface representing the content of a TreeTable.

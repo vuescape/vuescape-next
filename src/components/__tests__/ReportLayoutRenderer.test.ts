@@ -1,42 +1,40 @@
-import { ref } from 'vue'
-import { mount } from '@vue/test-utils'
-import { describe, it, expect } from 'vitest'
+// import { ref } from 'vue'
+import { describe, it } from 'vitest'
 
-import ReportLayoutRenderer from '../ReportLayoutRenderer.vue'
-import { ReportPaneKind } from '../../models/feature'
+// import { ReportPaneKind } from '../../models/feature'
 
-const reportLayouts = ref([
-  {
-    id: 'report-left',
-    title: 'Left Report',
-    content: {
-      id: 'left-content',
-      sections: [],
-      targetPane: ReportPaneKind.LeftPane,
-      paneWidthPercent: 20
-    }
-  },
-  {
-    id: 'report-center',
-    title: 'Center Report',
-    content: {
-      id: 'center-content',
-      sections: [],
-      targetPane: ReportPaneKind.CenterPane,
-      paneWidthPercent: 60
-    }
-  },
-  {
-    id: 'report-right',
-    title: 'Right Report',
-    content: {
-      id: 'right-content',
-      sections: [],
-      targetPane: ReportPaneKind.RightPane,
-      paneWidthPercent: 20
-    }
-  }
-])
+// const reportLayouts = ref([
+//   {
+//     id: 'report-left',
+//     title: 'Left Report',
+//     content: {
+//       id: 'left-content',
+//       sections: [],
+//       targetPane: ReportPaneKind.LeftPane,
+//       paneWidthPercent: 20
+//     }
+//   },
+//   {
+//     id: 'report-center',
+//     title: 'Center Report',
+//     content: {
+//       id: 'center-content',
+//       sections: [],
+//       targetPane: ReportPaneKind.CenterPane,
+//       paneWidthPercent: 60
+//     }
+//   },
+//   {
+//     id: 'report-right',
+//     title: 'Right Report',
+//     content: {
+//       id: 'right-content',
+//       sections: [],
+//       targetPane: ReportPaneKind.RightPane,
+//       paneWidthPercent: 20
+//     }
+//   }
+// ])
 
 describe('ReportLayoutRenderer.vue', () => {
   it('renders the report title', () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
 import PaneSectionRenderer from '../../components/PaneSectionRenderer.vue'
-import { PaneSectionRendererProps } from '../../models/componentProps/PaneSectionRendererProps'
+import type { PaneSectionRendererProps } from '../../models/componentProps/PaneSectionRendererProps'
 import PaneItemView from '../PaneItemRenderer.vue'
 import { createPinia, setActivePinia } from 'pinia'
 

@@ -1,5 +1,5 @@
-import { SortComparisonStrategy } from '../../infrastructure'
-import { SortDirection } from './SortDirection'
+import type { SortComparisonStrategy } from '../../infrastructure'
+import type { SortDirection } from './SortDirection'
 
 /**
  * Interface representing a ColumnSorter.

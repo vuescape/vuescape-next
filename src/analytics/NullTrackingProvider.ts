@@ -11,7 +11,7 @@ export class NullTrackingProvider implements TrackingProvider {
    * Identifies the user.
    * @param user - The user to identify.
    */
-  // @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public identify(user: string): void {
     // no-op
   }
@@ -35,7 +35,7 @@ export class NullTrackingProvider implements TrackingProvider {
    * Tracks the page view.
    * @param urlFragment - The URL fragment of the page view.
    */
-  // @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public trackPageView(urlFragment: string): void {
     // no-op
   }
@@ -45,7 +45,7 @@ export class NullTrackingProvider implements TrackingProvider {
    * @param eventName - The name of the event.
    * @param payload - The payload of the event.
    */
-  // @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public sendEvent(eventName: string, payload: any): void {
     // no-op
   }

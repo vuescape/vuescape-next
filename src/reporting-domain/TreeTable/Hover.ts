@@ -1,4 +1,4 @@
-import { HoverContentKind } from './HoverContentKind'
+import type { HoverContentKind } from './HoverContentKind'
 
 /**
  * Interface representing rendering response to a Hover over.

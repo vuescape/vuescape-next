@@ -25,7 +25,7 @@ export async function handleAction(
 }
 
 export async function handleNoAction(action: NoAction, sourcePane: ReportPaneKind): Promise<void> {
-  console.info('No action handler invoked. No action to take.', action, sourcePane)
+  console.warn('No action handler invoked. No action to take.', action, sourcePane)
 }
 
 export async function handleNavigationAction(
@@ -38,7 +38,7 @@ export async function handleNavigationAction(
   if (!target) {
     return
   }
-  console.info(router.currentRoute.value)
+  // console.info(router.currentRoute.value)
 
   if (
     target === LinkTarget.CenterPane ||
@@ -67,7 +67,7 @@ export async function handleNavigationAction(
       // router.push(action.payload.url)
     }
   } else if (target === LinkTarget.NewWindow) {
-    console.log('Opening new window ' + action.payload.url)
+    // console.log('Opening new window ' + action.payload.url)
     window.open(action.payload.url, '_blank')
   } else if (target === LinkTarget.Download) {
     throw new Error('LinkTarget.Download Not implemented')

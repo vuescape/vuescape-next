@@ -1,4 +1,4 @@
-import { UiObjectType } from './UiObjectType'
+import type { UiObjectType } from './UiObjectType'
 
 /**
  * Interface representing a UiObject.

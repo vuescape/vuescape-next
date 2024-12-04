@@ -1,4 +1,4 @@
-import { NotificationSeverity } from './NotificationSeverity'
+import type { NotificationSeverity } from './NotificationSeverity'
 
 export interface NotificationMessage {
   id: string

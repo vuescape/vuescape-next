@@ -1,5 +1,5 @@
-import { type ColumnDefinition } from '../../reporting-domain'
-import { ClientBehavior, type TreeTableContent } from './index'
+import type { ColumnDefinition } from '../../reporting-domain'
+import type { ClientBehavior, TreeTableContent } from './index'
 
 /**
  * Interface representing a TreeTable.

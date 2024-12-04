@@ -3,8 +3,6 @@ import { mount } from '@vue/test-utils'
 import PaneItemRenderer from '../PaneItemRenderer.vue'
 import type { PaneItemRendererProps } from '../../models/componentProps/PaneItemRendererProps'
 
-import { TitleComponent } from '../../models'
-
 const props: PaneItemRendererProps = {
   item: {
     width: '100%',
@@ -15,13 +13,13 @@ const props: PaneItemRendererProps = {
 }
 
 describe('PaneItemRenderer', () => {
-//   it('renders the correct number of components', () => {
-//     const wrapper = mount(PaneItemRenderer, {
-//       props: { item: props.item }
-//     })
-//     const components = wrapper.findAllComponents({ name: 'component' })
-//     expect(components.length).toBe(props.item.components.length)
-//   })
+  //   it('renders the correct number of components', () => {
+  //     const wrapper = mount(PaneItemRenderer, {
+  //       props: { item: props.item }
+  //     })
+  //     const components = wrapper.findAllComponents({ name: 'component' })
+  //     expect(components.length).toBe(props.item.components.length)
+  //   })
 
   it('passes the correct props to each component', () => {
     const wrapper = mount(PaneItemRenderer, {

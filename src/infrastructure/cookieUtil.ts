@@ -105,9 +105,9 @@ export function releaseLock(cookieName: string, domain: string) {
     // Only release the lock if the current hostname holds it
     if (lockCookie.identifier === window.location.hostname) {
       cookies.remove(cookieName, { domain })
-      console.log('Lock released by', window.location.hostname)
+      // console.log('Lock released by', window.location.hostname)
     } else {
-      console.log('Cannot release lock: owned by', lockCookie.identifier)
+      // console.log('Cannot release lock: owned by', lockCookie.identifier)
     }
   }
 }

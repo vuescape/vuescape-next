@@ -3,14 +3,14 @@ import { registerGlobalVariable } from '../globalState'
 
 // @ts-nocheck
 describe('registerGlobalVariable', () => {
-  let originalWindow : any
+  let originalWindow: any
 
   beforeEach(() => {
     originalWindow = { ...window } // Backup the original window object
 
     // Define a mock crypto object or use a real one as needed
     const mockCrypto = {
-      getRandomValues: (arr : any) => arr, // Example mock implementation
+      getRandomValues: (arr: any) => arr // Example mock implementation
     }
 
     // Mock the crypto property on the window object
@@ -18,9 +18,8 @@ describe('registerGlobalVariable', () => {
       configurable: true, // This allows the property to be deleted or re-configured later
       enumerable: true,
       get: () => mockCrypto,
-      // @ts-ignore TS6133
-      set: (value) => {
-      }, // Optional: define a setter if you need to overwrite this in tests
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      set: (value) => {} // Optional: define a setter if you need to overwrite this in tests
     })
   })
 

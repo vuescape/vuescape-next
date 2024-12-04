@@ -38,6 +38,7 @@ export class DefaultTrackingService implements TrackingService {
    */
   public handleRouteChanged(
     to: RouteLocationNormalized, // @ts-ignore-once: TS6133 unused parameter
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     from: RouteLocationNormalized
   ): void {
     this.trackingProviders.forEach((_) => _.trackPageView(to.path))

@@ -1,4 +1,4 @@
-import { HorizontalAlignment } from '../../reporting-domain'
+import type { HorizontalAlignment } from '../../reporting-domain'
 import type { NavigationItemBase } from './NavigationItemBase'
 
 export interface MenuNavigationItem extends NavigationItemBase {

@@ -86,7 +86,7 @@ export class HubSpotTrackingProvider implements TrackingProvider {
    * @param eventName - The name of the event.
    * @param payload - The payload of the event.
    */
-  // @ts-ignore-once: TS6133
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public sendEvent(eventName: string, payload: any): void {
     // no-op
   }

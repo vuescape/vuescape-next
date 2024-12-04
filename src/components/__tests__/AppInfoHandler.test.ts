@@ -4,8 +4,8 @@ import AppInfoHandler from '../AppInfoHandler.vue'
 import { useAppInfoStore } from '../../stores/useAppInfoStore'
 import VuescapeDialog from '../VuescapeDialog.vue'
 import { reactive } from 'vue'
-import { AppInfo } from '../../models'
-import { AppInfoStore } from '../../stores'
+import type { AppInfo } from '../../models'
+import type { AppInfoStore } from '../../stores'
 
 // Mock the AppInfoStore
 const startPollingMock = vi.fn()

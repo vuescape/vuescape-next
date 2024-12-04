@@ -33,12 +33,12 @@ export async function usingRetryForFetch(
       response = await fetch(url, init)
 
       if (response.ok || response.status === 400 || response.status === 401) {
-        console.log('Successful fetch or client error')
+        // console.log('Successful fetch or client error')
         return response
       }
 
       if (!retryStatusCodes.includes(response.status)) {
-        console.log('Status not in retryStatusCodes, returning response')
+        // console.log('Status not in retryStatusCodes, returning response')
         return response
       }
 
@@ -51,7 +51,7 @@ export async function usingRetryForFetch(
       console.warn(`Retry ${retryNumber}/${MAX_NUMBER_RETRIES} for ${url} failed: ${errorMessage}`)
 
       if (retryNumber >= MAX_NUMBER_RETRIES) {
-        console.log('Max retries reached, exiting loop')
+        // console.log('Max retries reached, exiting loop')
         break
       }
 
