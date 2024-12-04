@@ -3,5 +3,24 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/vuescape.js"
+  "main": "dist/vuescape.js",
+  "types": "dist/vuescape.d.ts",
+  "peerDependencies": {
+    "vue": "^3.5.13",
+    "pinia": "^2.2.6",
+    "vue-router": "^4.4.5",
+    "primevue": "^4.2.3",
+    "@primevue/themes": "^4.2.3",
+    "@vueuse/core": "^10.11.1",
+    "@vueuse/integrations": "^10.11.1",
+    "qs": "^6.13.1",
+    "file-saver": "^2.0.5",
+    "@vueuse/router": "^10.11.1",
+    "change-case": "4.1.2",
+    "drauu": "0.3.7",
+    "focus-trap": "^7.6.2",
+    "idb-keyval": "^6.2.1",
+    "primeflex": "^3.3.1",
+    "universal-cookie": "^6.1.3"
+  }
 }

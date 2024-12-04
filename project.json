@@ -4,6 +4,20 @@
   "sourceRoot": "packages/vuescape-next/src",
   "targets": {
     "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["vite-build", "emit-types"],
+      "options": {
+        "command": "echo Build complete"
+      },
+      "outputs": ["{workspaceRoot}/packages/vuescape-next/dist"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest --config packages/vuescape-next/vitest.config.ts"
+      }
+    },
+    "vite-build": {
       "parallelism": false,
       "executor": "@nrwl/vite:build",
       "options": {
@@ -12,31 +26,26 @@
         "configFile": "packages/vuescape-next/vite.config.ts",
         "outputPath": "packages/vuescape-next/dist"
       },
-      "dependsOn": ["emit-types"]
-    },
-    "test:unit": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "vitest --config packages/vuescape-next/vitest.config.ts"
-      }
+      "outputs": ["{workspaceRoot}/packages/vuescape-next/dist"]
     },
     "emit-types": {
       "parallelism": false,
       "executor": "nx:run-commands",
       "options": {
-        "command": "vue-tsc --declaration --emitDeclarationOnly --project packages/vuescape-next/tsconfig.lib.json"
-      }
-    },
-    "type-check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "vue-tsc --declaration --declarationMap --project packages/vuescape-next/tsconfig.lib.json"
-      }
+        "command": "vue-tsc --declaration --declarationMap --emitDeclarationOnly --project packages/vuescape-next/tsconfig.json --outFile packages/vuescape-next/dist/vuescape.d.ts"
+      },
+      "outputs": ["{workspaceRoot}/packages/vuescape-next/dist"]
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["packages/vuescape-next/**/*.{ts,tsx,js,jsx,vue}"]
+      }
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rimraf packages/vuescape-next/dist"
       }
     },
     "format": {
