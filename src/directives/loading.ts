@@ -1,4 +1,3 @@
-// directives/loading.ts
 import { createApp, type Directive, type DirectiveBinding, h } from 'vue'
 import CustomLoading from '../components/CustomLoading.vue'
 

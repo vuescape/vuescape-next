@@ -31,7 +31,6 @@ export class GoogleUniversalAnalyticsTrackingProvider implements TrackingProvide
    * Identifies the user.
    * @param user - The user to identify.
    */
-  // @ts-ignore-once: TS6133
   public identify(user: string): void {
     // Not using Google Analytics to identify so just init the provider
     this.init()
