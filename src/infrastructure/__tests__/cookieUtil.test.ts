@@ -3,7 +3,7 @@ vi.mock('jwt-decode', () => ({
   default: vi.fn()
 }))
 
-vi.mock('@vueuse/integrations', () => ({
+vi.mock('@vueuse/integrations/useCookies', () => ({
   useCookies: vi.fn(() => ({
     get: vi.fn(),
     set: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock('@vueuse/integrations', () => ({
 }))
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useCookies } from '@vueuse/integrations'
+import { useCookies } from '@vueuse/integrations/useCookies'
 import {
   executeWithLockAsync,
   acquireLock,
