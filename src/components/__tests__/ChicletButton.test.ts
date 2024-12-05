@@ -1,13 +1,14 @@
-// @ts-nocheck
 import { ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
+
 import ChicletButton from '../../components/ChicletButton.vue'
-import type { Chiclet, NavigationActionPayload } from '../../models'
-import { LinkTarget } from '../../reporting-domain'
-import { useActionStore } from '../../stores'
-import { ReportPaneKind } from '../../models/feature'
+import type { Chiclet } from '../../models/Chiclet'
+import type { NavigationActionPayload } from '../../models/dynamic-ui/actions/NavigationActionPayload'
+import { LinkTarget } from '../../reporting-domain/Link/LinkTarget'
+import { useActionStore } from '../../stores/useActionStore'
+import { ReportPaneKind } from '../../models/feature/ReportPaneKind'
 
 describe('ChicletButton.vue', () => {
   let actionStore: ReturnType<typeof useActionStore>
@@ -42,7 +43,7 @@ describe('ChicletButton.vue', () => {
     mockPaneElement.setAttribute('data-panekind', ReportPaneKind.LeftPane)
     const buttonElement = wrapper.find('.chiclet-button__layout')
     buttonElement.element.closest = vi.fn(() => mockPaneElement) // Mock closest to return the mock pane element
-    
+
     await buttonElement.trigger('click')
 
     expect(actionStore.action.type).toBe('navigate')

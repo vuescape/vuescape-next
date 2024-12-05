@@ -1,8 +1,6 @@
-import {
-  SortDirection,
-  type TreeTableHeaderCell,
-  type TreeTableHeaderRow
-} from '../../reporting-domain/TreeTable'
+import { SortDirection } from '../../reporting-domain/TreeTable/SortDirection'
+import { type TreeTableHeaderCell } from '../../reporting-domain/TreeTable/TreeTableHeaderCell'
+import { type TreeTableHeaderRow } from '../../reporting-domain/TreeTable/TreeTableHeaderRow'
 
 /**
  * Function to get the sorted header cell with its index.

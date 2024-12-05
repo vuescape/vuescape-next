@@ -1,5 +1,6 @@
-import { ApplicationBootstrapper } from '../../infrastructure'
 import { expect, suite, test } from 'vitest'
+
+import { ApplicationBootstrapper } from '../../infrastructure/ApplicationBootstrapper'
 
 suite('ApplicationBootstrapper', () => {
   test('should initialize correctly with expected methods', () => {

@@ -16,12 +16,13 @@ import { computed } from 'vue'
 
 import Button from 'primevue/button'
 
-import type { Chiclet } from '../models/dynamic-ui/'
+import type { Chiclet } from '../models/dynamic-ui/Chiclet'
 
-import { useActionStore, type ActionStore } from '../stores'
+import { useActionStore } from '../stores/useActionStore'
+import { type ActionStore } from '../stores/ActionStore'
 
-import { toEnum } from '../infrastructure'
-import { ReportPaneKind } from '../models/feature'
+import { toEnum } from '../infrastructure/converters'
+import { ReportPaneKind } from '../models/feature/ReportPaneKind'
 
 /**
  * Props definition for the ChicletButton component.
@@ -54,12 +55,12 @@ const handleClick = (event: MouseEvent) => {
   const paneKind = paneElement ? paneElement.dataset.panekind! : ReportPaneKind.None
 
   const state: ActionStore = {
-      action: props.chiclet.action,
-      paneKind: toEnum(ReportPaneKind, paneKind)
-    }
+    action: props.chiclet.action,
+    paneKind: toEnum(ReportPaneKind, paneKind)
+  }
 
-    actionStore.action = state.action
-    actionStore.paneKind = state.paneKind
+  actionStore.action = state.action
+  actionStore.paneKind = state.paneKind
 }
 </script>
 

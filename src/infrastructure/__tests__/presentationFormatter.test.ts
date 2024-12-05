@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
-  DEFAULT_EMPTY_DISPLAY, formatValue, round, toDateDisplay, toDateTimeDisplay, toTextDisplay,
-} from '../../infrastructure'
+  DEFAULT_EMPTY_DISPLAY,
+  formatValue,
+  round,
+  toDateDisplay,
+  toDateTimeDisplay,
+  toTextDisplay
+} from '../../infrastructure/presentationFormatter'
 import { PresentationFormatKind } from '../../infrastructure/PresentationFormatKind'
 
 describe('presentationFormatter', () => {
@@ -26,7 +31,7 @@ describe('presentationFormatter --', () => {
 
     it('should return emptyDisplay when value is not a string', () => {
       // Arrange
-      const inputValue   = {}
+      const inputValue = {}
       const emptyDisplay = 'not a string'
 
       // Act
@@ -73,7 +78,7 @@ describe('presentationFormatter --', () => {
 
     it('should return emptyDisplay when value is not a string', () => {
       // Arrange
-      const inputValue   = {}
+      const inputValue = {}
       const emptyDisplay = 'not a string'
 
       // Act
@@ -142,7 +147,7 @@ describe('presentationFormatter --', () => {
 
     it('should return emptyDisplay when value is not a string', () => {
       // Arrange
-      const inputValue   = {}
+      const inputValue = {}
       const emptyDisplay = 'not a string'
 
       // Act
@@ -249,11 +254,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Currency
-        const inputValue             = '22.55'
-        const numberOfDecimalPlaces  = 1
+        const inputValue = '22.55'
+        const numberOfDecimalPlaces = 1
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('$22.6')
@@ -262,11 +271,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Currency
-        const inputValue             = '-22.55'
-        const numberOfDecimalPlaces  = 1
+        const inputValue = '-22.55'
+        const numberOfDecimalPlaces = 1
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-$22.6')
@@ -275,11 +288,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for a small negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Currency
-        const inputValue             = '-0.055'
-        const numberOfDecimalPlaces  = 1
+        const inputValue = '-0.055'
+        const numberOfDecimalPlaces = 1
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-$0.1')
@@ -288,11 +305,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for zero', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Currency
-        const inputValue             = '-0.00009'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-0.00009'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('$0.00')
@@ -303,11 +324,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Percentage
-        const inputValue             = '22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('22.56%')
@@ -316,11 +341,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Percentage
-        const inputValue             = '-22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-22.56%')
@@ -331,11 +360,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Number
-        const inputValue             = '22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('22.56')
@@ -344,11 +377,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Number
-        const inputValue             = '-22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-22.56')
@@ -359,11 +396,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Number
-        const inputValue             = '22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('22.56')
@@ -372,11 +413,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Number
-        const inputValue             = '-22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-22.56')
@@ -387,11 +432,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Accounting
-        const inputValue             = '22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('22.56')
@@ -400,11 +449,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for large value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Accounting
-        const inputValue             = '999999999.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '999999999.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('999,999,999.56')
@@ -413,11 +466,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.Accounting
-        const inputValue             = '-22.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-22.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('(22.56)')
@@ -428,11 +485,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for positive value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.MMCurrency
-        const inputValue             = '151651622.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '151651622.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('$151,651,622.56mm')
@@ -441,11 +502,15 @@ describe('presentationFormatter --', () => {
       it('should format correctly for negative value', () => {
         // Arrange
         const presentationFormatKind = PresentationFormatKind.MMCurrency
-        const inputValue             = '-151651622.555'
-        const numberOfDecimalPlaces  = 2
+        const inputValue = '-151651622.555'
+        const numberOfDecimalPlaces = 2
 
         // Act
-        const formattedValue = formatValue(presentationFormatKind, inputValue, numberOfDecimalPlaces)
+        const formattedValue = formatValue(
+          presentationFormatKind,
+          inputValue,
+          numberOfDecimalPlaces
+        )
 
         // Assert
         expect(formattedValue).toEqual('-$151,651,622.56mm')

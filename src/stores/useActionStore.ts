@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import type { Action, NoAction } from '../models'
-import { ReportPaneKind } from '../models/feature'
+import type { Action, NoAction } from '../models/dynamic-ui/actions'
+import { ReportPaneKind } from '../models/feature/ReportPaneKind'
 import type { ActionStore } from './ActionStore'
 
 export const useActionStore = defineStore('useActionStore', () => {

@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { Guid } from '../../models'
 
-import { base64ToBase64Url, base64UrlToBase64, decodeBase64String, encodeBase64String } from '../converters'
+import { Guid } from '../../models/Guid'
+import {
+  base64ToBase64Url,
+  base64UrlToBase64,
+  decodeBase64String,
+  encodeBase64String
+} from '../converters'
 
 describe('decodeBase64String', () => {
   // Decodes a base64 string to a Uint8Array.
@@ -49,8 +54,10 @@ describe('encodeBase64String and decodeBase64String', () => {
 
 describe('base64ToBase64Url', () => {
   it('should convert base64 to base64url format', () => {
-    const base64String = 'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg=='
-    const expected = 'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg'
+    const base64String =
+      'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg=='
+    const expected =
+      'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg'
     const result = base64ToBase64Url(base64String)
     expect(result).toBe(expected)
   })
@@ -58,8 +65,10 @@ describe('base64ToBase64Url', () => {
 
 describe('base64UrlToBase64', () => {
   it('should convert base64url to base64 format', () => {
-    const base64UrlString = 'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg'
-    const expected = 'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg=='
+    const base64UrlString =
+      'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg'
+    const expected =
+      'TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQgdGhhdCBieSBhIHBlcnNldmVyYW5jZSBvZiBkZWxpZ2h0IGluIHRoZSBjb250aW51ZWQgYW5kIGluZGVmYXRpZ2FibGUgZ2VuZXJhdGlvbiBvZiBrbm93bGVkZ2UsIGV4Y2VlZHMgdGhlIHNob3J0IHZlaGVtZW5jZSBvZiBhbnkgY2FybmFsIHBsZWFzdXJlLg=='
     const result = base64UrlToBase64(base64UrlString)
     expect(result).toBe(expected)
   })

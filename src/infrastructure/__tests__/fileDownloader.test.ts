@@ -1,6 +1,7 @@
-import { downloadFile } from '../../infrastructure'
 import * as fileSaver from 'file-saver'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { downloadFile } from '../../infrastructure/fileDownloader'
 
 // Mock the file-saver module
 vi.mock('file-saver', () => ({

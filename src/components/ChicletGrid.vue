@@ -12,7 +12,7 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import type { ChicletGridProps } from '../models'
+import type { ChicletGridProps } from '../models/componentProps/ChicletGridProps'
 import ChicletButton from './ChicletButton.vue'
 
 const props = defineProps<ChicletGridProps>()

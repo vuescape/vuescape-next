@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect } from 'vitest'
-import NotificationMessages from '../NotificationMessages.vue'
 import Message from 'primevue/message'
-import type { NotificationMessage} from '../../models';
-import { NotificationSeverity } from '../../models'
 import PrimeVue from 'primevue/config'
+import type { NotificationMessage } from '../../models/NotificationMessage'
+import { NotificationSeverity } from '../../models/NotificationSeverity'
+import NotificationMessages from '../NotificationMessages.vue'
 
 const createWrapper = (messages: Array<NotificationMessage>) => {
   return mount(NotificationMessages, {

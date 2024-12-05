@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { ScrollBarDimension } from '../../infrastructure'
+
+import { ScrollBarDimension } from '../../infrastructure/ScrollBarDimension'
 
 // @ts-nocheck
 describe('ScrollBarDimension', () => {

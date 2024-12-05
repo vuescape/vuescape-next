@@ -2,8 +2,11 @@ import { type Pinia } from 'pinia'
 import { type ComponentPublicInstance, createApp, h, type Plugin, render } from 'vue'
 import type { Router } from 'vue-router'
 
-import { NullTrackingService, type TrackingService } from '../analytics'
-import type { BootstrappedComponent, ErrorHandler, InitFunctionResult } from '../models'
+import { type TrackingService } from '../analytics/TrackingService'
+import { NullTrackingService } from '../analytics/NullTrackingService'
+import type { BootstrappedComponent } from '../models/BootstrappedComponent'
+import type { ErrorHandler } from '../models/ErrorHandler'
+import type { InitFunctionResult } from '../models/InitFunctionResult'
 import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
 
 import LoadingDirective from '../directives/loading'

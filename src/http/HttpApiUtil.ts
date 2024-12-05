@@ -1,8 +1,11 @@
 import { HttpMethod } from './HttpMethod'
-import { sleepAsync } from '../infrastructure'
+import { sleepAsync } from '../infrastructure/asyncUtils'
 import { ApiFetchError } from '../models/ApiFetchError'
-import { useNotificationStore, type NotificationStore } from '../stores'
-import { Guid, NotificationSeverity, type NotificationMessage } from '../models'
+import { type NotificationStore } from '../stores/NotificationStore'
+import { useNotificationStore } from '../stores/useNotificationStore'
+import { Guid } from '../models/Guid'
+import { NotificationSeverity } from '../models/NotificationSeverity'
+import { type NotificationMessage } from '../models/NotificationMessage'
 
 const MAX_NUMBER_RETRIES = 3
 const RETRY_DELAY_MS = 250

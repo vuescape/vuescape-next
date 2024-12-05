@@ -1,4 +1,4 @@
-import { addScript, loadScriptFromUrl } from '../../infrastructure'
+import { addScript, loadScriptFromUrl } from '../../infrastructure/scriptHelpers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('scriptHelpers', () => {
@@ -9,11 +9,10 @@ describe('scriptHelpers', () => {
     // @ts-ignore TS2740
     createElementSpy = vi.spyOn(document, 'createElement').mockImplementation(() => ({
       setAttribute: vi.fn(),
-      remove: vi.fn(),
+      remove: vi.fn()
     }))
     // @ts-ignore TS2345
-    appendChildSpy = vi.spyOn(document.head, 'appendChild').mockImplementation(() => {
-    })
+    appendChildSpy = vi.spyOn(document.head, 'appendChild').mockImplementation(() => {})
     querySelectorSpy = vi.spyOn(document.head, 'querySelector').mockImplementation(() => null)
   })
 
@@ -38,7 +37,7 @@ describe('scriptHelpers', () => {
     it('removes existing script if ID matches', () => {
       // @ts-ignore TS7005
       querySelectorSpy.mockImplementation(() => ({
-        remove: vi.fn(),
+        remove: vi.fn()
       }))
       addScript('console.log("Hello again!");', 'testScript')
       // @ts-ignore TS7005
@@ -58,7 +57,7 @@ describe('scriptHelpers', () => {
     it('removes existing script if ID matches', () => {
       // @ts-ignore TS7005
       querySelectorSpy.mockImplementation(() => ({
-        remove: vi.fn(),
+        remove: vi.fn()
       }))
       loadScriptFromUrl('https://example.com/newscript.js', 'remoteScript')
       // @ts-ignore TS7005

@@ -13,7 +13,6 @@ export default {}
 <script setup lang="ts">
 import type { PaneSectionRendererProps } from '../models/componentProps/PaneSectionRendererProps'
 import PaneItemView from './PaneItemRenderer.vue'
-import { defineProps } from 'vue'
 
 const props = defineProps<PaneSectionRendererProps>()
 </script>

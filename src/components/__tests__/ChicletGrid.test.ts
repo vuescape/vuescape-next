@@ -1,10 +1,11 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+
 import ChicletGrid from '../ChicletGrid.vue'
-import { createPinia, setActivePinia } from 'pinia'
 
 import type { ChicletGridProps } from '../../models/componentProps/ChicletGridProps'
-import { LinkTarget } from '../../reporting-domain'
+import { LinkTarget } from '../../reporting-domain/Link/LinkTarget'
 
 describe('ChicletGrid.vue', () => {
   beforeEach(() => {

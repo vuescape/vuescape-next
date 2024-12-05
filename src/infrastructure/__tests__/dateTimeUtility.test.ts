@@ -1,5 +1,6 @@
-import { formatUtcDateTimeString } from '../../infrastructure'
 import { describe, expect, it } from 'vitest'
+
+import { formatUtcDateTimeString } from '../../infrastructure/dateTimeUtility'
 
 describe('formatUtcDateTimeString', () => {
   it('returns an empty string for empty input', () => {

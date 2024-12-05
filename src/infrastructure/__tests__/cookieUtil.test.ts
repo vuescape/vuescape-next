@@ -1,4 +1,16 @@
 /* eslint-disable */
+vi.mock('jwt-decode', () => ({
+  default: vi.fn()
+}))
+
+vi.mock('@vueuse/integrations', () => ({
+  useCookies: vi.fn(() => ({
+    get: vi.fn(),
+    set: vi.fn(),
+    remove: vi.fn()
+  }))
+}))
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useCookies } from '@vueuse/integrations'
 import {
@@ -7,8 +19,6 @@ import {
   acquireLockWithRetryAsync,
   releaseLock
 } from '../cookieUtil'
-
-vi.mock('@vueuse/integrations')
 
 describe('cookieUtil', () => {
   let cookiesMock: any
@@ -24,7 +34,7 @@ describe('cookieUtil', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })
-
+  
   describe('executeWithLockAsync', () => {
     it('executes action if lock is acquired', async () => {
       vi.spyOn(global, 'window', 'get').mockReturnValue({ location: { hostname: 'test.com' } })

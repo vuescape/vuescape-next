@@ -1,3 +1,4 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 
@@ -5,7 +6,6 @@ import PaneLayoutRenderer from '../PaneLayoutRenderer.vue'
 import PaneSectionRenderer from '../PaneSectionRenderer.vue'
 
 import type { PaneLayoutRendererProps } from '../../models/componentProps/PaneLayoutRendererProps'
-import { createPinia, setActivePinia } from 'pinia'
 
 setActivePinia(createPinia())
 
