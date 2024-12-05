@@ -3,8 +3,15 @@
   "projectType": "library",
   "sourceRoot": "packages/vuescape-next/src",
   "targets": {
-    "build": {},
+    "build-sync": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "nx run vuescape:build --parallel=false"
+      }
+    },
     "test:unit": {},
+    "build": {},
     "vite-build": {},
     "emit-types": {},
     "lint": {}
