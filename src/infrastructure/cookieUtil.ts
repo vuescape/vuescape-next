@@ -1,4 +1,4 @@
-import { useCookies } from '@vueuse/integrations/useCookies'
+import { useCookies } from '@vueuse/integrations'
 import type { CookieLock } from '../models'
 
 /**

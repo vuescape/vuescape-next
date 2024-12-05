@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useCookies } from '@vueuse/integrations/useCookies'
+import { useCookies } from '@vueuse/integrations'
 import {
   executeWithLockAsync,
   acquireLock,
@@ -8,7 +8,7 @@ import {
   releaseLock
 } from '../cookieUtil'
 
-vi.mock('@vueuse/integrations/useCookies')
+vi.mock('@vueuse/integrations')
 
 describe('cookieUtil', () => {
   let cookiesMock: any
