@@ -1,11 +1,14 @@
 import { createApp, type Directive, type DirectiveBinding, h } from 'vue'
 import CustomLoading from '../components/CustomLoading.vue'
 
-// Define the types for the directive binding and element
+// Define local interface for for the directive binding and element since only used internally
 interface HTMLElementWithLoading extends HTMLElement {
-  loadingElement?: HTMLElement | null;
+  loadingElement?: HTMLElement | null
 }
 
+/**
+ * A custom Vue directive to show or hide a loading spinner on an element.
+ */
 const loadingDirective: Directive<HTMLElementWithLoading, boolean> = {
   mounted(el: HTMLElementWithLoading, binding: DirectiveBinding<boolean>) {
     if (binding.value) {
@@ -13,7 +16,7 @@ const loadingDirective: Directive<HTMLElementWithLoading, boolean> = {
       const loadingApp = createApp({
         render() {
           return h(CustomLoading, { isVisible: true })
-        },
+        }
       })
 
       // Mount the loading and append it to the element
@@ -28,7 +31,7 @@ const loadingDirective: Directive<HTMLElementWithLoading, boolean> = {
       const loadingApp = createApp({
         render() {
           return h(CustomLoading, { isVisible: true })
-        },
+        }
       })
       const loadingInstance = loadingApp.mount(document.createElement('div'))
       el.loadingElement = loadingInstance.$el as HTMLElement
@@ -45,7 +48,7 @@ const loadingDirective: Directive<HTMLElementWithLoading, boolean> = {
       el.removeChild(el.loadingElement)
       el.loadingElement = null
     }
-  },
+  }
 }
 
 export default loadingDirective

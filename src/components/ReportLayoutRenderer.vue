@@ -62,21 +62,19 @@ watch(
   { immediate: true, deep: true } // Syncs immediately on mount and responds to deep changes
 )
 
-// Computed properties to check for the presence of panes with a positive width
+// Computed properties for each pane layout
 const leftReportLayout = computed(() =>
   reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.LeftPane)
 )
 const centerReportLayout = computed(() =>
   reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.CenterPane)
 )
-
 const rightReportLayout = computed(() =>
   reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.RightPane)
 )
 
-const leftPaneExistsWithWidth = computed(
-  () => (leftReportLayout.value?.paneWidthPercent ?? 0) > 0
-)
+// Computed properties checking if a specified pane exists and has > 0 width
+const leftPaneExistsWithWidth = computed(() => (leftReportLayout.value?.paneWidthPercent ?? 0) > 0)
 const centerPaneExistsWithWidth = computed(
   () => (centerReportLayout.value?.paneWidthPercent ?? 0) > 0
 )
@@ -91,15 +89,15 @@ const isOnlyCenterPane = computed(
     centerPaneExistsWithWidth.value
 )
 
-onMounted(() => {
+const getPageTitle = (reportLayouts: Array<ReportLayout>) => {
   let title
-  const centerReportLayout = reportLayouts.value.find(
+  const centerReportLayout = reportLayouts.find(
     (layout) => layout.targetPane === ReportPaneKind.CenterPane
   )
-  const leftReportLayout = reportLayouts.value.find(
+  const leftReportLayout = reportLayouts.find(
     (layout) => layout.targetPane === ReportPaneKind.LeftPane
   )
-  const rightReportLayout = reportLayouts.value.find(
+  const rightReportLayout = reportLayouts.find(
     (layout) => layout.targetPane === ReportPaneKind.RightPane
   )
 
@@ -111,6 +109,11 @@ onMounted(() => {
     title = rightReportLayout.title
   }
 
+  return title
+}
+
+onMounted(() => {
+  const title = getPageTitle(reportLayouts.value)
   if (title) {
     document.title = title
   }
@@ -120,7 +123,7 @@ onMounted(() => {
 <template>
   <!-- <h3>{{ reportLayout.title }}</h3> -->
   <PaneLayoutRenderer
-  :data-paneKind="ReportPaneKind.CenterPane"
+    :data-paneKind="ReportPaneKind.CenterPane"
     :class="ReportPaneKind.CenterPane"
     v-if="isOnlyCenterPane && centerReportLayout?.content"
     :pane="centerReportLayout.content"
@@ -131,19 +134,31 @@ onMounted(() => {
       v-if="leftPaneExistsWithWidth && leftReportLayout?.content"
       :size="leftReportLayout.paneWidthPercent"
     >
-      <PaneLayoutRenderer :data-paneKind="ReportPaneKind.LeftPane" :class="ReportPaneKind.LeftPane" :pane="leftReportLayout.content" />
+      <PaneLayoutRenderer
+        :data-paneKind="ReportPaneKind.LeftPane"
+        :class="ReportPaneKind.LeftPane"
+        :pane="leftReportLayout.content"
+      />
     </SplitterPanel>
     <SplitterPanel
       v-if="centerPaneExistsWithWidth && centerReportLayout?.content"
       :size="centerReportLayout.paneWidthPercent"
     >
-      <PaneLayoutRenderer :class="ReportPaneKind.CenterPane" :data-paneKind="ReportPaneKind.CenterPane" :pane="centerReportLayout.content" />
+      <PaneLayoutRenderer
+        :class="ReportPaneKind.CenterPane"
+        :data-paneKind="ReportPaneKind.CenterPane"
+        :pane="centerReportLayout.content"
+      />
     </SplitterPanel>
     <SplitterPanel
       v-if="rightPaneExistsWithWidth && rightReportLayout?.content"
       :size="rightReportLayout.paneWidthPercent"
     >
-      <PaneLayoutRenderer :class="ReportPaneKind.RightPane" :data-paneKind="ReportPaneKind.RightPane" :pane="rightReportLayout.content" />
+      <PaneLayoutRenderer
+        :class="ReportPaneKind.RightPane"
+        :data-paneKind="ReportPaneKind.RightPane"
+        :pane="rightReportLayout.content"
+      />
     </SplitterPanel>
   </Splitter>
 </template>

@@ -20,14 +20,14 @@ import Dialog from 'primevue/dialog'
 import Divider from 'primevue/divider'
 import type { VuescapeDialogProps } from '../models/componentProps/VuescapeDialogProps'
 
+const emit = defineEmits(['update:visible'])
+
 withDefaults(defineProps<VuescapeDialogProps>(), {
   closable: true,
   draggable: false,
   okButtonText: 'OK',
   showFooter: true
 })
-
-const emit = defineEmits(['update:visible'])
 
 const okClick = () => {
   emit('update:visible', false)

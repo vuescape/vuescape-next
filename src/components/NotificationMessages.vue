@@ -16,6 +16,7 @@ import Message from 'primevue/message'
 import { ref, watch } from 'vue'
 import type { NotificationMessage, NotificationMessagesProps } from '../models'
 
+const emit = defineEmits<{ (e: 'remove', id: string): void }>()
 // Accept messages as a prop
 const props = defineProps<NotificationMessagesProps>()
 const messages = ref([...props.messages])
@@ -25,13 +26,13 @@ const handleClose = (msg: NotificationMessage, event: Event) => {
     return
   }
 
-  // We are  managing the list of messages and not PrimeVue so stop the event from propagating
+  // Emit the remove event with the message id so that it can be removed if desired
   emit('remove', msg.id)
+
+  // We are  managing the list of messages and not PrimeVue so stop the event from propagating
   event.stopPropagation()
   event.preventDefault()
 }
-
-const emit = defineEmits<{ (e: 'remove', id: string): void }>()
 
 watch(
   () => props.messages,

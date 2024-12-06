@@ -19,7 +19,6 @@ suite('ApplicationBootstrapper', () => {
     expect(bootstrapper).to.respondTo('withHeaderComponent')
     expect(bootstrapper).to.respondTo('withFooterComponent')
     expect(bootstrapper).to.respondTo('withPrimeVueTheme')
-    expect(bootstrapper).to.respondTo('withPrimeVueComponents')
     expect(bootstrapper).to.respondTo('withGlobalClickHandler')
     expect(bootstrapper).to.respondTo('bootstrap')
   })

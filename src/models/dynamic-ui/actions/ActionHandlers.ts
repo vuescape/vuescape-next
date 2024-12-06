@@ -5,6 +5,15 @@ import { LinkTarget } from '../../../reporting-domain'
 import type { NoAction } from './NoAction'
 import type { ReportPaneKind } from '../../feature'
 
+/**
+ * Handles different types of actions based on the action type in the action store state.
+ *
+ * @param actionStoreState - The state of the action store containing the action to be handled.
+ * @param router - The router instance used for navigation actions.
+ * @param loadReport - A function to load a report given a URL.
+ * @returns A promise that resolves when the action has been handled.
+ * @throws Will throw an error if the action type is unknown.
+ */
 export async function handleAction(
   actionStoreState: ActionStore,
   router: Router,
@@ -28,6 +37,18 @@ export async function handleNoAction(action: NoAction, sourcePane: ReportPaneKin
   console.warn('No action handler invoked. No action to take.', action, sourcePane)
 }
 
+/**
+ * Handles navigation actions based on the specified target and payload.
+ *
+ * @param {NavigationAction} action - The navigation action containing the payload and target.
+ * @param {ReportPaneKind} sourcePane - The source pane from which the action originated.
+ * @param {Router} router - The router instance used for navigation.
+ * @param {(url: string) => Promise<void>} loadReport - A function to load a report given a URL.
+ *
+ * @returns {Promise<void>} A promise that resolves when the navigation action is handled.
+ *
+ * @throws {Error} If the target is LinkTarget.Download or LinkTarget.Modal, an error is thrown indicating that the target is not implemented.
+ */
 export async function handleNavigationAction(
   action: NavigationAction,
   sourcePane: ReportPaneKind,

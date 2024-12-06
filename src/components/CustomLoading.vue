@@ -12,6 +12,7 @@ export default {}
 
 <script lang="ts" setup>
 import type { CustomLoadingProps } from '../models/componentProps/CustomLoadingProps'
+// TODO: Why is this image not loading?
 import loadingImage from '../assets/thin-broken-ring-335.gif'
 
 const props = withDefaults(defineProps<CustomLoadingProps>(), {

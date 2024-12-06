@@ -22,11 +22,8 @@ import LoadingDirective from '../directives/loading'
 export class ApplicationBootstrapper {
   private theme: any = {}
   private primeVue?: Plugin
-  private primeVueComponents: Array<any> = []
 
   private errorHandler!: ErrorHandler
-  // private storeModules                     = {}
-  // private vuexStore: Store<any>
   private router!: Router
   private rootComponentOptions!: { cssSelector: string; rootComponent: BootstrappedComponent }
   private bootstrappedHeaderComponent!: BootstrappedComponent
@@ -181,17 +178,6 @@ export class ApplicationBootstrapper {
   public withPrimeVueTheme(theme: any, primeVue: Plugin) {
     this.theme = theme
     this.primeVue = primeVue
-    return this
-  }
-
-  /**
-   * Sets the PrimeVue components to be used in the application.
-   *
-   * @param components - An array of PrimeVue components.
-   * @returns The `ApplicationBootstrapper` instance.
-   */
-  public withPrimeVueComponents(components: Array<any>) {
-    this.primeVueComponents = components
     return this
   }
 

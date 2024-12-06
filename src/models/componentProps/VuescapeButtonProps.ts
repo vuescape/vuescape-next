@@ -1,5 +1,4 @@
-// Define the IconPosition type if not already defined
-export type IconPosition = 'left' | 'right' | 'top' | 'bottom'
+import type { IconPosition } from './IconPosition'
 
 /**
  * Interface for VuescapeButton props.
