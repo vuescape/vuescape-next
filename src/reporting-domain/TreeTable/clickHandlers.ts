@@ -7,7 +7,6 @@ import { type TreeTableRow } from './TreeTableRow'
  * @param row - The row of the tree table.
  * @param cell - The cell of the tree table.
  */
-// @ts-ignore-once: TS6133
 export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
   if (!cell || !cell.links) {
     return
@@ -44,7 +43,7 @@ export function selfLinkClickHandler(row: TreeTableRow, cell: TreeTableCell) {
         // TODO: determine if absolute or relative url to see if we should perform a route or location.url
         break
       default:
-        throw new Error('Invalid linkTarget: ' + target)       
+        throw new Error('Invalid linkTarget: ' + target)
     }
   }
 }

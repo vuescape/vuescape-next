@@ -29,7 +29,6 @@ export class HubSpotTrackingProvider implements TrackingProvider {
    * Identifies the user.
    * @param user - The user to identify.
    */
-  // @ts-ignore-once: TS6133
   public identify(user: string): void {
     if (!this.isInitialized) {
       this.getHsq().push([

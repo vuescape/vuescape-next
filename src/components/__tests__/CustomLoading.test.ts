@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import CustomLoading from '../CustomLoading.vue'

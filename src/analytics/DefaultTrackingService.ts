@@ -37,7 +37,7 @@ export class DefaultTrackingService implements TrackingService {
    * @param from - The previous route.
    */
   public handleRouteChanged(
-    to: RouteLocationNormalized, // @ts-ignore-once: TS6133 unused parameter
+    to: RouteLocationNormalized,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     from: RouteLocationNormalized
   ): void {

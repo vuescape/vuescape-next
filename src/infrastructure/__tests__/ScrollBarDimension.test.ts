@@ -2,13 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ScrollBarDimension } from '../../infrastructure/ScrollBarDimension'
 
-// @ts-nocheck
 describe('ScrollBarDimension', () => {
-  // @ts-ignore
   let createElementSpy, appendChildSpy, removeChildSpy
 
   beforeEach(() => {
     // Mock createElement to return a div with controlled offsetWidth and clientWidth
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     createElementSpy = vi.spyOn(document, 'createElement').mockImplementation(() => {
       const div = {
@@ -20,31 +19,27 @@ describe('ScrollBarDimension', () => {
       return div
     })
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     appendChildSpy = vi.spyOn(document.body, 'appendChild').mockImplementation(() => {
     })
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation(() => {
     })
   })
 
   afterEach(() => {
-    // @ts-ignore
     createElementSpy.mockRestore()
-    // @ts-ignore
     appendChildSpy.mockRestore()
-    // @ts-ignore
     removeChildSpy.mockRestore()
   })
 
   it('calculates scrollbar width correctly upon instantiation', () => {
     const scrollBarDimension = new ScrollBarDimension()
     expect(scrollBarDimension.width).toBe(10)
-    // @ts-ignore
     expect(createElementSpy).toHaveBeenCalledWith('div')
-    // @ts-ignore
     expect(appendChildSpy).toHaveBeenCalledTimes(1)
-    // @ts-ignore
     expect(removeChildSpy).toHaveBeenCalledTimes(1)
   })
 

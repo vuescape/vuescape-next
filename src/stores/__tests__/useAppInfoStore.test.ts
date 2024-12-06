@@ -1,9 +1,11 @@
-// @ts-ignore TS2339
+import type { Ref } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import fetchMocker from 'vitest-fetch-mock'
+
 import type { AppInfoStore } from '../AppInfoStore'
 import { useAppInfoStore } from '../useAppInfoStore'
+import type { AppInfo } from 'vuescape'
 
 const fetchMock = fetchMocker(vi)
 
@@ -54,13 +56,12 @@ describe('useAppInfoStore', () => {
     vi.spyOn(global, 'setTimeout')
     const store = useAppInfoStore() as AppInfoStore
 
-    // @ts-ignore TS2339
-    const initialState = store.state.value
+    const appInfo: Ref<AppInfo> = store.state as Ref<AppInfo>
+    const initialState = appInfo.value
     fetchMock.mockImplementation(() => Promise.resolve(new Response(null, { status: 500 })))
     await store.fetchAppInfoAsync()
 
-    // @ts-ignore TS2339
-    expect(store.state.value).toEqual(initialState)
+    expect(appInfo.value).toEqual(initialState)
     expect(setTimeout).toHaveBeenCalledTimes(2)
   })
 

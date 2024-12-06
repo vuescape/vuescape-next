@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { mount } from '@vue/test-utils'
 import Button from 'primevue/button'
 import { describe, expect, it } from 'vitest'

@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { registerGlobalVariable } from '../globalState'
 
-// @ts-nocheck
 describe('registerGlobalVariable', () => {
   let originalWindow: any
 
@@ -24,6 +23,7 @@ describe('registerGlobalVariable', () => {
   })
 
   afterEach(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore TS2790
     delete window.crypto // Clean up by removing the mock
     Object.assign(window, originalWindow) // Restore the original window object
@@ -33,27 +33,22 @@ describe('registerGlobalVariable', () => {
     const name = 'newVar'
     const value = 'newValue'
     registerGlobalVariable(name, value)
-    // @ts-ignore 7015
     expect(window[name]).toBe(value)
   })
 
   it('should not overwrite an existing variable if shouldAlwaysRegister is false', () => {
     const name = 'existingVar'
     const initialValue = 'initialValue'
-    // @ts-ignore 7015
     window[name] = initialValue
     registerGlobalVariable(name, 'newValue')
-    // @ts-ignore 7015
     expect(window[name]).toBe(initialValue)
   })
 
   it('should overwrite an existing variable if shouldAlwaysRegister is true', () => {
     const name = 'overwriteVar'
     const initialValue = 'initialValue'
-    // @ts-ignore 7015
     window[name] = initialValue
     registerGlobalVariable(name, 'newValue', true)
-    // @ts-ignore 7015
     expect(window[name]).toBe('newValue')
   })
 })

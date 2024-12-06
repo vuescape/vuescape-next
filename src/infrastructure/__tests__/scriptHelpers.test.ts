@@ -1,16 +1,18 @@
+/* eslint-disable */
 import { addScript, loadScriptFromUrl } from '../../infrastructure/scriptHelpers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('scriptHelpers', () => {
-  // @ts-ignore TS7034
   let createElementSpy, appendChildSpy, querySelectorSpy
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore TS2740
     createElementSpy = vi.spyOn(document, 'createElement').mockImplementation(() => ({
       setAttribute: vi.fn(),
       remove: vi.fn()
     }))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore TS2345
     appendChildSpy = vi.spyOn(document.head, 'appendChild').mockImplementation(() => {})
     querySelectorSpy = vi.spyOn(document.head, 'querySelector').mockImplementation(() => null)
