@@ -1,6 +1,6 @@
 import type { TrackingProvider } from './TrackingProvider'
 
-// eslint-disable-next-line no-var
+// eslint-disable-next-line no-var, @typescript-eslint/no-unsafe-function-type
 declare var ga: Function
 
 /**

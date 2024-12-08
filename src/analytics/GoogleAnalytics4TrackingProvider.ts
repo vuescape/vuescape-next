@@ -1,7 +1,7 @@
 import { addScript, loadScriptFromUrl } from '../infrastructure'
 import type { TrackingProvider } from './TrackingProvider'
 
-// eslint-disable-next-line no-var
+// eslint-disable-next-line no-var, @typescript-eslint/no-unsafe-function-type
 declare var gtag: Function
 
 /**
@@ -64,8 +64,7 @@ gtag('config', '${this.trackingId}', { send_page_view: false })
     if (this.isInitialized) {
       gtag('config', `${this.trackingId}`, { page_path: urlFragment })
     } else {
-      const self = this
-      const callback = () => self.trackPageView(urlFragment)
+      const callback = () => this.trackPageView(urlFragment)
       setTimeout(callback, 500)
       console.warn(
         'GoogleAnalytics4TrackingProvider.trackPageView: HubSpot is not initialized. Page view not tracked.'

@@ -54,6 +54,10 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
     poller = setInterval(async () => {
       await fetchAppInfoAsync()
     }, pollingIntervalMilliseconds)
+    // eslint-disable-next-line no-console
+    console.info(
+      `AppInfo Polling started with interval of ${pollingIntervalMilliseconds} milliseconds`
+    )
   }
 
   /**
@@ -61,7 +65,11 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
    * If the poller is not defined, the function does nothing.
    */
   function stopPolling() {
-    poller && clearInterval(poller)
+    if (poller) {
+      // eslint-disable-next-line no-console
+      console.info('AppInfo Polling stopped')
+      clearInterval(poller)
+    }
   }
 
   /**

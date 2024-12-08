@@ -13,13 +13,14 @@ const props: PaneItemRendererProps = {
 }
 
 describe('PaneItemRenderer', () => {
-  //   it('renders the correct number of components', () => {
-  //     const wrapper = mount(PaneItemRenderer, {
-  //       props: { item: props.item }
-  //     })
-  //     const components = wrapper.findAllComponents({ name: 'component' })
-  //     expect(components.length).toBe(props.item.components.length)
-  //   })
+  // TODO: fix test -- Skipping for now due to failure
+  it.skip('renders the correct number of components', () => {
+    const wrapper = mount(PaneItemRenderer, {
+      props: { item: props.item }
+    })
+    const components = wrapper.findAllComponents({ name: 'component' })
+    expect(components.length).toBe(props.item.components.length)
+  })
 
   it('passes the correct props to each component', () => {
     const wrapper = mount(PaneItemRenderer, {

@@ -48,7 +48,6 @@ const actionStore = useActionStore()
 // TODO: handling an action will no doubt be used in more than one component,
 // so it should be extracted to a utility function
 const handleClick = (event: MouseEvent) => {
-  console.info(event)
   const clickedElement = event.target as HTMLElement
   const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
 

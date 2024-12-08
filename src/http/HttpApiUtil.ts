@@ -94,6 +94,7 @@ export function constructUrl(
     }
     return url.toString()
   } catch (error) {
+    console.error(error)
     throw new Error(`Invalid URL: ${baseUrl}`)
   }
 }

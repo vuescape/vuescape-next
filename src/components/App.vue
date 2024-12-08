@@ -45,7 +45,6 @@ const removeMessage = (id: string) => {
     return
   }
   messages.splice(index, 1)
-  console.info('removed index ' + index, notificationStore.messages)
 }
 
 const appInfoStore = useAppInfoStore() as AppInfoStore

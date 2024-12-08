@@ -16,7 +16,6 @@ import type { ChicletGridProps } from '../models/componentProps/ChicletGridProps
 import ChicletButton from './ChicletButton.vue'
 
 const props = defineProps<ChicletGridProps>()
-console.info(JSON.stringify(props.chiclets))
 </script>
 
 <template>
