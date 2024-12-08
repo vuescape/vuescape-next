@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outFile": "./dist/vuescape.d.ts",
     "rootDir": "./src",
   },
   "include": [
