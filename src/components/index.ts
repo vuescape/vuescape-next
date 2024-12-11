@@ -13,6 +13,7 @@ export { default as TitleComponentRenderer } from './TitleComponentRenderer.vue'
 
 export { default as VuescapeButton } from './VuescapeButton.vue'
 export { default as VuescapeDialog } from './VuescapeDialog.vue'
+export { default as VuescapeSelect } from './VuescapeSelect.vue'
 
 export { default as ChicletButton } from './ChicletButton.vue'
 export { default as ChicletGrid } from './ChicletGrid.vue'

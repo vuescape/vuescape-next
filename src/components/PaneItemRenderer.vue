@@ -13,12 +13,14 @@ export default {}
 <script setup lang="ts">
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 
+import ChicletGridComponentView from './ChicletGrid.vue'
 import TitleComponentView from './TitleComponentRenderer.vue'
 import ButtonComponentView from './VuescapeButton.vue'
-import ChicletGridComponentView from './ChicletGrid.vue'
-
 // TODO: import the actual components
 import TableComponentView from './VuescapeButton.vue'
+import SelectComponentView from './VuescapeSelect.vue'
+
+// TODO: import the actual components
 
 import type { PaneItemRendererProps } from '../models/componentProps/PaneItemRendererProps'
 
@@ -28,7 +30,8 @@ const componentMap: Record<PaneComponent['type'], any> = {
   title: TitleComponentView,
   button: ButtonComponentView,
   chicletGrid: ChicletGridComponentView,
-  table: TableComponentView
+  table: TableComponentView,
+  select: SelectComponentView
 }
 </script>
 

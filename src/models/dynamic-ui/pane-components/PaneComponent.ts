@@ -1,5 +1,6 @@
 import type { ButtonComponent } from './ButtonComponent'
 import type { ChicletGridComponent } from './ChicletGridComponent'
+import type { SelectComponent } from './SelectComponent'
 import type { TableComponent } from './TableComponent'
 import type { TitleComponent } from './TitleComponent'
 
@@ -11,4 +12,9 @@ import type { TitleComponent } from './TitleComponent'
  * - `ChicletGridComponent`: A component that displays a grid of chiclets.
  * - `TableComponent`: A component that displays a table.
  */
-export type PaneComponent = TitleComponent | ButtonComponent | ChicletGridComponent | TableComponent
+export type PaneComponent =
+  | TitleComponent
+  | ButtonComponent
+  | ChicletGridComponent
+  | TableComponent
+  | SelectComponent
