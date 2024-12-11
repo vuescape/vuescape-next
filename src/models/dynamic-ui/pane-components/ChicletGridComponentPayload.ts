@@ -1,4 +1,4 @@
-import type { ChicletGridProps } from '../../componentProps'
+import type { ChicletGridProps } from '../../componentProps/ChicletGridProps'
 
 /**
  * Represents the payload for the ChicletGrid component.
