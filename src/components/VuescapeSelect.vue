@@ -25,7 +25,28 @@ const initializedProps = ref<VuescapeSelectProps>({
   disabled: props.disabled ?? false,
   class: props.class ?? ''
 })
+
+// eslint-disable-next-line vue/valid-define-emits
+const emit = defineEmits()
 const attrs = useAttrs()
+
+/**
+ * Creates an object containing event listeners from the provided attributes.
+ *
+ * @param {Record<string, unknown>} attrs - The attributes object containing potential event listeners.
+ * @param {Function} emit - The function used to emit events.
+ * @returns {Record<string, (event: unknown) => void>} An object containing event listeners.
+ */
+const listeners = Object.keys(attrs).reduce(
+  (acc, key) => {
+    if (key.startsWith('on')) {
+      const eventName = key.slice(2).toLowerCase()
+      acc[eventName] = (event: unknown) => emit(eventName, event)
+    }
+    return acc
+  },
+  {} as Record<string, (event: unknown) => void>
+)
 </script>
 
 <template>
@@ -40,6 +61,7 @@ const attrs = useAttrs()
       :class="initializedProps.class"
       :disabled="initializedProps.disabled"
       v-bind="attrs"
+      v-on="listeners"
     >
     </Select>
   </div>

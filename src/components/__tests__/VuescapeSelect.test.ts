@@ -15,7 +15,13 @@ const props: VuescapeSelectProps = {
   class: 'custom-class'
 }
 
-const createWrapper = (propsData: VuescapeSelectProps) => {
+const attrs = {
+  'data-test': 'my-select',
+  onChange: vi.fn()
+  //onUpdateModelValue: vi.fn()
+}
+
+const createWrapper = (propsData: VuescapeSelectProps, attrsData: any) => {
   return mount(VuescapeSelect, {
     global: {
       plugins: [PrimeVue],
@@ -23,14 +29,15 @@ const createWrapper = (propsData: VuescapeSelectProps) => {
         Select: PrimeVueSelect
       }
     },
-    props: propsData
+    props: propsData,
+    attrs: attrsData
   })
 }
 describe('VuescapeSelect.vue', () => {
   let wrapper
 
   beforeEach(() => {
-    wrapper = createWrapper(props)
+    wrapper = createWrapper(props, attrs)
   })
 
   it('renders the select component', () => {
@@ -39,7 +46,6 @@ describe('VuescapeSelect.vue', () => {
 
   it('passes the correct props to the select component', () => {
     const selectComponent = wrapper.findComponent({ name: 'select' })
-    const sProps = selectComponent.props()
     expect(selectComponent.props().options).toEqual(props.options)
     expect(selectComponent.props().modelValue).toEqual(props.value)
     expect(selectComponent.props().name).toBe(props.name)
@@ -55,7 +61,7 @@ describe('VuescapeSelect.vue', () => {
   })
 
   it('renders the correct placeholder', () => {
-    wrapper = createWrapper({ ...props, value: null })
+    wrapper = createWrapper({ ...props, value: null }, attrs)
     expect(wrapper.find('span.p-placeholder').attributes('aria-label')).toBe(props.placeholder)
   })
 })
