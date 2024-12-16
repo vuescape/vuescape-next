@@ -1,12 +1,14 @@
-import type { ActionStore } from '../../../stores'
-import type { NavigationAction } from './NavigationAction'
 import type { Router } from 'vue-router'
-import { LinkTarget } from '../../../reporting-domain'
-import type { NoAction } from './NoAction'
-import type { ReportPaneKind } from '../../feature'
 
-/**
- * Handles different types of actions based on the action type in the action store state.
+import { LinkTarget } from '../../../reporting-domain/Link/LinkTarget'
+import type { ActionStore } from '../../../stores/ActionStore'
+import { ReportPaneKind } from '../../feature/ReportPaneKind'
+import type { Action } from './Action'
+import type { NavigationAction } from './NavigationAction'
+import type { NoAction } from './NoAction'
+import { toEnum } from '../../../infrastructure/converters'
+
+/* Handles different types of actions based on the action type in the action store state.
  *
  * @param actionStoreState - The state of the action store containing the action to be handled.
  * @param router - The router instance used for navigation actions.
@@ -59,8 +61,6 @@ export async function handleNavigationAction(
   if (!target) {
     return
   }
-  // console.info(router.currentRoute.value)
-
   if (
     target === LinkTarget.CenterPane ||
     target === LinkTarget.LeftPane ||
@@ -71,6 +71,8 @@ export async function handleNavigationAction(
     if (action.payload.replace === true) {
       router.replace(action.payload.url)
     } else {
+      // TODO: Remove this logic from here and ensure payload.url is already
+      // the correct URL for the route
       const route = '/my-data' + action.payload.url
       router.push(route)
     }
@@ -84,8 +86,8 @@ export async function handleNavigationAction(
     } else if (action.payload.replace === true) {
       router.replace(action.payload.url)
     } else {
-      history.replaceState(null, '', action.payload.url)
-      // router.push(action.payload.url)
+      console.info('Navigating to for LinkTarget.CurrentWindow' + action.payload.url)
+      router.push(action.payload.url)
     }
   } else if (target === LinkTarget.NewWindow) {
     // console.log('Opening new window ' + action.payload.url)
@@ -97,4 +99,26 @@ export async function handleNavigationAction(
   } else if (target == LinkTarget.None) {
     throw new Error('LinkTarget.None not supported')
   }
+}
+
+/**
+ * Handles an action event by updating the action store so that the action can be completed.
+ *
+ * @param event - The event object triggered by the action.
+ * @param action - The action to be handled.
+ * @param actionStore - The store where the action and pane kind will be updated.
+ */
+export function handleActionEvent(event: Event, action: Action, actionStore: ActionStore): void {
+  const clickedElement = event.target as HTMLElement
+  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
+
+  const paneKind = paneElement ? paneElement.dataset.panekind! : ReportPaneKind.None
+
+  const state: ActionStore = {
+    action: action,
+    paneKind: toEnum(ReportPaneKind, paneKind)
+  }
+
+  actionStore.action = state.action
+  actionStore.paneKind = state.paneKind
 }

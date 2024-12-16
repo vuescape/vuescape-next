@@ -17,12 +17,8 @@ import { computed } from 'vue'
 import Button from 'primevue/button'
 
 import type { Chiclet } from '../models/dynamic-ui/Chiclet'
-
+import { handleActionEvent } from '../models/dynamic-ui/actions/ActionHandlers'
 import { useActionStore } from '../stores/useActionStore'
-import { type ActionStore } from '../stores/ActionStore'
-
-import { toEnum } from '../infrastructure/converters'
-import { ReportPaneKind } from '../models/feature/ReportPaneKind'
 
 /**
  * Props definition for the ChicletButton component.
@@ -40,27 +36,6 @@ const icons = computed((event: any) => {
 })
 
 const actionStore = useActionStore()
-
-/**
- * Handles the action when the ChicletButton is clicked.
- * This function is responsible for executing the primary action associated with the button.
- */
-// TODO: handling an action will no doubt be used in more than one component,
-// so it should be extracted to a utility function
-const handleClick = (event: MouseEvent) => {
-  const clickedElement = event.target as HTMLElement
-  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
-
-  const paneKind = paneElement ? paneElement.dataset.panekind! : ReportPaneKind.None
-
-  const state: ActionStore = {
-    action: props.chiclet.action,
-    paneKind: toEnum(ReportPaneKind, paneKind)
-  }
-
-  actionStore.action = state.action
-  actionStore.paneKind = state.paneKind
-}
 </script>
 
 <template>
@@ -70,7 +45,7 @@ const handleClick = (event: MouseEvent) => {
     iconPos="top"
     iconClass="chiclet-button__icon"
     :class="['chiclet-button__layout', chiclet.cssClass]"
-    @click="handleClick"
+    @click="handleActionEvent($event, props.chiclet.action, actionStore)"
   />
 </template>
 
