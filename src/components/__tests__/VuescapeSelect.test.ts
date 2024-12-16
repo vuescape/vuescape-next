@@ -1,3 +1,4 @@
+import { createTestingPinia } from '@pinia/testing'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VuescapeSelectProps } from '../../models/componentProps/VuescapeSelectProps'
@@ -24,7 +25,12 @@ const attrs = {
 const createWrapper = (propsData: VuescapeSelectProps, attrsData: any) => {
   return mount(VuescapeSelect, {
     global: {
-      plugins: [PrimeVue],
+      plugins: [
+        PrimeVue,
+        createTestingPinia({
+          createSpy: vi.fn
+        })
+      ],
       components: {
         Select: PrimeVueSelect
       }

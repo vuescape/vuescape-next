@@ -1,3 +1,5 @@
+import { type Action } from '../dynamic-ui'
+
 /**
  * Interface representing the properties for the VuescapeSelect component.
  *
@@ -9,9 +11,15 @@ export interface VuescapeSelectProps {
   options: Array<any>
 
   /**
-   * The currently selected value.
+   * The currently selected value. Undefined if no value is selected.
    */
   value: any
+
+  /**
+   * The action to perform when the value of the select component changes.
+   * @optional
+   */
+  onChangeAction?: Action
 
   /**
    * The name of the select component.

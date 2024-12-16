@@ -1,3 +1,4 @@
+import { createTestingPinia } from '@pinia/testing'
 import { mount } from '@vue/test-utils'
 import VuescapeSelect from '../VuescapeSelect.vue'
 import PrimeVue from 'primevue/config'
@@ -41,7 +42,12 @@ const testEvent = async (
 
   const wrapper = mount(ParentComponent, {
     global: {
-      plugins: [PrimeVue],
+      plugins: [
+        PrimeVue,
+        createTestingPinia({
+          createSpy: vi.fn
+        })
+      ],
       components: {
         Select: PrimeVueSelect
       }
