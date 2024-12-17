@@ -17,6 +17,7 @@ import ChicletGridComponentView from './ChicletGrid.vue'
 import TitleComponentView from './TitleComponentRenderer.vue'
 import ButtonComponentView from './VuescapeButton.vue'
 // TODO: import the actual components
+import TableTabsComponentView from './TableTabsComponent.vue'
 import TableComponentView from './VuescapeButton.vue'
 import SelectComponentView from './VuescapeSelect.vue'
 
@@ -31,7 +32,8 @@ const componentMap: Record<PaneComponent['type'], any> = {
   button: ButtonComponentView,
   chicletGrid: ChicletGridComponentView,
   table: TableComponentView,
-  select: SelectComponentView
+  select: SelectComponentView,
+  tableTabs: TableTabsComponentView
 }
 </script>
 
