@@ -7,6 +7,6 @@ export interface SelectComponent {
   /** The type of the component, which is always 'select'. */
   type: 'select'
 
-  /** The payload associated with the button component. */
+  /** The payload associated with the tab component. */
   payload: SelectComponentPayload
 }

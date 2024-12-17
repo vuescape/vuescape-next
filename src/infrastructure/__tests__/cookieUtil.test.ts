@@ -1,4 +1,3 @@
-/* eslint-disable */
 vi.mock('jwt-decode', () => ({
   default: vi.fn()
 }))

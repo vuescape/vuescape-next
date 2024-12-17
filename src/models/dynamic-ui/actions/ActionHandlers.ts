@@ -86,7 +86,7 @@ export async function handleNavigationAction(
     } else if (action.payload.replace === true) {
       router.replace(action.payload.url)
     } else {
-      console.info('Navigating to for LinkTarget.CurrentWindow' + action.payload.url)
+      // console.info('Navigating to for LinkTarget.CurrentWindow' + action.payload.url)
       router.push(action.payload.url)
     }
   } else if (target === LinkTarget.NewWindow) {

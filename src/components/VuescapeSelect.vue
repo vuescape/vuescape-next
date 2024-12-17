@@ -65,7 +65,6 @@ const listeners = Object.keys(attrs)
  * @param event - The event object triggered by the change.
  */
 const handleChange = (event: unknown) => {
-  console.log('Handling change event:', event)
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
     const loadReport = async (url: string) => {}
