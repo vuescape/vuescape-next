@@ -1,4 +1,4 @@
-import { type Action } from '../dynamic-ui'
+import { type Action } from '../dynamic-ui/actions/Action'
 
 /**
  * Interface representing the properties for the VuescapeSelect component.

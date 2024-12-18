@@ -1,3 +1,4 @@
+import type { SelectComponent } from '../dynamic-ui/pane-components/SelectComponent'
 import type { TableTab } from '../dynamic-ui/TableTab'
 
 /**
@@ -13,4 +14,9 @@ export interface TableTabsProps {
    * The collection of table tabs available.
    */
   tabs: Array<TableTab>
+
+  /**
+   * The select component that will be displayed above the table tabs.
+   */
+  selectComponent?: SelectComponent
 }

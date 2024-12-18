@@ -17,7 +17,7 @@ import ChicletGridComponentView from './ChicletGrid.vue'
 import TitleComponentView from './TitleComponentRenderer.vue'
 import ButtonComponentView from './VuescapeButton.vue'
 // TODO: import the actual components
-import TableTabsComponentView from './TableTabsComponent.vue'
+import TableTabsComponentView from './TableTabs.vue'
 import TableComponentView from './VuescapeButton.vue'
 import SelectComponentView from './VuescapeSelect.vue'
 

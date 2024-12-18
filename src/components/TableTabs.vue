@@ -17,6 +17,8 @@ import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import Tabs from 'primevue/tabs'
 
+import VuescapeSelect from './VuescapeSelect.vue'
+
 import type { TableTabsProps } from '../models/componentProps/TableTabsProps'
 
 const props = defineProps<TableTabsProps>()
@@ -24,9 +26,14 @@ const props = defineProps<TableTabsProps>()
 
 <template>
   <Tabs value="0">
-    <TabList>
-      <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
-    </TabList>
+    <div class="flex align-items-center justify-content-between">
+      <TabList>
+        <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
+      </TabList>
+      <div class="ml-4" v-if="props.selectComponent">
+        <VuescapeSelect v-bind="props.selectComponent.payload"></VuescapeSelect>
+      </div>
+    </div>
     <TabPanels>
       <TabPanel v-for="tab in props.tabs" :key="tab.id" :value="tab.id">
         {{ tab.table ? JSON.stringify(tab.table) : 'No Results Found' }}

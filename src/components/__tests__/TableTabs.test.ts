@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import TableTabsComponent from '../TableTabsComponent.vue'
+import TableTabsComponent from '../TableTabs.vue'
 import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
 import { describe, expect, it } from 'vitest'
 

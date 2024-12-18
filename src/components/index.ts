@@ -17,3 +17,5 @@ export { default as VuescapeSelect } from './VuescapeSelect.vue'
 
 export { default as ChicletButton } from './ChicletButton.vue'
 export { default as ChicletGrid } from './ChicletGrid.vue'
+
+export { default as TableTabs } from './TableTabs.vue'
