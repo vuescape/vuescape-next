@@ -7,9 +7,9 @@
   "types": "dist/vuescape.d.ts",
   "peerDependencies": {
     "@primevue/themes": "^4.2.5",
-    "@vueuse/core": "^12.0.0",
-    "@vueuse/integrations": "^12.0.0",
-    "@vueuse/router": "^12.0.0",
+    "@vueuse/core": "^12.2.0",
+    "@vueuse/integrations": "^12.2.0",
+    "@vueuse/router": "^12.2.0",
     "file-saver": "^2.0.5",
     "pinia": "^2.3.0",
     "primeflex": "^3.3.1",
