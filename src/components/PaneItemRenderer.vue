@@ -11,30 +11,11 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
-
-import ChicletGridComponentView from './ChicletGrid.vue'
-import TitleComponentView from './TitleComponentRenderer.vue'
-import ButtonComponentView from './VuescapeButton.vue'
-// TODO: import the actual components
-import TableTabsComponentView from './TableTabs.vue'
-import TableComponentView from './VuescapeButton.vue'
-import SelectComponentView from './VuescapeSelect.vue'
-
-// TODO: import the actual components
-
 import type { PaneItemRendererProps } from '../models/componentProps/PaneItemRendererProps'
 
-const props = defineProps<PaneItemRendererProps>()
+import PaneComponentRenderer from './PaneComponentRenderer.vue'
 
-const componentMap: Record<PaneComponent['type'], any> = {
-  title: TitleComponentView,
-  button: ButtonComponentView,
-  chicletGrid: ChicletGridComponentView,
-  table: TableComponentView,
-  select: SelectComponentView,
-  tableTabs: TableTabsComponentView
-}
+const props = defineProps<PaneItemRendererProps>()
 </script>
 
 <template>
@@ -46,11 +27,11 @@ const componentMap: Record<PaneComponent['type'], any> = {
       item.verticalAlignment ? `p-ai-${item.verticalAlignment}` : ''
     ]"
   >
-    <component
-      v-for="component in props.item.components"
-      :key="component.type"
-      :is="componentMap[component.type]"
-      v-bind="component.payload"
+    <!-- Future Feature: Add support for nested components or recursive components -->
+    <PaneComponentRenderer
+      v-for="(component, index) in props.item.components"
+      :key="`${component.type}-${index}`"
+      :component="component"
     />
   </div>
 </template>
