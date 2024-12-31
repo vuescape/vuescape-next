@@ -65,10 +65,18 @@ const props = defineProps<VuescapeTableProps>()
 //   // sortingState.value.sortOrder = augmentedEvent.order ?? undefined
 // }
 
-// Extract display value for table cells
+/**
+ * Retrieves the display value for a given row and column.
+ *
+ * @param row - The row object containing data.
+ * @param  columnId - The identifier for the column.
+ * @returns The display value for the specified row and column.
+ */
 function getDisplayValue(row: TableRow, columnId: string): string {
   const cell = row.cells[columnId]
-  return cell?.displayValue ?? cell?.rawValue?.value ?? ''
+  // Don't use the raw value even if there is no display value.
+  const result = cell?.displayValue ?? ''
+  return result
 }
 
 function getSortField(column: { id: string }) {
