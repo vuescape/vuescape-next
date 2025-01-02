@@ -71,9 +71,7 @@ export async function handleNavigationAction(
     if (action.payload.replace === true) {
       router.replace(action.payload.url)
     } else {
-      // TODO: Remove this logic from here and ensure payload.url is already
-      // the correct URL for the route
-      const route = '/my-data' + action.payload.url
+      const route = action.payload.url
       router.push(route)
     }
   } else if (target === LinkTarget.CurrentWindow) {
