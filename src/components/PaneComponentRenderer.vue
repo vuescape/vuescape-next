@@ -1,17 +1,6 @@
-<script lang="ts">
-/**
- * PaneComponentRenderer @component
- *
- * This is a Vue Single File Component (SFC) that dynamically renders a pane component passed in via props.
- *
- * @prop {PaneComponent} paneComponent - The pane component to render
- *
- */
-export default {}
-</script>
-
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { ref, watchEffect } from 'vue'
+import { markRaw } from 'vue'
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 
@@ -26,27 +15,41 @@ const componentMap: Record<PaneComponent['type'], any> = {
   tableTabs: () => import('./TableTabs.vue')
 }
 
-const resolvedComponent = computed(() => {
+const resolvedComponent = ref<any>(null)
+const isLoading = ref(true)
+const error = ref<string | null>(null)
+
+watchEffect(async () => {
   const importFn = componentMap[props.component.type]
+
   if (importFn) {
-    return () => ({
-      component: importFn(),
-      loading: { template: '<div>Loading...</div>' },
-      error: getUnsupportedComponent(props.component.type, 'Error loading component')
-    })
+    try {
+      isLoading.value = true
+      error.value = null
+      const module = await importFn()
+      resolvedComponent.value = markRaw(module.default)
+    } catch (e) {
+      console.error(`Error loading component type: ${props.component.type}`, e)
+      error.value = `Error loading component type: ${props.component.type}`
+      resolvedComponent.value = null
+    } finally {
+      isLoading.value = false
+    }
   } else {
-    return getUnsupportedComponent(props.component.type)
+    console.warn(`Unsupported component type: '${props.component.type}'`)
+    error.value = `Unsupported component type: '${props.component.type}'`
+    resolvedComponent.value = null
+    isLoading.value = false
   }
 })
-
-function getUnsupportedComponent(type: string, error?: string) {
-  console.warn(`Unsupported component type: '${type}'`, error)
-  return {
-    template: `<div>Component type not supported: '${type}' ${error ? error : ''}</div>`
-  }
-}
 </script>
 
 <template>
-  <component :is="resolvedComponent" v-bind="component.payload" />
+  <div v-if="isLoading">
+    <div>Loading...</div>
+  </div>
+  <div v-else-if="error">
+    <div>{{ error }}</div>
+  </div>
+  <component v-else :is="resolvedComponent" v-bind="component.payload" />
 </template>
