@@ -1,6 +1,6 @@
-import { flushPromises, mount } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { nextTick, ref } from 'vue'
+import { ref } from 'vue'
 import type { TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
 import VuescapeTable from '../VuescapeTable.vue'

@@ -1,4 +1,4 @@
-import type { ReportPaneKind } from '../feature'
+import type { ReportPaneKind } from '../feature/ReportPaneKind'
 import type { PaneLayout } from './PaneLayout'
 
 /**
