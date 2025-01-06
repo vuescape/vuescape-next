@@ -19,13 +19,19 @@ import Tabs from 'primevue/tabs'
 
 import VuescapeSelect from './VuescapeSelect.vue'
 
+import { ref } from 'vue'
 import type { TableTabsProps } from '../models/componentProps/TableTabsProps'
+import VuescapeTable from './VuescapeTable.vue'
 
 const props = defineProps<TableTabsProps>()
+
+// Assign the first tab as the active tab
+// TODO: Tie into routing?
+const activeTabId = ref(props.tabs[0]?.id)
 </script>
 
 <template>
-  <Tabs value="0">
+  <Tabs v-model:value="activeTabId">
     <div class="flex align-items-center justify-content-between">
       <TabList>
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
@@ -36,7 +42,8 @@ const props = defineProps<TableTabsProps>()
     </div>
     <TabPanels>
       <TabPanel v-for="tab in props.tabs" :key="tab.id" :value="tab.id">
-        {{ tab.table ? JSON.stringify(tab.table) : 'No Results Found' }}
+        <VuescapeTable v-if="tab.table" v-bind="tab.table.payload"></VuescapeTable>
+        <div v-else>No Results Found</div>
       </TabPanel>
     </TabPanels>
   </Tabs>
