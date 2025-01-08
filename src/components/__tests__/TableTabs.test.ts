@@ -39,8 +39,7 @@ describe('TableTabsComponent', () => {
 
     const tabButtons = wrapper.findAll('button.p-tab')
 
-    // Initially, no tabs are active -- unsure if this is by design or a primevue issue?
-    expect(tabButtons[0].attributes('aria-selected')).toBe('false')
+    expect(tabButtons[0].attributes('aria-selected')).toBe('true')
     expect(tabButtons[1].attributes('aria-selected')).toBe('false')
 
     // Click on the second tab
@@ -65,7 +64,7 @@ describe('TableTabsComponent', () => {
     const tabPanels = wrapper.findAll('.p-tabpanel')
 
     // Initially, no panels are visible even though expect the first panel should be visible
-    expect(tabPanels[0].element.style.display).toBe('none')
+    expect(tabPanels[0].element.style.display).toBe('')
     expect(tabPanels[1].element.style.display).toBe('none')
     expect(tabPanels[2].element.style.display).toBe('none')
 
