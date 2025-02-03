@@ -33,7 +33,7 @@ const testEvent = async (
           optionLabel: 'name',
           placeholder: 'Select One of the Options',
           disabled: false,
-          class: 'custom-class'
+          cssClass: 'custom-class'
         },
         onEvent: mockEventHandler
       }

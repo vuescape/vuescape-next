@@ -1,4 +1,5 @@
 import { type Action } from '../dynamic-ui/actions/Action'
+import type { SelectOption } from '../dynamic-ui/SelectOption'
 
 /**
  * Interface representing the properties for the VuescapeSelect component.
@@ -8,12 +9,12 @@ export interface VuescapeSelectProps {
   /**
    * The options to display in the select component.
    */
-  options: Array<any>
+  options: Array<SelectOption>
 
   /**
    * The currently selected value. Undefined if no value is selected.
    */
-  value: any
+  selectedValue: SelectOption | undefined
 
   /**
    * The action to perform when the value of the select component changes.
@@ -27,11 +28,11 @@ export interface VuescapeSelectProps {
    */
   name?: string
 
-  /**
-   * The property of the options object used to display the label in the select component.
-   * @optional
-   */
-  optionLabel?: string
+  // /**
+  //  * The property of the options object used to display the label in the select component.
+  //  * @optional
+  //  */
+  // optionLabel?: string
 
   /**
    * The placeholder text for the select component.
@@ -49,5 +50,5 @@ export interface VuescapeSelectProps {
    * The CSS class for the select component.
    * @optional
    */
-  class?: string
+  cssClass?: string
 }

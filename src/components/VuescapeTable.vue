@@ -79,36 +79,70 @@ function getDisplayValue(row: TableRow, columnId: string): string {
   return result
 }
 
-function getSortField(column: { id: string }) {
-  let sortProperty = 'comparableValue'
-  const columnIndex = props.columns.findIndex((col) => col.id === column.id)
-  if (columnIndex !== -1 && props.columns[columnIndex].isSortable && props.rows.length > 0) {
-    const allCellsHaveComparableValue = props.rows.every(
-      (row) => row.cells[column.id].comparableValue !== undefined
-    )
-    if (!allCellsHaveComparableValue) {
-      sortProperty = 'displayValue'
-    }
-  }
-
-  const result = `cells.${column.id}.${sortProperty}`
-  return result
-}
-// Helper to get the comparable value for sorting
-// function getComparableValue(row: TableRow, columnId: string) {
-//   const result = row.cells[columnId]?.comparableValue?.toString() ?? ''
-//   return result
-// }
-
 /**
  * Map of column id to sort field. This map is used to determine the sort field for each column.
  * Saved in a variable to avoid re-creating the map on each render.
  */
 const columnIdToSortFieldMap = new Map<string, string>()
+
+/**
+ * Initializes the mapping between column IDs and their corresponding sort fields.
+ * TODO: perhaps this could be calculated on the backend and passed as a value.
+ */
 function initializeColumnIdToSortFieldMap() {
   columnIdToSortFieldMap.clear()
-  props.columns.forEach((column) => {
-    columnIdToSortFieldMap.set(column.id, getSortField(column))
+
+  const columnIds = props.columns.map((column) => column.id)
+
+  // Initialize a map to track the sort fields for each column
+  const columnSortCandidates: Record<string, { commonKey: string | null; isValid: boolean }> = {}
+  columnIds.forEach((id) => {
+    columnSortCandidates[id] = { commonKey: null, isValid: true }
+  })
+
+  // Iterate through rows once and evaluate all columns
+  for (const row of props.rows) {
+    for (const columnId of columnIds) {
+      const cell = row.cells[columnId]
+      const columnState = columnSortCandidates[columnId]
+
+      if (!columnState.isValid) {
+        // Skip further checks for this column if already invalid
+        continue
+      }
+
+      if (!cell || !cell.comparableValue) {
+        // Invalidate the column if the cell or comparableValue is missing
+        columnState.isValid = false
+        continue
+      }
+
+      const keys = Object.keys(cell.comparableValue)
+      if (keys.length !== 1) {
+        // Invalidate the column if there are multiple or no keys
+        columnState.isValid = false
+        continue
+      }
+
+      const key = keys[0]
+      const commonKey = `comparableValue.${key}`
+      if (!columnState.commonKey) {
+        // Set the first key as the common key for this column
+        columnState.commonKey = commonKey
+      } else if (columnState.commonKey !== commonKey) {
+        // Invalidate the column if keys are inconsistent
+        columnState.isValid = false
+      }
+    }
+  }
+
+  // Populate the columnIdToSortFieldMap with results
+  columnIds.forEach((id) => {
+    const columnState = columnSortCandidates[id]
+    columnIdToSortFieldMap.set(
+      id,
+      `cells.${id}.${columnState.isValid && columnState.commonKey ? columnState.commonKey : 'displayValue'}`
+    )
   })
 }
 

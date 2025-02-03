@@ -13,7 +13,7 @@ const props: VuescapeSelectProps = {
   optionLabel: 'name',
   placeholder: 'Select One of the Options',
   disabled: false,
-  class: 'custom-class'
+  cssClass: 'custom-class'
 }
 
 const attrs = {

@@ -5,7 +5,7 @@ import type { TableRow } from '../dynamic-ui/TableRow'
  * Interface representing the properties for a table component.
  */
 export interface VuescapeTableProps {
-  /**
+/**
    * The unique identifier for the table.
    */
   id: string

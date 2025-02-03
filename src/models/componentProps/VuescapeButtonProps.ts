@@ -33,5 +33,5 @@ export interface VuescapeButtonProps {
    * Can be a string or an object.
    * @default ''
    */
-  class?: string | object
+  cssClass?: string | object
 }

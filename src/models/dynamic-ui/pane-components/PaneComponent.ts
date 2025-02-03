@@ -1,8 +1,9 @@
 import type { ButtonComponent } from './ButtonComponent'
 import type { ChicletGridComponent } from './ChicletGridComponent'
 import type { SelectComponent } from './SelectComponent'
-import type { TableTabsComponent } from './TableTabsComponent'
 import type { TableComponent } from './TableComponent'
+import type { TableTabsComponent } from './TableTabsComponent'
+import type { TextLinkComponent } from './TextLinkComponent'
 import type { TitleComponent } from './TitleComponent'
 
 /**
@@ -20,3 +21,4 @@ export type PaneComponent =
   | TableComponent
   | SelectComponent
   | TableTabsComponent
+  | TextLinkComponent

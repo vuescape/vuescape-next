@@ -43,7 +43,7 @@ describe('VuescapeButton', () => {
 
   it('applies class prop as string', () => {
     const wrapper = mount(VuescapeButton, {
-      props: { class: 'custom-class' },
+      props: { cssClass: 'custom-class' },
     })
     const button = wrapper.findComponent(Button)
 
@@ -52,7 +52,7 @@ describe('VuescapeButton', () => {
 
   it('applies class prop as object', () => {
     const wrapper = mount(VuescapeButton, {
-      props: { class: { 'custom-class': true, 'another-class': false } },
+      props: { cssClass: { 'custom-class': true, 'another-class': false } },
     })
     const button = wrapper.findComponent(Button)
 

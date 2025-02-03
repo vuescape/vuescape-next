@@ -13,7 +13,8 @@ const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Compo
   chicletGrid: () => import('./ChicletGrid.vue'),
   table: () => import('./VuescapeTable.vue'),
   select: () => import('./VuescapeSelect.vue'),
-  tableTabs: () => import('./TableTabs.vue')
+  tableTabs: () => import('./TableTabs.vue'),
+  textLink: () => import('./TextLinkComponent.vue')
 }
 
 const resolvedComponent = ref<Component | null>(null)

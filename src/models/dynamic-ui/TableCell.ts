@@ -1,4 +1,5 @@
 import type { UiObject } from '../../reporting-domain'
+import type { ComparableValue } from './ComparableValue'
 import type { PaneComponent } from './pane-components'
 
 /**
@@ -22,9 +23,9 @@ export interface TableCell {
    * The value used for comparisons such as filtering or sorting.
    * If not provided, the displayValue will be used followed by the rawValue.
    */
-  comparableValue?: string | number | boolean | Date | null
+  comparableValue?: ComparableValue
   /**
-   * The inline style of the cell.
+   * The inline styles of the cell.
    */
-  cssStyle?: string
+  cssStyles?: Record<string, string>
 }

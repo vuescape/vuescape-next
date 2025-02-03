@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<VuescapeButtonProps>(), {
   icon: '',
   iconPos: '' as IconPosition,
   disabled: false,
-  class: ''
+  cssClass: ''
 })
 
 const emit = defineEmits<{
@@ -36,7 +36,7 @@ const handleClick = (event: Event) => {
 
 <template>
   <Button
-    :class="[props.class, { 'vuescape-button--with-icon': props.icon }]"
+    :class="[props.cssClass, { 'vuescape-button--with-icon': props.icon }]"
     :disabled="props.disabled"
     :icon="props.icon"
     :iconPos="props.iconPos"

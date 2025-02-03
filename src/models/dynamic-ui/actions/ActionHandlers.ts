@@ -107,11 +107,7 @@ export async function handleNavigationAction(
  * @param actionStore - The store where the action and pane kind will be updated.
  */
 export function handleActionEvent(event: Event, action: Action, actionStore: ActionStore): void {
-  const clickedElement = event.target as HTMLElement
-  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
-
-  const paneKind = paneElement ? paneElement.dataset.panekind! : ReportPaneKind.None
-
+  const paneKind = getSourcePaneKind(event)
   const state: ActionStore = {
     action: action,
     paneKind: toEnum(ReportPaneKind, paneKind)
@@ -120,3 +116,23 @@ export function handleActionEvent(event: Event, action: Action, actionStore: Act
   actionStore.action = state.action
   actionStore.paneKind = state.paneKind
 }
+
+/**
+ * Retrieves the pane kind from the closest ancestor element with the `data-panekind` attribute.
+ *
+ * @param event - The event object from which the target element is derived.
+ * @returns The pane kind as a string if the `data-panekind` attribute is found, otherwise returns `ReportPaneKind.None`.
+ */
+export function getSourcePaneKind(event: Event): ReportPaneKind {
+  const clickedElement = event.target as HTMLElement;
+  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null;
+
+  const paneKind = paneElement?.dataset.panekind;
+
+  if (paneKind && Object.values(ReportPaneKind).includes(paneKind as ReportPaneKind)) {
+    return paneKind as ReportPaneKind;
+  }
+
+  return ReportPaneKind.None;
+}
+
