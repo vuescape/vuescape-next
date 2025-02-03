@@ -23,7 +23,8 @@ function normalizeValue(
 function validateHandlers<T>(handlers: Partial<Record<keyof T, any>>, source: Record<string, any>) {
   Object.keys(handlers).forEach((key) => {
     if (!(key in source)) {
-      console.warn(`[watchRoute] Invalid key detected: ${key}`)
+      console.warn(`[watchRoute] Invalid key detected: ${key}. 
+        If this key is part of the query string then this warning can be ignored.`)
     }
   })
 }
@@ -56,7 +57,13 @@ function validateHandlers<T>(handlers: Partial<Record<keyof T, any>>, source: Re
 // }
 
 /**
- * Watches changes to `params` and `query` and triggers handlers.
+ * Watches changes in route props and triggers the specified handlers for each property.
+ *
+ * @param handlers - An object containing functions to handle changes for specific route props.
+ *                    Each key corresponds to a route prop, and the value is a function called
+ *                    with the new and old values of that prop whenever it changes.
+ * @param options - Optional configuration for the watcher.
+ *                  - `immediate`: Whether to invoke the handlers immediately with the current values.
  */
 export function watchRouteProps<T extends Record<string, any>>(
   handlers: Partial<

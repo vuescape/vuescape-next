@@ -1,37 +1,23 @@
 import { useRouter, useRoute } from 'vue-router'
 
 /**
- * Provides declarative deep linking navigation.
- * @param initialState Optional initial state to override or initialize route-based properties.
- */
-/**
- * A composable function that provides utilities to manage and update route parameters and query strings.
+ * Provides a utility for managing route parameters and query values with type safety.
+ * 
+ * This function allows for easy synchronization of route props with application state,
+ * ensuring changes to the route are reflected in the URL and vice versa.
  *
- * @template T - A generic type extending a record with string keys and any values.
+ * @template T - The type of the route props, defined as a record of string keys and their corresponding value types.
  *
- * @param {Partial<T>} [initialState] - An optional initial state to set route parameters and query strings.
- *
- * @returns {Object} An object containing the `updateRouteProps` function.
- *
- * @function
- * @name useRouteProps
- *
- * @example
- * ```typescript
- * const { updateRouteProps } = useRouteProps<{ id: string }>({ id: '123' });
- * updateRouteProps({ id: '456' });
- * ```
- *
- * @function
- * @name updateRouteProps
- *
- * @param {Partial<T>} updates - An object containing the updates to be applied to the route parameters and query strings.
- *
- * @description
- * The `updateRouteProps` function updates the route parameters and query strings with the provided updates.
- * It only pushes the new state to the router if there are actual changes.
- *
- */
+ * @param [initialState] - Optional initial state to populate the route parameters and query.
+ *                                      If provided, it updates the route with the initial state upon initialization.
+ * 
+ * @returns {{
+*   updateRouteProps: (updates: Partial<T>) => void;
+* }} An object containing utility functions for working with route props:
+* 
+* - `updateRouteProps(updates: Partial<T>)`: Updates the route parameters and query with the provided values.
+*                                            Only modifies the route if there are actual changes.
+*/
 export function useRouteProps<T extends Record<string, any>>(initialState?: Partial<T>) {
   const router = useRouter()
   const route = useRoute()
