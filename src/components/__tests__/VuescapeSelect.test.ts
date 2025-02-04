@@ -7,10 +7,12 @@ import PrimeVueSelect from 'primevue/select'
 import PrimeVue from 'primevue/config'
 
 const props: VuescapeSelectProps = {
-  options: [{ name: 'Option 1' }, { name: 'Option 2' }],
-  value: { name: 'Option 1' },
+  options: [
+    { displayName: 'Option 1', id: '1' },
+    { displayName: 'Option 2', id: '2' }
+  ],
+  selectedValue: { displayName: 'Option 1', id: '1' },
   name: 'test-select',
-  optionLabel: 'name',
   placeholder: 'Select One of the Options',
   disabled: false,
   cssClass: 'custom-class'
@@ -53,9 +55,8 @@ describe('VuescapeSelect.vue', () => {
   it('passes the correct props to the select component', () => {
     const selectComponent = wrapper.findComponent({ name: 'select' })
     expect(selectComponent.props().options).toEqual(props.options)
-    expect(selectComponent.props().modelValue).toEqual(props.value)
+    expect(selectComponent.props().modelValue).toEqual(props.selectedValue)
     expect(selectComponent.props().name).toBe(props.name)
-    expect(selectComponent.props().optionLabel).toBe(props.optionLabel)
     expect(selectComponent.props().placeholder).toBe(props.placeholder)
     expect(selectComponent.props().disabled).toBe(props.disabled)
     // Class is not part of the API so no need to test here.
@@ -67,7 +68,7 @@ describe('VuescapeSelect.vue', () => {
   })
 
   it('renders the correct placeholder', () => {
-    wrapper = createWrapper({ ...props, value: null }, attrs)
+    wrapper = createWrapper({ ...props, selectedValue: undefined }, attrs)
     expect(wrapper.find('span.p-placeholder').attributes('aria-label')).toBe(props.placeholder)
   })
 })

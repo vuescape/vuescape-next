@@ -23,8 +23,7 @@ function normalizeValue(
 function validateHandlers<T>(handlers: Partial<Record<keyof T, any>>, source: Record<string, any>) {
   Object.keys(handlers).forEach((key) => {
     if (!(key in source)) {
-      console.warn(`[watchRoute] Invalid key detected: ${key}. 
-        If this key is part of the query string then this warning can be ignored.`)
+      console.warn(`[watchRoute] Invalid key detected: ${key}. If this key is part of the query string then this warning can be ignored.`)
     }
   })
 }

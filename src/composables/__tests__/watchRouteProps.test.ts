@@ -120,7 +120,8 @@ describe('watchRouteProps', () => {
     // Wait for reactivity to process
     await nextTick()
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith('[watchRoute] Invalid key detected: invalidKey')
+    expect(consoleWarnSpy).toHaveBeenCalledOnce()
+    expect(consoleWarnSpy).toBeCalledWith(`[watchRoute] Invalid key detected: invalidKey. If this key is part of the query string then this warning can be ignored.`)
 
     consoleWarnSpy.mockRestore()
   })
