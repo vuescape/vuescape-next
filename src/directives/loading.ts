@@ -1,7 +1,6 @@
-import { createApp, type Directive, type DirectiveBinding, h } from 'vue'
+import { type Directive, type DirectiveBinding, h, createVNode, render } from 'vue'
 import CustomLoading from '../components/CustomLoading.vue'
 
-// Define local interface for for the directive binding and element since only used internally
 interface HTMLElementWithLoading extends HTMLElement {
   loadingElement?: HTMLElement | null
 }
@@ -12,38 +11,29 @@ interface HTMLElementWithLoading extends HTMLElement {
 const loadingDirective: Directive<HTMLElementWithLoading, boolean> = {
   mounted(el: HTMLElementWithLoading, binding: DirectiveBinding<boolean>) {
     if (binding.value) {
-      // Create a Vue instance with the CustomLoading component
-      const loadingApp = createApp({
-        render() {
-          return h(CustomLoading, { isVisible: true })
-        }
-      })
+      // Create a vnode instead of a Vue app
+      const vnode = createVNode(CustomLoading, { isVisible: true })
+      const container = document.createElement('div')
 
-      // Mount the loading and append it to the element
-      const loadingInstance = loadingApp.mount(document.createElement('div'))
-      el.loadingElement = loadingInstance.$el as HTMLElement // Save reference for later removal
+      render(vnode, container) // Render the vnode
+      el.loadingElement = container.firstElementChild as HTMLElement
       el.appendChild(el.loadingElement)
     }
   },
   updated(el: HTMLElementWithLoading, binding: DirectiveBinding<boolean>) {
     if (binding.value && !el.loadingElement) {
-      // Add the loading if it's not already present
-      const loadingApp = createApp({
-        render() {
-          return h(CustomLoading, { isVisible: true })
-        }
-      })
-      const loadingInstance = loadingApp.mount(document.createElement('div'))
-      el.loadingElement = loadingInstance.$el as HTMLElement
+      const vnode = createVNode(CustomLoading, { isVisible: true })
+      const container = document.createElement('div')
+
+      render(vnode, container) // Render the vnode
+      el.loadingElement = container.firstElementChild as HTMLElement
       el.appendChild(el.loadingElement)
     } else if (!binding.value && el.loadingElement) {
-      // Remove the loading if it exists
       el.removeChild(el.loadingElement)
       el.loadingElement = null
     }
   },
   unmounted(el: HTMLElementWithLoading) {
-    // Clean up on unmount
     if (el.loadingElement) {
       el.removeChild(el.loadingElement)
       el.loadingElement = null
