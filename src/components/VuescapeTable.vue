@@ -20,9 +20,35 @@ import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 
-// Define props
-const props = defineProps<VuescapeTableProps>()
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+// Define props
+const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
+const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
+
+const dtRef = ref<any>(null)
+
+function onScroll(e: Event) {
+  emit('update:scrollPosition', (e.target as HTMLElement).scrollTop)
+}
+
+onMounted(() => {
+  const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
+  if (scrollerEl) {
+    scrollerEl.addEventListener('scroll', onScroll)
+    // Restore scroll
+    if (props.initialScrollPosition ?? 0 > 0) {
+      setTimeout(() => {
+        scrollerEl.scrollTo({ top: props.initialScrollPosition })
+      }, 0)
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
+  scrollerEl?.removeEventListener('scroll', onScroll)
+})
 // Sorting state
 // const sortingState = ref({
 //   sortField: undefined as string | undefined,
@@ -78,6 +104,11 @@ function getDisplayValue(row: TableRow, columnId: string): string {
   const result = cell?.displayValue ?? ''
   return result
 }
+
+// function getDisplayHtml(row: TableRow, columnId: string): string {
+//   const text = getDisplayValue(row, columnId)
+//   return `<a href="https://www.cometrics.com">${text}</a>`
+// }
 
 /**
  * Map of column id to sort field. This map is used to determine the sort field for each column.
@@ -156,17 +187,30 @@ initializeColumnIdToSortFieldMap()
     @update:sortOrder="(value) => (sortingState.sortOrder = value)" 
             :sortField="(item) => getComparableValue(item, column.id)"
 
+            paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]"
+
     -->
 
   <DataTable
+    ref="dtRef"
     :value="rows"
     :dataKey="id"
     :scrollable="true"
+    scroll-height="500px"
     :stripedRows="true"
     :showGridlines="true"
     :resizableColumns="true"
     tableStyle="min-width: 100%;"
+    :virtualScrollerOptions="{ itemSize: 46 }"
+    stateStorage="session"
+    :stateKey="id"
   >
+    <template #empty>
+      <div class="text-center">
+        <p>No Data Found</p>
+      </div>
+    </template>
+
     <template v-for="column in columns" :key="column.id">
       <Column
         :field="column.id"

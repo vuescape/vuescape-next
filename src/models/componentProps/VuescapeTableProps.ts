@@ -4,8 +4,11 @@ import type { TableRow } from '../dynamic-ui/TableRow'
 /**
  * Interface representing the properties for a table component.
  */
-export interface VuescapeTableProps {
 /**
+ * Interface representing the properties for the VuescapeTable component.
+ */
+export interface VuescapeTableProps {
+  /**
    * The unique identifier for the table.
    */
   id: string
@@ -19,4 +22,10 @@ export interface VuescapeTableProps {
    * An array of objects representing the rows of the table.
    */
   rows: Array<TableRow>
+
+  /**
+   * The initial scroll position of the table.
+   * @default 0
+   */
+  initialScrollPosition?: number
 }
