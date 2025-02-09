@@ -29,26 +29,21 @@ const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 const dtRef = ref<any>(null)
 
 const localState = reactive({
+  id: props.id,
   rows: [...props.rows],
   columns: [...props.columns]
 })
 
 // Watch for changes in props and update local refs reactively
 watch(
-  () => props.rows,
-  (newRows) => {
-    console.info('Updating localRows from props.rows', newRows)
+  [() => props.rows, () => props.columns, () => props.id],
+  ([newRows, newColumns, id]) => {
     localState.rows = [...newRows]
-  },
-  { deep: true }
-)
-
-// Watch for column changes
-watch(
-  () => props.columns,
-  (newColumns) => {
-    console.info('Updating localColumns from props.columns', newColumns)
     localState.columns = [...newColumns]
+    localState.id = id
+
+    console.log('Watcher fired:', localState.rows)
+    initializeColumnIdToSortFieldMap()
   },
   { deep: true }
 )
@@ -203,6 +198,16 @@ function initializeColumnIdToSortFieldMap() {
 }
 
 initializeColumnIdToSortFieldMap()
+// const sortingState = reactive({
+//   sortField: '',
+//   sortOrder: 1
+// })
+// function stateRestore(event: DataTableStateEvent) {
+//   console.log('stateRestore', event)
+// }
+// function stateSave(event: DataTableStateEvent) {
+//   console.log('stateSave', event)
+// }
 </script>
 
 <template>
@@ -226,8 +231,12 @@ initializeColumnIdToSortFieldMap()
     tableStyle="min-width: 100%;"
     :virtualScrollerOptions="{ itemSize: 46 }"
     stateStorage="session"
-    :stateKey="id"
+    :stateKey="localState.id"
   >
+    <!-- v-model:sortField="sortingState.sortField"
+      v-model:sortOrder="sortingState.sortOrder"
+    @state-restore="stateRestore"
+    @state-save="stateSave" -->
     <template #empty>
       <div class="text-center">
         <p>No Results Found</p>
