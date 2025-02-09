@@ -70,7 +70,16 @@ const listeners = Object.keys(attrs)
  *
  * @param event - The event object triggered by the change.
  */
-const handleChange = (event: Event) => {
+const handleChange = (event: Event & { value: { id: string; isInitalValue: boolean } }) => {
+  // If this is the initial value, replace the history state with the initial value.
+  // We bypass vue-router to avoid a navigation event since we are assuming that when the 
+  // page loads and there is a selected item that the data is already loaded and we don't
+  // want to trigger a reload of the same data.
+  if (event?.value?.isInitalValue === true) {
+    window.history.replaceState({}, '', event.value.id)
+    return
+  }
+
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
     const loadReport = async (url: string) => {}
@@ -100,7 +109,6 @@ const handleChange = (event: Event) => {
 }
 
 onMounted(() => {
-  debugger
   if (mySelect.value && props.onChangeAction && props.selectedValue?.id) {
     const mySelectValue = mySelect.value as any
 
@@ -120,7 +128,7 @@ onMounted(() => {
       })
       // Set the target to the HTML select element
       Object.defineProperty(customEvent, 'value', {
-        value: { id: props.selectedValue.id }
+        value: { id: props.selectedValue.id, isInitalValue: true }
       })
 
       // Emit the custom event
