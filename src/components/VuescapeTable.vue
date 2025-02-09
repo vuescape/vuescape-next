@@ -20,13 +20,38 @@ import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
 const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 
 const dtRef = ref<any>(null)
+
+const localState = reactive({
+  rows: [...props.rows],
+  columns: [...props.columns]
+})
+
+// Watch for changes in props and update local refs reactively
+watch(
+  () => props.rows,
+  (newRows) => {
+    console.info('Updating localRows from props.rows', newRows)
+    localState.rows = [...newRows]
+  },
+  { deep: true }
+)
+
+// Watch for column changes
+watch(
+  () => props.columns,
+  (newColumns) => {
+    console.info('Updating localColumns from props.columns', newColumns)
+    localState.columns = [...newColumns]
+  },
+  { deep: true }
+)
 
 function onScroll(e: Event) {
   emit('update:scrollPosition', (e.target as HTMLElement).scrollTop)
@@ -123,7 +148,7 @@ const columnIdToSortFieldMap = new Map<string, string>()
 function initializeColumnIdToSortFieldMap() {
   columnIdToSortFieldMap.clear()
 
-  const columnIds = props.columns.map((column) => column.id)
+  const columnIds = localState.columns.map((column) => column.id)
 
   // Initialize a map to track the sort fields for each column
   const columnSortCandidates: Record<string, { commonKey: string | null; isValid: boolean }> = {}
@@ -132,7 +157,7 @@ function initializeColumnIdToSortFieldMap() {
   })
 
   // Iterate through rows once and evaluate all columns
-  for (const row of props.rows) {
+  for (const row of localState.rows) {
     for (const columnId of columnIds) {
       const cell = row.cells[columnId]
       const columnState = columnSortCandidates[columnId]
@@ -193,13 +218,11 @@ initializeColumnIdToSortFieldMap()
 
   <DataTable
     ref="dtRef"
-    :value="rows"
-    :dataKey="id"
+    :value="localState.rows"
     :scrollable="true"
     scroll-height="500px"
     :stripedRows="true"
     :showGridlines="true"
-    :resizableColumns="true"
     tableStyle="min-width: 100%;"
     :virtualScrollerOptions="{ itemSize: 46 }"
     stateStorage="session"
@@ -207,11 +230,11 @@ initializeColumnIdToSortFieldMap()
   >
     <template #empty>
       <div class="text-center">
-        <p>No Data Found</p>
+        <p>No Results Found</p>
       </div>
     </template>
 
-    <template v-for="column in columns" :key="column.id">
+    <template v-for="column in localState.columns" :key="column.id">
       <Column
         :field="column.id"
         :header="column.headerText"
