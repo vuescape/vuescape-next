@@ -17,6 +17,7 @@ import { computed } from 'vue'
 import Button from 'primevue/button'
 
 import type { Chiclet } from '../models/dynamic-ui/Chiclet'
+import { type Action } from '../models/dynamic-ui/actions/Action'
 import { handleActionEvent } from '../models/dynamic-ui/actions/ActionHandlers'
 import { useActionStore } from '../stores/useActionStore'
 
@@ -36,20 +37,36 @@ const icons = computed((event: any) => {
 })
 
 const actionStore = useActionStore()
+
+const url = computed(() => {
+  const action = props.chiclet?.action as Action
+  if (action?.type === 'navigate') {
+    return action.payload.url
+  }
+  return ''
+})
 </script>
 
 <template>
-  <Button
+  <a
+    class="chiclet-button__a--style"
     v-if="chiclet.isVisible"
-    :icon="icons"
-    iconPos="top"
-    iconClass="chiclet-button__icon"
-    :class="['chiclet-button__layout', chiclet.cssClass]"
-    @click="handleActionEvent($event, props.chiclet.action, actionStore)"
-  />
+    :href="url"
+    @click.prevent="handleActionEvent($event, props.chiclet.action, actionStore)"
+  >
+    <Button
+      :icon="icons"
+      iconPos="top"
+      iconClass="chiclet-button__icon"
+      :class="['chiclet-button__layout', chiclet.cssClass]"
+      />
+  </a>
 </template>
 
 <style>
+.chiclet-button__a--style {
+  text-decoration: none;
+}
 .p-button.chiclet-button__layout {
   width: 160px;
   height: 160px;
