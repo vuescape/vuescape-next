@@ -22,7 +22,6 @@ const router = useRouter()
 
 const props = defineProps<TextLinkComponentProps>()
 const handleClick = (event: Event) => {
-  event.preventDefault()
   // This handler will not load a report but instead will simply navigate to a new route.
   const loadReport = async (url: string) => {}
   // Sometimes event can be wrap the original event.
@@ -33,7 +32,7 @@ const handleClick = (event: Event) => {
 </script>
 
 <template>
-  <a class="link" @click="handleClick" :href="props.navigationAction.payload.url">{{
+  <a class="link" @click.prevent="handleClick" :href="props.navigationAction.payload.url">{{
     props.text
   }}</a>
 </template>
