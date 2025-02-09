@@ -3,7 +3,7 @@
  * TableTabs @component
  *
  * This is a Vue Single File Component (SFC) that renders a collection of TabComponents.
- * 
+ *
  * Tabs are lazy loaded so that @see VuescapeTable is rendered when using VirutalScroller.
  * If lazy loading is not used, the table will not render any rows. The consequence of lazy
  * loading is that the table is created and destroyed each time the tab is selected so
