@@ -32,6 +32,7 @@ const props = defineProps<TableTabsProps>()
 
 // Assign the first tab as the active tab
 const activeTabId = ref(props.tabs[0]?.id)
+const selectedEntity = ref<string | null>(null)
 
 const tableToInitialScrollPositionMap = new Map<string, number>()
 props.tabs.forEach((tab) => {
@@ -48,6 +49,28 @@ function getInitialScrollPosition(tabId: string) {
   const result = tableToInitialScrollPositionMap.get(tabId) ?? 0
   return result
 }
+
+function setEntity(event: Event & { value: { id: string } }) {
+  selectedEntity.value = event.value.id
+  console.info('setEntity', selectedEntity)
+}
+
+function tableKey(tabId: string) {
+  const result = '/my-data/product/' + tabId + (selectedEntity.value ?? '')
+  console.info('tableKey', result)
+  return result
+}
+
+function clearSessionStorageByPrefix(prefix: string) {
+  Object.keys(sessionStorage).forEach((key) => {
+    if (key.startsWith(prefix)) {
+      sessionStorage.removeItem(key)
+    }
+  })
+}
+
+// Usage: Remove all sessionStorage items starting with "/my-data/product"
+clearSessionStorageByPrefix('/my-data/product')
 </script>
 
 <template>
@@ -57,7 +80,7 @@ function getInitialScrollPosition(tabId: string) {
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>
       <div class="ml-4" v-if="props.selectComponent">
-        <VuescapeSelect v-bind="props.selectComponent.payload"></VuescapeSelect>
+        <VuescapeSelect @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
       </div>
     </div>
     <TabPanels>
@@ -65,6 +88,7 @@ function getInitialScrollPosition(tabId: string) {
         <VuescapeTable
           v-if="tab.table"
           v-bind="tab.table.payload"
+          :id="tableKey(tab.id)"
           :initialScrollPosition="getInitialScrollPosition(tab.id)"
           @update:scrollPosition="updateInitialScrollPosition(tab.id, $event)"
         ></VuescapeTable>
