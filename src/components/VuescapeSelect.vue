@@ -30,6 +30,7 @@ const router = useRouter()
 const props = defineProps<VuescapeSelectProps>()
 const initializedProps = ref<VuescapeSelectProps>({
   options: props.options ?? [],
+  // options: [props.options[0]],
   selectedValue: props.selectedValue,
   onChangeAction: props.onChangeAction,
   name: props.name ?? '',
@@ -72,7 +73,7 @@ const listeners = Object.keys(attrs)
  */
 const handleChange = (event: Event & { value: { id: string; isInitalValue: boolean } }) => {
   // If this is the initial value, replace the history state with the initial value.
-  // We bypass vue-router to avoid a navigation event since we are assuming that when the 
+  // We bypass vue-router to avoid a navigation event since we are assuming that when the
   // page loads and there is a selected item that the data is already loaded and we don't
   // want to trigger a reload of the same data.
   if (event?.value?.isInitalValue === true) {
@@ -142,6 +143,7 @@ onMounted(() => {
   <!-- do we need card flex here or should it just be the bare component? -->
   <div class="card flex">
     <Select
+      v-show="initializedProps.options.length !== 1"
       ref="mySelect"
       :name="initializedProps.name"
       :model-value="initializedProps.selectedValue"
@@ -156,7 +158,15 @@ onMounted(() => {
       @change="handleChange"
     >
     </Select>
+    <div v-if="initializedProps.options.length === 1" class="single-option-text">
+      For {{ initializedProps.selectedValue?.displayName ?? initializedProps.options[0].displayName }}
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.single-option-text
+{
+  font-weight:500;
+  margin-right: 1rem;
+}</style>
