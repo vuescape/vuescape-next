@@ -61,21 +61,18 @@ describe('TableTabsComponent', () => {
 
     const wrapper = mount(TableTabsComponent, { props })
 
-    const tabPanels = wrapper.findAll('.p-tabpanel')
-
-    // Initially, no panels are visible even though expect the first panel should be visible
-    expect(tabPanels[0].element.style.display).toBe('')
-    expect(tabPanels[1].element.style.display).toBe('none')
-    expect(tabPanels[2].element.style.display).toBe('none')
+    const tabPanels1 = wrapper.findAll('.p-tabpanel')
+    expect(tabPanels1.length).toBe(1)
+    expect(tabPanels1[0].html()).toContain('tab_tab1')
 
     // Click on the second tab
     const tabButtons = wrapper.findAll('button.p-tab')
     await tabButtons[1].trigger('click')
 
     // Verify the second panel is visible
-    expect(tabPanels[0].element.style.display).toBe('none')
-    expect(tabPanels[1].element.style.display).toBe('')
-    expect(tabPanels[2].element.style.display).toBe('none')
+    const tabPanels2 = wrapper.findAll('.p-tabpanel')
+    expect(tabPanels2.length).toBe(1)
+    expect(tabPanels2[0].html()).toContain('tab_tab2')
   })
 
   it('associates tabs and panels correctly using aria-controls and id', () => {
@@ -94,7 +91,6 @@ describe('TableTabsComponent', () => {
 
     // Check the association between aria-controls and id
     expect(tabButtons[0].attributes('aria-controls')).toBe(tabPanels[0].attributes('id'))
-    expect(tabButtons[1].attributes('aria-controls')).toBe(tabPanels[1].attributes('id'))
   })
 
   it('renders nothing when tabs array is empty', () => {

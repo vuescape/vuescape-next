@@ -5,11 +5,10 @@ import fetchMocker from 'vitest-fetch-mock'
 
 import type { AppInfoStore } from '../AppInfoStore'
 import { useAppInfoStore } from '../useAppInfoStore'
-import type { AppInfo } from 'vuescape'
+import type { AppInfo } from '../../models/AppInfo'
+import { beforeAll } from 'vitest'
 
 const fetchMock = fetchMocker(vi)
-
-fetchMock.enableMocks()
 
 const useMockTimers = (vi: any) => {
   vi.useFakeTimers()
@@ -18,6 +17,9 @@ const useMockTimers = (vi: any) => {
 }
 
 describe('useAppInfoStore', () => {
+  beforeAll(() => {
+    fetchMock.enableMocks()
+  })
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.clearAllMocks()
@@ -47,7 +49,7 @@ describe('useAppInfoStore', () => {
     fetchMock.mockResponseOnce(JSON.stringify(mockAppInfo))
 
     const store = useAppInfoStore() as AppInfoStore
-    await store.fetchAppInfoAsync()
+    await store.fetchAppInfoAsync()  
 
     expect(store.state).toEqual(mockAppInfo)
   })
