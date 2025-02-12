@@ -21,12 +21,14 @@ import TabList from 'primevue/tablist'
 import TabPanel from 'primevue/tabpanel'
 import TabPanels from 'primevue/tabpanels'
 import Tabs from 'primevue/tabs'
+import { defineAsyncComponent } from 'vue'
 
-import VuescapeSelect from './VuescapeSelect.vue'
-
+import type { SelectChangeEvent } from 'primevue/select'
 import { ref } from 'vue'
 import type { TableTabsProps } from '../models/componentProps/TableTabsProps'
-import VuescapeTable from './VuescapeTable.vue'
+
+const VuescapeSelect = defineAsyncComponent(() => import('./VuescapeSelect.vue'))
+const VuescapeTable = defineAsyncComponent(() => import('./VuescapeTable.vue'))
 
 const props = defineProps<TableTabsProps>()
 
@@ -50,14 +52,12 @@ function getInitialScrollPosition(tabId: string) {
   return result
 }
 
-function setEntity(event: Event & { value: { id: string } }) {
+function setEntity(event: SelectChangeEvent) {
   selectedEntity.value = event.value.id
-  console.info('setEntity', selectedEntity)
 }
 
 function tableKey(tabId: string) {
   const result = '/my-data/product/' + tabId + (selectedEntity.value ?? '')
-  console.info('tableKey', result)
   return result
 }
 
@@ -80,7 +80,7 @@ clearSessionStorageByPrefix('/my-data/product')
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>
       <div class="ml-4" v-if="props.selectComponent">
-        <VuescapeSelect @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
+        <VuescapeSelect :key="props.id" @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
       </div>
     </div>
     <TabPanels>
