@@ -10,6 +10,7 @@ export default {}
 </script>
 
 <script lang="ts" setup>
+import type { SelectChangeEvent } from 'primevue/Select'
 import Select from 'primevue/Select'
 import { onMounted, ref, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
@@ -40,8 +41,11 @@ const initializedProps = ref<VuescapeSelectProps>({
 })
 
 const mySelect = ref(null)
-// eslint-disable-next-line vue/valid-define-emits
-const emit = defineEmits()
+
+const emit = defineEmits<{
+  (evt: 'change', event: SelectChangeEvent): void
+}>()
+
 const attrs = useAttrs()
 
 /**
@@ -56,11 +60,10 @@ const listeners = Object.keys(attrs)
   .filter((key) => key.startsWith('on') && key !== 'onChange')
   .reduce(
     (acc, key) => {
-      const eventName = key.slice(2).toLowerCase()
-      acc[eventName] = (event: unknown) => emit(eventName, event)
+      acc[key] = attrs[key]
       return acc
     },
-    {} as Record<string, (event: unknown) => void>
+    {} as Record<string, unknown>
   )
 
 /**
@@ -71,16 +74,7 @@ const listeners = Object.keys(attrs)
  *
  * @param event - The event object triggered by the change.
  */
-const handleChange = (event: Event & { value: { id: string; isInitalValue: boolean } }) => {
-  // If this is the initial value, replace the history state with the initial value.
-  // We bypass vue-router to avoid a navigation event since we are assuming that when the
-  // page loads and there is a selected item that the data is already loaded and we don't
-  // want to trigger a reload of the same data.
-  if (event?.value?.isInitalValue === true) {
-    window.history.replaceState({}, '', event.value.id)
-    return
-  }
-
+const handleChange = (event: SelectChangeEvent) => {
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
     const loadReport = async (url: string) => {}
@@ -110,31 +104,16 @@ const handleChange = (event: Event & { value: { id: string; isInitalValue: boole
 }
 
 onMounted(() => {
-  if (mySelect.value && props.onChangeAction && props.selectedValue?.id) {
-    const mySelectValue = mySelect.value as any
-
-    // Get the root HTML element of the Select component
-    const selectElement = mySelectValue.$el || mySelectValue.$refs.input
-
-    if (selectElement) {
-      // Create a custom Event object
-      const customEvent = new Event('change', {
-        bubbles: true,
-        cancelable: true
-      })
-
-      // Set the target to the HTML select element
-      Object.defineProperty(customEvent, 'target', {
-        value: selectElement
-      })
-      // Set the target to the HTML select element
-      Object.defineProperty(customEvent, 'value', {
-        value: { id: props.selectedValue.id, isInitalValue: true }
-      })
-
-      // Emit the custom event
-      mySelectValue.$emit('change', customEvent)
-    }
+  if (
+    mySelect.value &&
+    initializedProps.value.onChangeAction &&
+    initializedProps.value.selectedValue?.id &&
+    router.currentRoute.value.path != initializedProps.value?.selectedValue?.id
+  ) {
+    // Use the router here -- this can result in duplciate api calls if /my-data
+    //  only has one product and that call already returned the product info.
+    router.replace(initializedProps.value.selectedValue.id)
+    return
   }
 })
 </script>
@@ -159,14 +138,15 @@ onMounted(() => {
     >
     </Select>
     <div v-if="initializedProps.options.length === 1" class="single-option-text">
-      For {{ initializedProps.selectedValue?.displayName ?? initializedProps.options[0].displayName }}
+      For
+      {{ initializedProps.selectedValue?.displayName ?? initializedProps.options[0].displayName }}
     </div>
   </div>
 </template>
 
 <style scoped>
-.single-option-text
-{
-  font-weight:500;
+.single-option-text {
+  font-weight: 500;
   margin-right: 1rem;
-}</style>
+}
+</style>
