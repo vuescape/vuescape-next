@@ -1,3 +1,4 @@
+/* eslint-disable require-await */ // -- all functions are noops
 import type { Router } from 'vue-router'
 
 import type { Feature, FeatureNavigationRegistration, FeatureService } from '.'
