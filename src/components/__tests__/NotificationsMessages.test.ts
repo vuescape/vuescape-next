@@ -37,7 +37,7 @@ describe('NotificationMessage.vue', () => {
     })
   })
 
-  it('emits remove event when a message is closed', async () => {
+  it('emits remove event when a message is closed', () => {
     const wrapper = createWrapper(mockMessages)
 
     const renderedMessages = wrapper.findAllComponents(Message)
@@ -50,7 +50,7 @@ describe('NotificationMessage.vue', () => {
     expect(wrapper.emitted('remove')?.[0]).toEqual(['1'])
   })
 
-  it('does not emit remove event when message is not closeable', async () => {
+  it('does not emit remove event when message is not closeable', () => {
     const wrapper = createWrapper(mockMessages)
 
     const renderedMessages = wrapper.findAllComponents(Message)
