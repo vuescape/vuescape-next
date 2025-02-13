@@ -46,47 +46,49 @@ describe('VuescapeTable.vue', () => {
     expect(tableColumns.length).toBe(columns.value.length)
   })
 
-  // it('renders correct cell values', () => {
-  //   const wrapper = mount(VuescapeTable, {
-  //     props: {
-  //       id: 'test-table',
-  //       columns: columns.value,
-  //       rows: rows.value,
-  //       initialScrollPosition: 0
-  //     }
-  //   })
+  // TODO: test virtual scroller implementation since table data is not in the body of the table.
+  it.skip('renders correct cell values', () => {
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'test-table',
+        columns: columns.value,
+        rows: rows.value,
+        initialScrollPosition: 0
+      }
+    })
 
-  //   for (let rowIndex = 0; rowIndex < rows.value.length - 1; rowIndex++) {
-  //     const rowCells = wrapper.findAll(`tr[data-p-index="${rowIndex}"] td`)
-  //     expect(rowCells.length).toBe(columns.value.length)
+    for (let rowIndex = 0; rowIndex < rows.value.length - 1; rowIndex++) {
+      const rowCells = wrapper.findAll(`tr[data-p-index="${rowIndex}"] td`)
+      expect(rowCells.length).toBe(columns.value.length)
 
-  //     const row = rows.value[rowIndex]
-  //     for (let cellIndex = 0; cellIndex < rowCells.length - 1; cellIndex++) {
-  //       const rowCell = rowCells[cellIndex]
-  //       const cell = row.cells[columns.value[cellIndex].id]
-  //       expect(rowCell.text()).toBe(cell.displayValue)
-  //     }
-  //   }
-  // })
+      const row = rows.value[rowIndex]
+      for (let cellIndex = 0; cellIndex < rowCells.length - 1; cellIndex++) {
+        const rowCell = rowCells[cellIndex]
+        const cell = row.cells[columns.value[cellIndex].id]
+        expect(rowCell.text()).toBe(cell.displayValue)
+      }
+    }
+  })
 
-  // it('sorts rows correctly when column header is clicked', async () => {
-  //   const wrapper = mount(VuescapeTable, {
-  //     props: {
-  //       id: 'test-table',
-  //       columns: columns.value,
-  //       rows: rows.value,
-  //       initialScrollPosition: 0
-  //     }
-  //   })
-  //   const headers = wrapper.findAll('th[data-p-sortable-column="true"]')
-  //   await headers[0].trigger('click')
-  //   const sortedRows = wrapper.findAll('tbody tr')
-  //   expect(sortedRows[0].findAll('td')[0].text()).toBe(rows.value[1].cells['name'].displayValue)
-  //   expect(sortedRows[1].findAll('td')[0].text()).toBe(rows.value[0].cells['name'].displayValue)
+  // TODO: test virtual scroller implementation since table data is not in the body of the table.
+  it.skip('sorts rows correctly when column header is clicked', async () => {
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'test-table',
+        columns: columns.value,
+        rows: rows.value,
+        initialScrollPosition: 0
+      }
+    })
+    const headers = wrapper.findAll('th[data-p-sortable-column="true"]')
+    await headers[0].trigger('click')
+    const sortedRows = wrapper.findAll('tbody tr')
+    expect(sortedRows[0].findAll('td')[0].text()).toBe(rows.value[1].cells['name'].displayValue)
+    expect(sortedRows[1].findAll('td')[0].text()).toBe(rows.value[0].cells['name'].displayValue)
 
-  //   await headers[0].trigger('click')
-  //   const sortedRows2 = wrapper.findAll('tbody tr')
-  //   expect(sortedRows2[0].findAll('td')[0].text()).toBe(rows.value[0].cells['name'].displayValue)
-  //   expect(sortedRows2[1].findAll('td')[0].text()).toBe(rows.value[1].cells['name'].displayValue)
-  // })
+    await headers[0].trigger('click')
+    const sortedRows2 = wrapper.findAll('tbody tr')
+    expect(sortedRows2[0].findAll('td')[0].text()).toBe(rows.value[0].cells['name'].displayValue)
+    expect(sortedRows2[1].findAll('td')[0].text()).toBe(rows.value[1].cells['name'].displayValue)
+  })
 })
