@@ -42,7 +42,6 @@ watch(
     localState.columns = [...newColumns]
     localState.id = id
 
-    console.log('Watcher fired:', localState.rows)
     initializeColumnIdToSortFieldMap()
   },
   { deep: true }

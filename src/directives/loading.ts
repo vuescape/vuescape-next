@@ -1,4 +1,4 @@
-import { type Directive, type DirectiveBinding, h, createVNode, render } from 'vue'
+import { createVNode, type Directive, type DirectiveBinding, render } from 'vue'
 import CustomLoading from '../components/CustomLoading.vue'
 
 interface HTMLElementWithLoading extends HTMLElement {
