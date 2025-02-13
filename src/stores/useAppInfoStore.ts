@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { usingRetryForFetch } from '../http'
+import { usingRetryForFetchAsync } from '../http'
 import type { AppInfo } from '../models'
 import type { AppInfoStore } from './AppInfoStore'
 
@@ -29,7 +29,7 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
    * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
    */
   async function fetchAppInfoAsync() {
-    const response = await usingRetryForFetch('/appInfo.json')
+    const response = await usingRetryForFetchAsync('/appInfo.json')
     if (response.ok) {
       const appInfo = await response.json()
       if (JSON.stringify(appInfo) !== JSON.stringify(state.value)) {

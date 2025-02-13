@@ -16,13 +16,13 @@ import { toEnum } from '../../../infrastructure/converters'
  * @returns A promise that resolves when the action has been handled.
  * @throws Will throw an error if the action type is unknown.
  */
-export async function handleAction(
+export async function handleActionAsync(
   actionStoreState: ActionStore,
   router: Router,
   loadReport: (url: string) => Promise<void>
 ): Promise<void> {
   if (actionStoreState.action.type === 'navigate') {
-    await handleNavigationAction(
+    await handleNavigationActionAsync(
       actionStoreState.action,
       actionStoreState.paneKind,
       router,
@@ -51,7 +51,7 @@ export function handleNoAction(action: NoAction, sourcePane: ReportPaneKind): vo
  *
  * @throws {Error} If the target is LinkTarget.Download or LinkTarget.Modal, an error is thrown indicating that the target is not implemented.
  */
-export async function handleNavigationAction(
+export async function handleNavigationActionAsync(
   action: NavigationAction,
   sourcePane: ReportPaneKind,
   router: Router,

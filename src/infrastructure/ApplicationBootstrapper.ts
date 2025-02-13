@@ -200,7 +200,7 @@ export class ApplicationBootstrapper {
    * If the initialization function returns a redirect URL, it redirects the window to that URL.
    * If an error occurs during initialization, it logs the error and its details.
    */
-  public async bootstrap() {
+  public async bootstrapAsync() {
     this.validate()
 
     // Leave resize handling to root component and child components but use vueUse resize composable

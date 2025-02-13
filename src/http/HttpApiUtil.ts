@@ -20,7 +20,7 @@ const RETRY_DELAY_MS = 250
  * @param retryStatusCodes - Status codes for which to retry (default: 500-599).
  * @returns The response from the fetch operation.
  */
-export async function usingRetryForFetch(
+export async function usingRetryForFetchAsync(
   url: string,
   init?: RequestInit,
   retryStatusCodes: number[] = [500]
@@ -220,7 +220,7 @@ export function createPostRequest(
  * @returns {Promise<T | null>} - A promise that resolves to the response data of type T or null if the response body is empty.
  * @throws {ApiFetchError} - Throws an error if the response is not ok.
  */
-export async function apiFetch<T = unknown>(
+export async function apiFetchAsync<T = unknown>(
   baseUrl: string,
   argsOrData?: Record<string, unknown>,
   init?: RequestInit
@@ -235,7 +235,7 @@ export async function apiFetch<T = unknown>(
         )
       : createPostRequest(baseUrl, argsOrData || {}, init)
 
-  const response = await usingRetryForFetch(url, options)
+  const response = await usingRetryForFetchAsync(url, options)
 
   if (!response?.ok) {
     throw new ApiFetchError(response)
@@ -243,7 +243,7 @@ export async function apiFetch<T = unknown>(
 
   // TODO: what if the response is ok but the body is empty?
   // Will this statement throw? If so
-  const result = safeJson<T>(response)
+  const result = safeJsonAsync<T>(response)
   return result
 }
 
@@ -267,7 +267,7 @@ export async function apiFetch<T = unknown>(
  * }
  * ```
  */
-export async function withErrorHandling<T = unknown>(
+export async function withErrorHandlingAsync<T = unknown>(
   apiFetchFn: (
     baseUrl: string,
     argsOrData?: Record<string, unknown>,
@@ -322,7 +322,7 @@ export function apiFetchWithErrorHandling<T = unknown>(
   data: T | null
   error: ApiFetchError | null
 }> {
-  const result = withErrorHandling(apiFetch<T>, baseUrl, argsOrData, init)
+  const result = withErrorHandlingAsync(apiFetchAsync<T>, baseUrl, argsOrData, init)
   return result
 }
 
@@ -333,7 +333,7 @@ export function apiFetchWithErrorHandling<T = unknown>(
  * @param {Response} response - The response object to parse.
  * @returns {Promise<T | null>} A promise that resolves to the parsed JSON object of type T, or null if parsing fails.
  */
-export async function safeJson<T>(response: Response): Promise<T | null> {
+export async function safeJsonAsync<T>(response: Response): Promise<T | null> {
   try {
     return await response.json()
   } catch {

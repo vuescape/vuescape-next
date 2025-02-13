@@ -18,8 +18,8 @@ import { useRouter } from 'vue-router'
 import type { VuescapeSelectProps } from '../models/componentProps/VuescapeSelectProps'
 import {
   getSourcePaneKind,
-  handleAction,
-  handleNavigationAction
+  handleActionAsync,
+  handleNavigationActionAsync
 } from '../models/dynamic-ui/actions/ActionHandlers'
 import type { NavigationAction } from '../models/dynamic-ui/actions/NavigationAction'
 import type { SelectOption } from '../models/dynamic-ui/SelectOption'
@@ -74,10 +74,10 @@ const listeners = Object.keys(attrs)
  *
  * @param event - The event object triggered by the change.
  */
-const handleChange = async (event: SelectChangeEvent) => {
+const handleChangeAsync = async (event: SelectChangeEvent) => {
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
-    const loadReport = async (url: string) => {}
+    const loadReportAsync = async (url: string) => {}
     if (initializedProps.value.onChangeAction.type === 'selectNavigate') {
       if (!initializedProps.value.selectedValue) {
         console.warn('No selected value to navigate to')
@@ -94,9 +94,9 @@ const handleChange = async (event: SelectChangeEvent) => {
           target: initializedProps.value.onChangeAction.payload.target
         }
       }
-      await handleNavigationAction(navigationAction, sourcePaneKind, router, loadReport)
+      await handleNavigationActionAsync(navigationAction, sourcePaneKind, router, loadReportAsync)
     } else {
-      await handleAction(actionStore, router, loadReport)
+      await handleActionAsync(actionStore, router, loadReportAsync)
     }
   } else {
     emit('change', event)
@@ -112,7 +112,7 @@ onMounted(async () => {
   ) {
     // Use the router here -- this can result in duplciate api calls if /my-data
     //  only has one product and that call already returned the product info.
-    await router.replace(initializedProps.value.selectedValue.id)
+    await router.push(initializedProps.value.selectedValue.id)
   }
 })
 </script>
@@ -133,7 +133,7 @@ onMounted(async () => {
       :disabled="initializedProps.disabled"
       v-bind="attrs"
       v-on="listeners"
-      @change="handleChange"
+      @change="handleChangeAsync"
     >
     </Select>
     <div v-if="initializedProps.options.length === 1" class="single-option-text">

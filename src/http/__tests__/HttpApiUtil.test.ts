@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HttpMethod } from '../HttpMethod'
 import {
-  usingRetryForFetch,
+  usingRetryForFetchAsync,
   constructUrl,
   prepareRequest,
   createGetRequest,
   createPostRequest,
-  apiFetch,
-  withErrorHandling,
+  apiFetchAsync,
+  withErrorHandlingAsync,
   apiFetchWithErrorHandling,
-  safeJson
+  safeJsonAsync
 } from '../HttpApiUtil'
 import { ApiFetchError } from '../../models/ApiFetchError'
 import { createPinia, setActivePinia } from 'pinia'
@@ -30,7 +30,7 @@ describe('HttpApiUtil', () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
 
-      const response = await usingRetryForFetch('https://example.com', {}, [500])
+      const response = await usingRetryForFetchAsync('https://example.com', {}, [500])
       expect(response.status).toBe(200)
       expect(mockFetch).toHaveBeenCalledTimes(3)
     })
@@ -38,7 +38,7 @@ describe('HttpApiUtil', () => {
     it('returns response on client errors without retrying', async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 400 }))
 
-      const response = await usingRetryForFetch('https://example.com')
+      const response = await usingRetryForFetchAsync('https://example.com')
       expect(response.status).toBe(400)
       expect(mockFetch).toHaveBeenCalledTimes(1)
     })
@@ -92,27 +92,27 @@ describe('HttpApiUtil', () => {
   describe('apiFetch', () => {
     it('fetches data using GET method', async () => {
       mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ foo: 'bar' }), { status: 200 }))
-      const data = await apiFetch('https://example.com', { foo: 'bar' })
+      const data = await apiFetchAsync('https://example.com', { foo: 'bar' })
       expect(data).toEqual({ foo: 'bar' })
     })
 
     it('throws ApiFetchError on non-ok response', async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
-      await expect(apiFetch('https://example.com')).rejects.toThrow(ApiFetchError)
+      await expect(apiFetchAsync('https://example.com')).rejects.toThrow(ApiFetchError)
     })
   })
 
   describe('withErrorHandling', () => {
     it('returns data on successful fetch', async () => {
       mockFetch.mockResolvedValueOnce(new Response(JSON.stringify({ foo: 'bar' }), { status: 200 }))
-      const result = await withErrorHandling(apiFetch, 'https://example.com')
+      const result = await withErrorHandlingAsync(apiFetchAsync, 'https://example.com')
       expect(result.data).toEqual({ foo: 'bar' })
       expect(result.error).toBeNull()
     })
 
     it('returns error on fetch failure', async () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
-      const result = await withErrorHandling(apiFetch, 'https://example.com')
+      const result = await withErrorHandlingAsync(apiFetchAsync, 'https://example.com')
       expect(result.data).toBeNull()
       expect(result.error).toBeInstanceOf(ApiFetchError)
     })
@@ -130,13 +130,13 @@ describe('HttpApiUtil', () => {
   describe('safeJson', () => {
     it('parses JSON response safely', async () => {
       const response = new Response(JSON.stringify({ foo: 'bar' }), { status: 200 })
-      const data = await safeJson(response)
+      const data = await safeJsonAsync(response)
       expect(data).toEqual({ foo: 'bar' })
     })
 
     it('returns null on JSON parsing failure', async () => {
       const response = new Response('invalid-json', { status: 200 })
-      const data = await safeJson(response)
+      const data = await safeJsonAsync(response)
       expect(data).toBeNull()
     })
   })
