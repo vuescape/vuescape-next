@@ -4,7 +4,7 @@ import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
 import { describe, expect, it } from 'vitest'
 
 describe('TableTabsComponent', () => {
-  it('renders the correct label on each tab button', async () => {
+  it('renders the correct label on each tab button', () => {
     const props: TableTabsProps = {
       id: 'testTabSet',
       tabs: [
