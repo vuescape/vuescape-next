@@ -74,7 +74,7 @@ const listeners = Object.keys(attrs)
  *
  * @param event - The event object triggered by the change.
  */
-const handleChange = (event: SelectChangeEvent) => {
+const handleChange = async (event: SelectChangeEvent) => {
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
     const loadReport = async (url: string) => {}
@@ -94,16 +94,16 @@ const handleChange = (event: SelectChangeEvent) => {
           target: initializedProps.value.onChangeAction.payload.target
         }
       }
-      handleNavigationAction(navigationAction, sourcePaneKind, router, loadReport)
+      await handleNavigationAction(navigationAction, sourcePaneKind, router, loadReport)
     } else {
-      handleAction(actionStore, router, loadReport)
+      await handleAction(actionStore, router, loadReport)
     }
   } else {
     emit('change', event)
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (
     mySelect.value &&
     initializedProps.value.onChangeAction &&
@@ -112,8 +112,7 @@ onMounted(() => {
   ) {
     // Use the router here -- this can result in duplciate api calls if /my-data
     //  only has one product and that call already returned the product info.
-    router.replace(initializedProps.value.selectedValue.id)
-    return
+    await router.replace(initializedProps.value.selectedValue.id)
   }
 })
 </script>

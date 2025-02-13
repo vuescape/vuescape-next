@@ -314,7 +314,7 @@ export async function withErrorHandling<T = unknown>(
  * @param {RequestInit} [init] - Optional custom settings to apply to the request.
  * @returns {Promise<{ data: T | null; error: ApiFetchError | null }>} A promise that resolves to an object containing either the fetched data or an error.
  */
-export async function apiFetchWithErrorHandling<T = unknown>(
+export function apiFetchWithErrorHandling<T = unknown>(
   baseUrl: string,
   argsOrData?: Record<string, unknown>,
   init?: RequestInit

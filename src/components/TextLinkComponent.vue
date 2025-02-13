@@ -21,13 +21,13 @@ import {
 const router = useRouter()
 
 const props = defineProps<TextLinkComponentProps>()
-const handleClick = (event: Event) => {
+const handleClick = async (event: Event) => {
   // This handler will not load a report but instead will simply navigate to a new route.
   const loadReport = async (url: string) => {}
   // Sometimes event can be wrap the original event.
   const eventToUse = (event as unknown as any).originalEvent ?? event
   const sourcePaneKind = getSourcePaneKind(eventToUse)
-  handleNavigationAction(props.navigationAction, sourcePaneKind, router, loadReport)
+  await handleNavigationAction(props.navigationAction, sourcePaneKind, router, loadReport)
 }
 </script>
 

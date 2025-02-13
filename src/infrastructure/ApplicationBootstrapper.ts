@@ -264,9 +264,8 @@ export class ApplicationBootstrapper {
     }
   }
 
-  private initFunction: () => Promise<InitFunctionResult | undefined> = async () => {
-    return { redirectUrl: '' }
-  }
+  private initFunction: () => Promise<InitFunctionResult | undefined> = () =>
+    Promise.resolve({ redirectUrl: '' })
 
   private validate() {
     if (!this.router) {

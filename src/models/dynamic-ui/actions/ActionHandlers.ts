@@ -29,13 +29,13 @@ export async function handleAction(
       loadReport
     )
   } else if (actionStoreState.action.type === 'noAction') {
-    await handleNoAction(actionStoreState.action, actionStoreState.paneKind)
+    handleNoAction(actionStoreState.action, actionStoreState.paneKind)
   } else {
     throw new Error('Unknown action type: ' + actionStoreState.action)
   }
 }
 
-export async function handleNoAction(action: NoAction, sourcePane: ReportPaneKind): Promise<void> {
+export function handleNoAction(action: NoAction, sourcePane: ReportPaneKind): void {
   console.warn('No action handler invoked. No action to take.', action, sourcePane)
 }
 
