@@ -46,7 +46,9 @@ const emit = defineEmits<{
   (evt: 'change', event: SelectChangeEvent): void
 }>()
 
-const attrs = useAttrs()
+// Pass-through all attributes to the Select component;
+// use type any since these could be any types.
+const attrs: any = useAttrs()
 
 /**
  * Creates an object containing event listeners from the provided attributes.
