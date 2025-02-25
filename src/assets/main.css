@@ -1,7 +1,7 @@
 @import './base.css';
 
 #app {
-  max-width: 1170px;
+  max-width: var(--p-max-container-width, '1170px');
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
