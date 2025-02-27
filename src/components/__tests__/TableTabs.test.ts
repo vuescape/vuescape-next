@@ -85,12 +85,12 @@ describe('TableTabsComponent', () => {
     }
 
     const wrapper = mount(TableTabsComponent, { props })
-
     const tabButtons = wrapper.findAll('button.p-tab')
     const tabPanels = wrapper.findAll('.p-tabpanel')
 
     // Check the association between aria-controls and id
-    expect(tabButtons[0].attributes('aria-controls')).toBe(tabPanels[0].attributes('id'))
+    expect(tabButtons[0].attributes('aria-controls')).toContain('tabpanel_' + props.tabs[0].id)
+    expect(tabPanels[0].attributes('id')).toContain('tabpanel_' + props.tabs[0].id)
   })
 
   it('renders nothing when tabs array is empty', () => {

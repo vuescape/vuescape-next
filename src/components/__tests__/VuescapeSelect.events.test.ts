@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import VuescapeSelect from '../VuescapeSelect.vue'
 import PrimeVue from 'primevue/config'
 import PrimeVueSelect from 'primevue/select'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 const testEvent = async (
   eventName: string,
@@ -65,6 +65,22 @@ const testEvent = async (
 }
 
 describe('VuescapeSelect.vue - Modular Event Testing', () => {
+  beforeAll(() => {
+    // Provide a mock implementation of matchMedia
+    window.matchMedia = vi.fn().mockImplementation((query) => {
+      return {
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn()
+      }
+    })
+  })
+
   const testCases = [
     {
       eventName: 'update:modelValue',

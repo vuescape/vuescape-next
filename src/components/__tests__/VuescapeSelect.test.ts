@@ -1,10 +1,10 @@
 import { createTestingPinia } from '@pinia/testing'
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import PrimeVue from 'primevue/config'
+import PrimeVueSelect from 'primevue/select'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { VuescapeSelectProps } from '../../models/componentProps/VuescapeSelectProps'
 import VuescapeSelect from '../VuescapeSelect.vue'
-import PrimeVueSelect from 'primevue/select'
-import PrimeVue from 'primevue/config'
 
 const props: VuescapeSelectProps = {
   options: [
@@ -43,6 +43,22 @@ const createWrapper = (propsData: VuescapeSelectProps, attrsData: any) => {
 }
 describe('VuescapeSelect.vue', () => {
   let wrapper
+
+  beforeAll(() => {
+    // Provide a mock implementation of matchMedia
+    window.matchMedia = vi.fn().mockImplementation((query) => {
+      return {
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn()
+      }
+    })
+  })
 
   beforeEach(() => {
     wrapper = createWrapper(props, attrs)
