@@ -33,7 +33,7 @@ const VuescapeTable = defineAsyncComponent(() => import('./VuescapeTable.vue'))
 const props = defineProps<TableTabsProps>()
 
 // Assign the first tab as the active tab
-const activeTabId = ref(props.tabs[0]?.id)
+const activeTabId = ref<string | number>(props.tabs[0]?.id)
 const selectedEntity = ref<string | null>(null)
 
 const tableToInitialScrollPositionMap = new Map<string, number>()
