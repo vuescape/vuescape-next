@@ -14,3 +14,5 @@ export * from './Menu'
 export * from './MenuSources'
 export * from './NotificationMessage'
 export * from './NotificationSeverity'
+
+export * from './wizard'

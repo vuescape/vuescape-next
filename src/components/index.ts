@@ -22,3 +22,4 @@ export { default as ChicletGrid } from './ChicletGrid.vue'
 export { default as TableTabs } from './TableTabs.vue'
 export { default as TextLinkComponent } from './TextLinkComponent.vue'
 
+export * from './wizard'
