@@ -28,4 +28,9 @@ export interface StepWizardProps {
    * Optional reference to the state of the wizard steps.
    */
   wizardStepState?: Record<string, any>
+
+  /**
+   * Optional maximum container width CSS expression. Defaults to '1070px'.
+   */
+  maxContainerWidth?: string
 }
