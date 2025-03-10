@@ -24,4 +24,4 @@ export * from './presentationFormatter'
 export { addScript, loadScriptFromUrl } from './scriptHelpers'
 export { ScrollBarDimension } from './ScrollBarDimension'
 export { SortComparisonStrategy } from './SortComparisonStrategy'
-
+export { capitalizeFirstCharacter } from './stringFormatter'
