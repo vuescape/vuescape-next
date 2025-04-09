@@ -6,7 +6,7 @@
   "main": "dist/vuescape.js",
   "types": "dist/vuescape.d.ts",
   "peerDependencies": {
-    "@primeuix/themes": "^1.0.1",
+    "@primeuix/themes": "^1.0.2",
     "@vueuse/core": "^13.1.0",
     "@vueuse/integrations": "^13.1.0",
     "@vueuse/router": "^13.1.0",
