@@ -34,6 +34,9 @@ export class ApplicationBootstrapper {
   // private featureService: FeatureService = new NullFeatureService()
   private globalClickHandler!: (e: MouseEvent) => void
 
+  private shouldUseToastService = false
+  private shouldUseConfirmationDialogService = false
+
   private piniaStore!: Pinia
 
   /**
@@ -80,6 +83,26 @@ export class ApplicationBootstrapper {
    */
   public withRouter(router: Router) {
     this.router = router
+    return this
+  }
+
+  /**
+   * Will setup the confirmation dialog service for application use.
+   *
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withConfirmationDialogService() {
+    this.shouldUseConfirmationDialogService = true
+    return this
+  }
+
+  /**
+   * Will setup the toast service for application use.
+   *
+   * @returns The `ApplicationBootstrapper` instance.
+   */
+  public withToastService() {
+    this.shouldUseToastService = true
     return this
   }
 
@@ -223,6 +246,16 @@ export class ApplicationBootstrapper {
       app.directive('loading', LoadingDirective)
 
       app.use(this.piniaStore)
+      if (this.shouldUseToastService) {
+        const { default: ToastService } = await import('primevue/toastservice')
+        app.use(ToastService)
+      }
+
+      if (this.shouldUseConfirmationDialogService) {
+        const { default: ConfirmationService } = await import('primevue/confirmationservice')
+        app.use(ConfirmationService)
+      }
+
       app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
       // app.provide('featureService', this.featureService)
       // app.provide('trackingService', this.trackingService)
