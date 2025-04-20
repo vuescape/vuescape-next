@@ -2,6 +2,7 @@ export { default as NotFoundPage } from './404Page.vue'
 export { default as App } from './App.vue'
 export { default as AppInfoHandler } from './AppInfoHandler.vue'
 export { default as CustomLoading } from './CustomLoading.vue'
+export { default as FileUpload } from './FileUpload.vue'
 
 export { default as NotificationMessages } from './NotificationMessages.vue'
 export { default as PaneItemRenderer } from './PaneItemRenderer.vue'
@@ -23,3 +24,4 @@ export { default as TableTabs } from './TableTabs.vue'
 export { default as TextLinkComponent } from './TextLinkComponent.vue'
 
 export * from './wizard'
+

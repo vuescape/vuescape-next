@@ -1,0 +1,236 @@
+<script lang="ts">
+/**
+ * FileUpload @component
+ *
+ * This is a Vue Single File Component (SFC) that renders File Upload component.
+ *
+ * @prop {FileUploadProps} fileUploadProps
+ *
+ */
+
+export default {}
+</script>
+
+<script setup lang="ts">
+import { usePrimeVue } from 'primevue/config'
+import { useToast } from 'primevue/usetoast'
+import { computed, ref } from 'vue'
+import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
+
+// Name PFileUpload to avoid naming conflict with this component
+import PFileUpload from 'primevue/fileupload'
+import Toast from 'primevue/toast'
+import Button from 'primevue/button'
+
+const $primevue = usePrimeVue()
+const toast = useToast()
+
+const chooseFileFn = ref<(() => void) | undefined>(undefined)
+const removeFileFn = ref<((index: number) => void) | undefined>(undefined)
+
+const files = ref<Array<File>>([])
+
+// props
+const props = withDefaults(defineProps<FileUploadProps>(), {
+  title: 'Upload a File',
+  maxFileSizeInBytes: 5 * 1024 * 1024, // 5MB default
+  acceptFileTypeExtensions: () => [],
+  uploadInstructionText: 'Drag and drop or click to choose your file'
+})
+
+const acceptFileTypes = computed(() => {
+  const extensions = props.acceptFileTypeExtensions ?? []
+  const result =
+    extensions.length === 0 || (extensions.length === 1 && extensions[0].trim() === '')
+      ? ''
+      : extensions.join(',')
+  return result
+})
+
+// events
+const emit = defineEmits<{
+  (e: 'files-changed', files: Array<File>): void
+}>()
+
+function clearFiles() {
+  for (let i = 0; i < files.value.length; i++) {
+    if (removeFileFn.value) {
+      removeFileFn.value(i)
+    }
+  }
+  files.value = []
+}
+
+/**
+ * Exposes the `clearFiles` method to the parent component.
+ *
+ * The `clearFiles` method is used to clear the uploaded files in the component.
+ */
+defineExpose({ clearFiles })
+
+const onRemoveTemplatingFile = (
+  file: File,
+  removeFileCallback: (index: number) => void,
+  index: number
+) => {
+  removeFileCallback(index)
+  // Remove from local files array
+  files.value.splice(index, 1)
+
+  emit('files-changed', [...files.value])
+}
+
+const onSelectedFiles = (event: { files: File[] }) => {
+  const validFiles: File[] = []
+  const rejectedIndices: number[] = []
+  event.files.forEach((file, index) => {
+    if (file.size <= props.maxFileSizeInBytes) {
+      validFiles.push(file)
+    } else {
+      rejectedIndices.push(index)
+    }
+  })
+
+  files.value = validFiles
+  emit('files-changed', [...files.value])
+
+  // 🔥 Remove from PrimeVue internal list
+  if (rejectedIndices.length > 0 && typeof removeFileFn.value === 'function') {
+    // Reverse order to avoid index shifting
+    rejectedIndices.reverse().forEach((index) => {
+      if (removeFileFn.value) {
+        removeFileFn.value(index)
+      }
+    })
+
+    toast.add({
+      severity: 'warn',
+      summary: 'File too large',
+      detail: `The selected file exceeded the max size of ${formatSize(
+        props.maxFileSizeInBytes
+      )}. Select a smaller file and try again.`,
+      life: 10000
+    })
+  }
+}
+
+const formatSize = (bytes: number) => {
+  const k = 1024
+  const dm = 3
+  const sizes = $primevue?.config?.locale?.fileSizeTypes ?? [
+    'Bytes',
+    'KB',
+    'MB',
+    'GB',
+    'TB',
+    'PB',
+    'EB',
+    'ZB',
+    'YB'
+  ]
+
+  if (bytes === 0) {
+    return `0 ${sizes[0]}`
+  }
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm))
+
+  return `${formattedSize} ${sizes[i]}`
+}
+</script>
+
+<template>
+  <Toast />
+  <div class="file-upload__container">
+    <PFileUpload
+      customUpload
+      :showHeader="false"
+      :multiple="false"
+      :accept="acceptFileTypes"
+      @select="onSelectedFiles"
+    >
+      <template #header="{ chooseCallback }">
+        <div class="file-upload__header--title">
+          {{ title }}
+        </div>
+        <template v-if="!chooseFileFn">{{ chooseFileFn = chooseCallback }}</template>
+      </template>
+
+      <!-- 🔳 Shared border container for both content and empty -->
+      <template #content="{ files, removeFileCallback }">
+        <template v-if="!removeFileFn">
+          {{ removeFileFn = removeFileCallback }}
+        </template>
+
+        <div
+          v-if="files.length > 0"
+          class="flex flex-column align-items-center justify-content-center border-2 border-dashed border-primary-300 border-round p-4"
+          style="min-height: 160px"
+        >
+          <div
+            v-for="(file, index) of files"
+            :key="file.name + file.type + file.size"
+            class="flex flex-column align-items-center w-20rem"
+          >
+            <span class="font-bold text-lg text-center text-color">
+              {{ file.name }}
+            </span>
+            <span class="text-sm text-color-secondary">
+              {{ formatSize(file.size) }}
+            </span>
+            <Button
+              icon="fas fa-times"
+              @click="onRemoveTemplatingFile(file, removeFileCallback, index)"
+              outlined
+              rounded
+              severity="danger"
+              class="mt-2 file-upload__button--delete"
+            />
+          </div>
+        </div>
+      </template>
+
+      <template #empty>
+        <div
+          class="flex flex-column align-items-center justify-content-center border-2 border-dashed border-primary-300 border-round p-4"
+          style="min-height: 160px"
+          @click="chooseFileFn?.()"
+        >
+          <div class="text-xl font-medium file-upload__p--instruction-text pb-3">
+            {{ uploadInstructionText }}
+          </div>
+          <i class="fad fa-cloud-upload file-upload__upload--icon" />
+        </div>
+      </template>
+    </PFileUpload>
+  </div>
+</template>
+
+<style>
+/* TODO use theming if possible  */
+.file-upload__select--hover {
+  cursor: pointer;
+}
+.file-upload__select--border {
+  border-color: #9bdddb !important;
+}
+.file-upload__p--instruction-text {
+  font-size: 20px;
+}
+.file-upload__container .p-fileupload-advanced {
+  border: unset;
+}
+.file-upload__upload--icon {
+  font-size: 64px;
+}
+.file-upload__header--title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.file-upload__button--delete {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+</style>
