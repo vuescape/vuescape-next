@@ -3,8 +3,9 @@
  */
 export interface FileUploadProps {
   id: string
+  isRequired: boolean
+  maxFileSizeInBytes?: number  
   title?: string
-  maxFileSizeInBytes?: number
   acceptFileTypeExtensions?: Array<string>
   uploadInstructionText?: string
 }
