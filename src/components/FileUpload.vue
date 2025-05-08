@@ -14,7 +14,7 @@ export default {}
 <script setup lang="ts">
 import { usePrimeVue } from 'primevue/config'
 import { useToast } from 'primevue/usetoast'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 
 // Name PFileUpload to avoid naming conflict with this component
@@ -38,6 +38,14 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
   uploadInstructionText: 'Drag and drop or click to choose your file'
 })
 
+const isValid = computed(() => {
+  if (props.isRequired && files.value.length === 0) {
+    return false
+  }
+
+  return files.value.every((file) => file.size <= props.maxFileSizeInBytes)
+})
+
 const acceptFileTypes = computed(() => {
   const extensions = props.acceptFileTypeExtensions ?? []
   const result =
@@ -49,7 +57,7 @@ const acceptFileTypes = computed(() => {
 
 // events
 const emit = defineEmits<{
-  (e: 'files-changed', files: Array<File>): void
+  (e: 'files-changed', payload: { isValid: boolean; files: Array<File> }): void
 }>()
 
 function clearFiles() {
@@ -77,7 +85,7 @@ const onRemoveTemplatingFile = (
   // Remove from local files array
   files.value.splice(index, 1)
 
-  emit('files-changed', [...files.value])
+  emit('files-changed', { isValid: isValid.value, files: [...files.value] })
 }
 
 const onSelectedFiles = (event: { files: File[] }) => {
@@ -92,7 +100,7 @@ const onSelectedFiles = (event: { files: File[] }) => {
   })
 
   files.value = validFiles
-  emit('files-changed', [...files.value])
+  emit('files-changed', { isValid: isValid.value, files: [...files.value] })
 
   // 🔥 Remove from PrimeVue internal list
   if (rejectedIndices.length > 0 && typeof removeFileFn.value === 'function') {
@@ -138,6 +146,10 @@ const formatSize = (bytes: number) => {
 
   return `${formattedSize} ${sizes[i]}`
 }
+
+onMounted(() => {
+  emit('files-changed', { isValid: isValid.value, files: [...files.value] })
+})
 </script>
 
 <template>

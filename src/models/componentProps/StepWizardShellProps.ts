@@ -1,28 +1,27 @@
-import type { WizardStep } from '../wizard/WizardStep'
+import type { WizardEngine } from '../wizard/WizardEngine'
 
 /**
  * Properties for the StepWizard component.
  */
-export interface StepWizardProps {
+export interface StepWizardShellProps {
   /**
-   * An array of steps to be displayed in the wizard.
+   * The wizard engine.
    */
-  steps: Array<WizardStep>
-
+  engine: WizardEngine
   /**
    * Text for the button to navigate to the previous step.
    */
-  previousStepButtonText?: string
+  backButtonText?: string
 
   /**
    * Text for the button to navigate to the next step.
    */
-  nextStepButtonText?: string
+  nextButtonText?: string
 
   /**
-   * Text for the button to navigate to the last step.
+   * Text for the button of the last step.
    */
-  lastStepButtonText?: string
+  lastButtonText?: string
 
   /**
    * Optional reference to the state of the wizard steps.

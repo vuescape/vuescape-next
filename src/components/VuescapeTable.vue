@@ -24,6 +24,14 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
+
+/**
+ * This component currently uses a typed event model (e.g. `@change`, `@update`).
+ * If this component is later used inside a dynamic wizard or needs to emit
+ * `can-continue` or unified `update` events, it may be wrapped in a
+ * wizard-specific variant (e.g., `WizardFileUpload.vue`) to keep the core
+ * component agnostic of wizard behavior.
+ */
 const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 
 const dtRef = ref<any>(null)

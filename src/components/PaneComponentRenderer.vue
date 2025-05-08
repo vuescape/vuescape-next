@@ -1,12 +1,17 @@
 <script lang="ts" setup>
-import { ref, watch, markRaw } from 'vue'
 import type { Component } from 'vue'
+import { markRaw, ref, watch } from 'vue'
 
+import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 
 // Props
 const props = defineProps<PaneComponentRendererProps>()
+
+const emit = defineEmits<{
+  (e: 'update', id: string, payload: any): void
+}>()
 
 /**
  * A map of component "type" to an async import function.
@@ -20,7 +25,7 @@ const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Compo
   table: () => import('./VuescapeTable.vue'),
   select: () => import('./VuescapeSelect.vue'),
   tableTabs: () => import('./TableTabs.vue'),
-  textLink: () => import('./TextLinkComponent.vue'),
+  textLink: () => import('./TextLinkComponent.vue')
 }
 
 /**
@@ -49,7 +54,6 @@ const error = ref<string | null>(null)
 watch(
   () => props.component.type,
   async (newType) => {
-
     if (!componentMap[newType]) {
       // Type not in our map
       console.warn(`Unsupported component type: '${newType}'`)
@@ -93,17 +97,32 @@ watch(
       console.error(`Error loading component type: ${newType}`, e)
       error.value = `Error loading component type: '${newType}'`
       resolvedComponent.value = null
-    }
-    finally {
+    } finally {
     }
   },
   { immediate: true }
 )
+
+// Manually emitting an event to the parent component when files are changed
+// This is to ensure that the parent component can react to file changes in the child component.
+// Currently, this is only used in the FileUpload component interacting with the Wizard component.
+// Other components may need to have an id passed in to the payload as well so that the data payload
+// can be mapped to the correct data item when submitting the wizard (e.g. survey field key).
+function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
+  const componentPayload = props.component.payload as FileUploadProps
+  const compositePayload = { componentType: props.component.type, ...payload }
+  emit('update', componentPayload.id, compositePayload)
+}
 </script>
 
 <template>
   <!-- If there's an error, display it. -->
   <div v-if="error">{{ error }}</div>
   <!-- Otherwise, render the (cached) dynamically imported component. -->
-  <component v-else :is="resolvedComponent" v-bind="component.payload" />
+  <component
+    v-else
+    :is="resolvedComponent"
+    v-bind="component.payload"
+    @files-changed="onFilesChanged"
+  />
 </template>
