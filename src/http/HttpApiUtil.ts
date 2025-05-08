@@ -118,8 +118,11 @@ export function prepareRequest(
   const defaultHeaders = {
     'Access-Control-Allow-Origin': origin,
     Origin: origin,
-    Accept: 'application/json, text/plain, */*',
-    'Content-Type': 'application/json'
+    Accept: 'application/json, text/plain, */*'
+  } as any
+
+  if (method === HttpMethod.Post && data && !init?.body) {
+    defaultHeaders['Content-Type'] = 'application/json'
   }
 
   // Convert init.headers to an object if it's a Headers instance
@@ -138,10 +141,8 @@ export function prepareRequest(
     headers: mergedHeaders // Pass the merged headers as an object
   }
 
-  if (method === HttpMethod.Post) {
-    requestInit.headers = {
-      ...requestInit.headers
-    }
+  // Only add the body for POST requests if data is provided AND init.body doesn't exist
+  if (method === HttpMethod.Post && data && !init?.body) {
     requestInit.body = JSON.stringify(data || {})
   }
 
