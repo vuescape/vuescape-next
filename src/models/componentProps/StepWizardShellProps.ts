@@ -8,6 +8,12 @@ export interface StepWizardShellProps {
    * The wizard engine.
    */
   engine: WizardEngine
+
+  /**
+   * Optional title for the wizard.
+   */
+  title?: string
+
   /**
    * Text for the button to navigate to the previous step.
    */
@@ -17,6 +23,11 @@ export interface StepWizardShellProps {
    * Text for the button to navigate to the next step.
    */
   nextButtonText?: string
+
+  /**
+   * Whether the cancel button should be displaed.
+   */
+  shouldShowCancelButton?: boolean
 
   /**
    * Text for the button of the last step.

@@ -26,6 +26,15 @@ export interface WizardNode<Props = any> {
   props?: (ctx: WizardContext) => Props
 
   /**
+   * An optional custom hash function to determine when the step should re-render.
+   *
+   * @param ctx - The wizard context.
+   * @param props - The current props of this node.
+   * @returns A hash value.
+   */
+  hash?: (ctx: WizardContext, props: Props) => string
+
+  /**
    * A function that determines the ID of the next wizard node to navigate to
    * based on the current wizard context.
    *

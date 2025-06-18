@@ -35,7 +35,7 @@ export interface WizardEngine {
    * Moves the wizard back to the previous step.
    */
   goBack: () => void
-
+  
   /**
    * Updates the state of a specific step in the wizard.
    *

@@ -22,6 +22,7 @@ const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Compo
   button: () => import('./VuescapeButton.vue'),
   chicletGrid: () => import('./ChicletGrid.vue'),
   fileUpload: () => import('./FileUpload.vue'),
+  readOnlyFileUpload: () => import('./ReadOnlyFileUpload.vue'),
   table: () => import('./VuescapeTable.vue'),
   select: () => import('./VuescapeSelect.vue'),
   tableTabs: () => import('./TableTabs.vue'),
@@ -103,11 +104,18 @@ watch(
   { immediate: true }
 )
 
-// Manually emitting an event to the parent component when files are changed
-// This is to ensure that the parent component can react to file changes in the child component.
-// Currently, this is only used in the FileUpload component interacting with the Wizard component.
-// Other components may need to have an id passed in to the payload as well so that the data payload
-// can be mapped to the correct data item when submitting the wizard (e.g. survey field key).
+/*
+ * Handles changes to the selected files.
+ * Manually emitting an event to the parent component when files are changed
+ * This is to ensure that the parent component can react to file changes in the child component.
+ * Currently, this is only used in the FileUpload component interacting with the Wizard component.
+ * Other components may need to have an id passed in to the payload as well so that the data payload
+ * can be mapped to the correct data item when submitting the wizard (e.g. survey field key).
+ *
+ * @param payload - An object containing:
+ *   - isValid: Indicates whether the selected files are valid.
+ *   - files: An array of File objects representing the selected files.
+ */
 function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
   const componentPayload = props.component.payload as FileUploadProps
   const compositePayload = { componentType: props.component.type, ...payload }

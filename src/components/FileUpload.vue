@@ -21,6 +21,7 @@ import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 import PFileUpload from 'primevue/fileupload'
 import Toast from 'primevue/toast'
 import Button from 'primevue/button'
+import { formatSize } from '../infrastructure/formatters'
 
 const $primevue = usePrimeVue()
 const toast = useToast()
@@ -122,30 +123,7 @@ const onSelectedFiles = (event: { files: File[] }) => {
   }
 }
 
-const formatSize = (bytes: number) => {
-  const k = 1024
-  const dm = 3
-  const sizes = $primevue?.config?.locale?.fileSizeTypes ?? [
-    'Bytes',
-    'KB',
-    'MB',
-    'GB',
-    'TB',
-    'PB',
-    'EB',
-    'ZB',
-    'YB'
-  ]
-
-  if (bytes === 0) {
-    return `0 ${sizes[0]}`
-  }
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm))
-
-  return `${formattedSize} ${sizes[i]}`
-}
+const sizes = $primevue?.config?.locale?.fileSizeTypes
 
 onMounted(() => {
   emit('files-changed', { isValid: isValid.value, files: [...files.value] })
@@ -189,7 +167,7 @@ onMounted(() => {
               {{ file.name }}
             </span>
             <span class="text-sm text-color-secondary">
-              {{ formatSize(file.size) }}
+              {{ formatSize(file.size, sizes) }}
             </span>
             <Button
               icon="fas fa-times"

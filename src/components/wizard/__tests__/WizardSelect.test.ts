@@ -1,9 +1,16 @@
+import { createRouter, createWebHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SelectOption } from '../../../models/dynamic-ui/SelectOption'
 import WizardSelect from '../WizardSelect.vue'
 import PrimeVue from 'primevue/config'
+
+// Mock router setup
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [] // Add routes if necessary
+})
 
 describe('WizardSelect.vue', () => {
   beforeAll(() => {
@@ -29,7 +36,7 @@ describe('WizardSelect.vue', () => {
   it('renders the component with title and prompt text', () => {
     const wrapper = mount(WizardSelect, {
       global: {
-        plugins: [PrimeVue]
+        plugins: [PrimeVue, router]
       },
       props: {
         title: 'Select a Company',
@@ -63,10 +70,9 @@ describe('WizardSelect.vue', () => {
       }
     })
 
-    const selectComponent = wrapper.findComponent({ name: 'VuescapeSelect' })
     const newSelection: SelectOption = { displayName: 'Company A', id: 'a' }
 
-    await selectComponent.vm.$emit('change', { value: newSelection })
+    await wrapper.vm.$emit('change', newSelection)
 
     expect(wrapper.emitted().change).toBeTruthy()
     expect(wrapper.emitted().change[0]).toEqual([newSelection])

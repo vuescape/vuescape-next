@@ -21,7 +21,8 @@ const props = withDefaults(defineProps<VuescapeButtonProps>(), {
   icon: '',
   iconPos: '' as IconPosition,
   disabled: false,
-  cssClass: ''
+  cssClass: '',
+  outlined: false
 })
 
 /**
@@ -49,6 +50,7 @@ const handleClick = (event: Event) => {
     :iconPos="props.iconPos"
     :label="props.label"
     @click="handleClick"
+    :outlined="outlined"
   />
 </template>
 

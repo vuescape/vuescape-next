@@ -24,11 +24,26 @@ describe('FileUpload.vue', () => {
   beforeEach(() => {
     wrapper = mount(FileUpload, {
       global: {
-        plugins: [PrimeVue, ToastService]
+        plugins: [PrimeVue, ToastService],
+        stubs: {
+          Toast: true,
+          PFileUpload: {
+            template: `
+              <div>
+                <slot name="header" :chooseCallback="() => {}"></slot>
+                <slot name="content" :files="[]" :removeFileCallback="() => {}"></slot>
+                <slot name="empty"></slot>
+              </div>
+            `
+          } // Stub the Toast component to avoid teleport issues
+        }
       },
       props: {
+        id: 'test-upload',
+        title: 'Test Upload',
+        isRequired: false,
         uploadInstructionText: 'Click or drag to upload a file',
-        maxFileSizeInBytes: 1024 * 1024 // 1MB max
+        maxFileSizeInBytes: 1024 * 1024
       }
     })
   })
@@ -38,32 +53,50 @@ describe('FileUpload.vue', () => {
   })
 
   it('emits files-changed when a valid file is selected', async () => {
-    const input = wrapper.find('input[type="file"]')
-    const file = createFile('valid.txt', 500_000)
+    // Create a mock file
+    const file = new File(['test content'], 'test.txt', { type: 'text/plain' })
 
-    // Simulate file selection (real DOM event)
-    const fileList = [file]
+    // Get initial emission count
+    const initialEmissions = wrapper.emitted('files-changed')?.length || 0
 
-    Object.defineProperty(input.element, 'files', {
-      value: fileList,
-      writable: false
-    })
+    // Call onSelectedFiles method directly with our test file
+    await wrapper.vm.onSelectedFiles({ files: [file] })
 
-    await input.trigger('change')
+    // Check if the files-changed event was emitted
+    expect(wrapper.emitted('files-changed')).toBeTruthy()
+    expect(wrapper.emitted('files-changed')?.length).toBe(initialEmissions + 1)
 
-    expect(wrapper.emitted()['files-changed']).toBeTruthy()
-    expect(wrapper.emitted()['files-changed']![0][0][0].name).toBe('valid.txt')
+    // Get the latest emission
+    const latestEmission = wrapper.emitted('files-changed')![initialEmissions][0]
+
+    // Check the payload structure
+    expect(latestEmission.isValid).toBe(true)
+    expect(latestEmission.files).toHaveLength(1)
+    expect(latestEmission.files[0].name).toBe('test.txt')
   })
 
   it('rejects files over max size and does not emit valid files', async () => {
-    const input = wrapper.find('input[type="file"]')
+    // Create a mock oversized file
     const oversizedFile = createFile('big.txt', 10 * 1024 * 1024) // 10MB
 
-    await triggerFileChange(input.element as HTMLInputElement, [oversizedFile])
+    // Call the component's method directly with our oversized file
+    await wrapper.vm.onSelectedFiles({ files: [oversizedFile] })
 
-    const emitted = wrapper.emitted()['files-changed']
+    // Get the emitted event
+    const emitted = wrapper.emitted('files-changed')
+
+    // Check that the event was emitted
     expect(emitted).toBeTruthy()
-    expect(emitted![0][0]).toEqual([]) // emitted, but with empty file list
+
+    // Find the last emission (at least one emission happens on component mount)
+    const lastEmission = emitted![emitted!.length - 1][0]
+
+    // Check that the emitted value has the correct structure
+    expect(lastEmission).toEqual({ isValid: true, files: [] })
+
+    // Alternative, more specific assertions:
+    expect(lastEmission.isValid).toBe(true)
+    expect(lastEmission.files).toHaveLength(0)
   })
 
   it('can clear files via exposed clearFiles()', async () => {

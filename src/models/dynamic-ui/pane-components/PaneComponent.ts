@@ -1,6 +1,7 @@
 import type { ButtonComponent } from './ButtonComponent'
 import type { ChicletGridComponent } from './ChicletGridComponent'
 import type { FileUploadComponent } from './FileUploadComponent'
+import type { ReadOnlyFileUploadComponent } from './ReadOnlyFileUploadComponent'
 import type { SelectComponent } from './SelectComponent'
 import type { TableComponent } from './TableComponent'
 import type { TableTabsComponent } from './TableTabsComponent'
@@ -20,3 +21,4 @@ export type PaneComponent =
   | SelectComponent
   | TableTabsComponent
   | TextLinkComponent
+  | ReadOnlyFileUploadComponent

@@ -34,7 +34,6 @@ const emit = defineEmits<{
 const componentState = ref<Record<string, any>>({})
 
 function onUpdate(id: string, payload: any) {
-  debugger
   componentState.value[id] = payload
   emit('update', { ...componentState.value })
 

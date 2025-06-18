@@ -34,4 +34,10 @@ export interface VuescapeButtonProps {
    * @default ''
    */
   cssClass?: string | object
+
+  /**
+   * Whether the button is outlined.
+   * @default false
+   */
+  outlined?: boolean
 }

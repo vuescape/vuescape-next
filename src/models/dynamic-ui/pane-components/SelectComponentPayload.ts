@@ -3,5 +3,4 @@ import type { VuescapeSelectProps } from '../../componentProps/VuescapeSelectPro
 /**
  * Represents the payload for the Select component.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface SelectComponentPayload extends VuescapeSelectProps {}
+export type SelectComponentPayload = VuescapeSelectProps

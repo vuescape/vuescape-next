@@ -11,6 +11,7 @@ import type { WizardState } from '../WizardState'
  * @param graph - A `WizardGraph` object that defines the structure of the wizard, including steps and transitions.
  * @param startId - The ID of the initial step in the wizard.
  * @param initialState - An optional initial state object for the wizard. Defaults to an empty object.
+ * @param initialHistory - An optional initial history for the wizard. Defaults to an empty array.
  * @returns A `WizardEngine` object that provides methods and properties to control and interact with the wizard.
  *
  * The returned `WizardEngine` includes:
@@ -26,11 +27,12 @@ import type { WizardState } from '../WizardState'
 export function createWizardEngine(
   graph: WizardGraph,
   startId: string,
-  initialState: WizardState = {}
+  initialState: WizardState = {},
+  initialHistory: string[] = []
 ): WizardEngine {
   const currentStepId = ref(startId)
   const state = reactive<WizardState>({ ...initialState })
-  const history = ref<string[]>([startId])
+  const history = ref<string[]>(initialHistory.length > 0 ? initialHistory : [startId]) // Use provided history or default to startId
 
   function updateState(stepId: string, payload: any) {
     state[stepId] = payload

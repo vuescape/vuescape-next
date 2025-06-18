@@ -11,63 +11,91 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import type { StepWizardShellProps } from '../../models/componentProps/StepWizardShellProps'
-
-import VuescapeButton from '../VuescapeButton.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { fastHash } from '../../infrastructure/fastHash'
+import type { StepWizardShellProps } from '../../models/componentProps/StepWizardShellProps'
+import VuescapeButton from '../VuescapeButton.vue'
 
 const emit = defineEmits<{
   (e: 'update', stepId: string, payload: any): void
   (e: 'finished', state: Record<string, any>): void
+  (e: 'cancel'): void
 }>()
 
 const props = defineProps<StepWizardShellProps>()
 
-const buttonText = computed(() => ({
+/**
+ * Computed property that returns an object representing the button text(s)
+ * for the StepWizardShell component. The returned object may contain
+ * dynamic values based on the current state of the wizard.
+ *
+ * @returns {Object} An object with button text(s) for the wizard UI.
+ */
+const uiElement = computed(() => ({
   previousStepButtonText: props.backButtonText ?? 'Back',
   nextStepButtonText: props.nextButtonText ?? 'Next',
-  lastStepButtonText: props.lastButtonText ?? 'Finish'
+  lastStepButtonText: props.lastButtonText ?? 'Finish',
+  title: props.title,
+  maxContainerWidth: props.maxContainerWidth ?? '1070px',
+  shouldShowCancelButton: props.shouldShowCancelButton ?? false
 }))
 
+/**
+ * Computes the current step component to render in the wizard.
+ *
+ * @returns {Component|null} The Vue component for the current step, or null if not set.
+ */
 const stepComponent = computed(() => props.engine.currentNode?.value?.component ?? null)
+
+/**
+ * Computes and returns the current value of the step wizard's engine properties.
+ */
 const stepProps = computed(() => props.engine.props.value)
-const propsHash = computed(() => fastHash(stepProps.value))
+
+/**
+ * Computes a hash value based on the current props.
+ * This computed property is used to track changes in props
+ * and trigger updates or reactivity in the component when props change.
+ *
+ * @returns {string} A hash representing the current state of the props.
+ */
+const propsHash = computed(() => {
+  const hash = props.engine.currentNode.value.hash
+  // Use defined hash function or fallback to default hash function
+  const result = hash
+    ? hash(props.engine.context, props.engine.currentNode.value.props)
+    : typeof props.engine.currentNode.value.props === 'function'
+      ? fastHash(props.engine.currentNode.value.props(props.engine.context))
+      : fastHash(props.engine.currentNode.value.props)
+  return result
+})
+
 const canContinue = ref(false)
 
-// Maintain reactivity
-// const wizardStepState = props.wizardStepState ?? <Record<string, any>>{}
-
+/**
+ * Handles updates triggered by wizard step changes.
+ *
+ * @param {any} payload - The data associated with the update event.
+ *   This may include information about the current step, user input, or other relevant state.
+ */
 function handleUpdate(payload: any) {
   props.engine.updateStepState(props.engine.currentStepId.value, payload)
   emit('update', props.engine.currentStepId.value, payload)
 }
 
+/**
+ * Handles the logic for determining if the wizard can proceed to the next step.
+ * @param {boolean} valid - Indicates whether the current step's data is valid and the user can continue.
+ */
 function handleCanContinue(valid: boolean) {
   canContinue.value = valid
 }
 
-// function validateStep() {
-//   const stepComponent = currentStep.value
-//   const stepState = wizardStepState[stepComponent.id]
-//   if (stepComponent.validationSchema || stepComponent.onValidate) {
-//     // Do the validations
-//     if (stepComponent.validationSchema) {
-//       const validationResult = stepComponent.validationSchema.safeParse(stepState)
-//       if (validationResult.success) {
-//         if (stepComponent.onValidate) {
-//           const isValid = stepComponent.onValidate(stepState)
-//           if (!isValid) {
-//             return false
-//           }
-//         }
-//       } else {
-//         return false
-//       }
-//     }
-//   }
-//   return true
-// }
-
+/**
+ * Handles the logic for moving to the next step in the wizard.
+ * Typically called when the user clicks the "Next" button.
+ * May include validation, state updates, or navigation logic.
+ */
 function handleNext() {
   if (props.engine.isLastStep.value) {
     emit('finished', props.engine.context.state)
@@ -76,29 +104,31 @@ function handleNext() {
   }
 }
 
+/**
+ * Handles the logic for navigating to the previous step in the wizard.
+ * Typically invoked when the user clicks the "Back" button.
+ * Implement any necessary state updates or validations before moving back.
+ */
 function handleBack() {
   props.engine.goBack()
 }
 
-let styleTag: HTMLStyleElement | null = null
-
-function fastHash(obj: unknown): string {
-  return btoa(
-    JSON.stringify(obj)
-      .split('')
-      .reduce((h, c) => (h << 5) - h + c.charCodeAt(0), 0) // 32-bit DJB2
-      .toString()
-  )
+function handleCancel() {
+  emit('cancel')
 }
 
-// Dynamically add CSS to handle responsive layout.
-// Use the maxContainerWidth from the theme to set the max-width of the inner container.
-// This is done as a dynamic style because media query must be a static value so to avoid
-// hardcoding the value, we use the theme prop injected dynamically.
+let styleTag: HTMLStyleElement | null = null
+
+/**
+ * Dynamically add CSS to handle responsive layout.
+ * Use the maxContainerWidth from the theme to set the max-width of the inner container.
+ * This is done as a dynamic style because media query must be a static value so to avoid
+ * hardcoding the value, we use the theme prop injected dynamically.
+ */
 onMounted(() => {
   styleTag = document.createElement('style')
   styleTag.textContent = `
-    @media (max-width: ${props.maxContainerWidth ?? '1070px'}) {
+    @media (max-width: ${uiElement.value.maxContainerWidth}) {
       .wizard-buttons-inner {
         max-width: 100%;
         padding: 0 1rem;
@@ -108,8 +138,10 @@ onMounted(() => {
   document.head.appendChild(styleTag)
 })
 
+/**
+ * Remove the style tag from the parent when the component is unmounted
+ */
 onUnmounted(() => {
-  // Remove the style tag when the component is unmounted
   if (styleTag && styleTag.parentNode) {
     styleTag.parentNode.removeChild(styleTag)
   }
@@ -119,6 +151,9 @@ onUnmounted(() => {
 <template>
   <div class="step-wizard-container">
     <!-- Render current step's component -->
+    <div v-if="uiElement.title" class="text-center text-xl font-semibold mb-4">
+      {{ uiElement.title }}
+    </div>
     <KeepAlive>
       <component
         v-if="stepComponent"
@@ -138,11 +173,19 @@ onUnmounted(() => {
       >
         <div class="flex items-center">
           <!-- Left side container: Back button (if any) -->
-          <div>
+          <div class="flex flex-none">
             <VuescapeButton
               :disabled="engine.context.history.length <= 1"
-              :label="buttonText.previousStepButtonText"
+              :label="uiElement.previousStepButtonText"
               @click="handleBack"
+            />
+          </div>
+          <div v-if="uiElement.shouldShowCancelButton" class="flex ml-auto mr-4 items-center">
+            <VuescapeButton
+              :disabled="engine.context.history.length <= 1"
+              label="Cancel"
+              :outlined="true"
+              @click="handleCancel"
             />
           </div>
           <!-- Right side container: Next/Finish butt~ons, pushed right with ml-auto -->
