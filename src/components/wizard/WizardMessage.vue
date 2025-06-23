@@ -8,7 +8,7 @@ const props = defineProps<WizardMessageProps>()
 
 <template>
   <div
-    class="flex flex-column align-items-center justify-content-center text-center px-4"
+    class="flex flex-col items-center justify-center text-center px-4"
     style="min-height: 100%; min-width: 300px"
   >
     <div v-if="props.title" class="mt-4 text-xl font-semibold">{{ props.title }}</div>

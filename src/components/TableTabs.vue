@@ -75,7 +75,7 @@ clearSessionStorageByPrefix('/my-data/product')
 
 <template>
   <Tabs v-model:value="activeTabId" :lazy="true">
-    <div class="flex align-items-center justify-content-between">
+    <div class="flex items-center justify-content-between">
       <TabList>
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>

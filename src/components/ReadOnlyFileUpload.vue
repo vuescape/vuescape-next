@@ -46,7 +46,7 @@ const onDownloadClick = () => {
 
     <div
       v-if="props?.id"
-      class="flex flex-column align-items-center justify-content-center border-2 border-dashed border-primary-300 border-round p-4"
+      class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 border-round p-4"
       style="min-height: 160px"
     >
       <span class="font-bold text-lg text-center text-color">

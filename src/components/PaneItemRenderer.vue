@@ -20,7 +20,7 @@ const props = defineProps<PaneItemRendererProps>()
 
 <template>
   <div
-    class="pane-item p-d-flex p-flex-column"
+    class="pane-item p-d-flex p-flex-col"
     :style="{ width: item.width }"
     :class="[
       item.horizontalAlignment ? `p-jc-${item.horizontalAlignment}` : '',

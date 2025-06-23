@@ -44,6 +44,7 @@ const handleClick = (event: Event) => {
 
 <template>
   <Button
+    class="w-[500px]"
     :class="[props.cssClass, { 'vuescape-button--with-icon': props.icon }]"
     :disabled="props.disabled"
     :icon="props.icon"

@@ -248,12 +248,12 @@ export class ApplicationBootstrapper {
       app.use(this.piniaStore)
       if (this.shouldUseToastService) {
         const { default: ToastService } = await import('primevue/toastservice')
-        app.use(ToastService)
+        app.use(ToastService as unknown as Plugin<[]>)
       }
 
       if (this.shouldUseConfirmationDialogService) {
         const { default: ConfirmationService } = await import('primevue/confirmationservice')
-        app.use(ConfirmationService)
+        app.use(ConfirmationService as unknown as Plugin<[]>)
       }
 
       app.config.errorHandler = this.errorHandler || this.defaultErrorHandler
@@ -270,7 +270,10 @@ export class ApplicationBootstrapper {
       }
 
       if (this.primeVue) {
-        app.use(this.primeVue, this.theme)
+        app.use(this.primeVue, {
+          unstyled: true,
+          ...this.theme
+        })
       }
 
       app.use(this.router)

@@ -65,7 +65,7 @@ const appInfoMessages = computed(
 
 <template>
   <div
-    class="flex flex-column min-h-screen"
+    class="flex flex-col min-h-screen"
     v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
     <div>

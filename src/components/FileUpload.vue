@@ -155,13 +155,13 @@ onMounted(() => {
 
         <div
           v-if="files.length > 0"
-          class="flex flex-column align-items-center justify-content-center border-2 border-dashed border-primary-300 border-round p-4"
+          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 border-round p-4"
           style="min-height: 160px"
         >
           <div
             v-for="(file, index) of files"
             :key="file.name + file.type + file.size"
-            class="flex flex-column align-items-center w-20rem"
+            class="flex flex-col items-center w-20rem"
           >
             <span class="font-bold text-lg text-center text-color">
               {{ file.name }}
@@ -183,7 +183,7 @@ onMounted(() => {
 
       <template #empty>
         <div
-          class="flex flex-column align-items-center justify-content-center border-2 border-dashed border-primary-300 border-round p-4"
+          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 border-round p-4"
           style="min-height: 160px"
           @click="chooseFileFn?.()"
         >
