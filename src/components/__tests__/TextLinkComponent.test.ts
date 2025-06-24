@@ -26,35 +26,6 @@ const props = {
 }
 
 describe('TextLinkComponent', () => {
-  it('renders correct href', () => {
-    const wrapper = mount(TextLinkComponent, {
-      props: {
-        text: 'Test Link',
-        navigationAction: { type: 'NAVIGATE', payload: { url: '/test-url' } }
-      },
-      global: {
-        plugins: [router]
-      }
-    })
-
-    const link = wrapper.find('a')
-    expect(link.attributes('href')).toBe('/test-url')
-  })
-
-  it('renders link text', () => {
-    const wrapper = mount(TextLinkComponent, {
-      props: {
-        text: 'Test Link',
-        navigationAction: { type: 'NAVIGATE', payload: { url: '/test-url' } }
-      },
-      global: {
-        plugins: [router] // Provide the router
-      }
-    })
-
-    expect(wrapper.text()).toBe('Test Link')
-  })
-
   it('renders link text', () => {
     const wrapper = mount(TextLinkComponent, { props })
     expect(wrapper.text()).toContain('Test Link')
@@ -66,31 +37,23 @@ describe('TextLinkComponent', () => {
   })
 
   // TODO: Uncomment this test to test the click handler
-  //   it('calls handleClickAsync on click', async () => {
-  //     const wrapper = mount(TextLinkComponent, {
-  //       props: {
-  //         text: 'Test Link',
-  //         navigationAction: { type: 'NAVIGATE', payload: { url: '/test-url' } }
-  //       },
-  //       global: {
-  //         plugins: [router]
-  //       }
-  //     })
+  it.skip('calls handleClickAsync on click', async () => {
+    const wrapper = mount(TextLinkComponent, { props })
 
-  //     // Spy on the component's method
-  //     const handleClickSpy = vi.spyOn(wrapper.vm, 'handleClickAsync')
+    // Spy on the component's method
+    const handleClickSpy = vi.spyOn(wrapper.vm, 'handleClickAsync')
 
-  //     // Create a mock event
-  //     const preventDefault = vi.fn()
-  //     const mockEvent = { preventDefault }
+    // Create a mock event
+    const preventDefault = vi.fn()
+    const mockEvent = { preventDefault }
 
-  //     // Call the method directly instead of triggering a click
-  //     await wrapper.vm.handleClickAsync(mockEvent)
+    // Call the method directly instead of triggering a click
+    await wrapper.vm.handleClickAsync(mockEvent)
 
-  //     // Check that the method was called
-  //     expect(handleClickSpy).toHaveBeenCalled()
-  //     expect(preventDefault).toHaveBeenCalled()
-  //   })
+    // Check that the method was called
+    expect(handleClickSpy).toHaveBeenCalled()
+    expect(preventDefault).toHaveBeenCalled()
+  })
 
   it('prevents default navigation', async () => {
     const wrapper = mount(TextLinkComponent, { props })

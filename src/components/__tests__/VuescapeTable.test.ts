@@ -41,7 +41,6 @@ describe('VuescapeTable.vue', () => {
   })
   
   it('renders table with correct number of columns', () => {
-    console.info('Columns:', columns.value)
     const wrapper = mount(VuescapeTable, {
       props: {
         id: 'test-table',
@@ -51,7 +50,6 @@ describe('VuescapeTable.vue', () => {
       }
     })
 
-    console.info(wrapper.html())
     const tableColumns = wrapper.findAllComponents({ name: 'Column' })
     expect(tableColumns.length).toBe(columns.value.length)
   })

@@ -51,7 +51,7 @@ describe('WizardConfirmation.vue', () => {
     expect(wrapper.emitted('can-continue')).toBeTruthy()
   })
 
-  it('emits update and can-continue when checkbox is unchecked', async () => {
+  it('emits update and can-continue when checkbox is unchecked', () => {
     const wrapper = mount(WizardConfirmation, {
       props: defaultProps,
       global: {
