@@ -20,7 +20,7 @@ emit('update', isConfirmed.value)
 
 <template>
   <div
-    class="flex flex-col items-center justify-center text-center px-4 pb-4"
+    class="flex flex-col items-center justify-center text-center px-6 pb-6"
     style="min-height: 100%; border: 1px solid var(--p-primary-color); border-radius: 8px"
   >
     <div v-if="props.title" class="mt-2 text-xl font-semibold">{{ props.title }}</div>

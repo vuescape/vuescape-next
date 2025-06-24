@@ -8,11 +8,11 @@ const props = defineProps<WizardMessageProps>()
 
 <template>
   <div
-    class="flex flex-col items-center justify-center text-center px-4"
+    class="flex flex-col items-center justify-center text-center px-6"
     style="min-height: 100%; min-width: 300px"
   >
-    <div v-if="props.title" class="mt-4 text-xl font-semibold">{{ props.title }}</div>
-    <div class="mt-3 mb-3" v-html="props.messageHtml"></div>
+    <div v-if="props.title" class="mt-6 text-xl font-semibold">{{ props.title }}</div>
+    <div class="mt-4 mb-4" v-html="props.messageHtml"></div>
     <VuescapeButton
       v-if="props.buttonText"
       :label="props.buttonText"

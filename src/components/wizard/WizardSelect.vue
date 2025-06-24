@@ -21,9 +21,9 @@ if (props.selectProps.selectedValue) {
 </script>
 
 <template>
-  <div class="p-d-flex p-flex-col p-ai-center" style="min-width: 300px">
-    <h3 class="p-mt-4">{{ props.title }}</h3>
-    <p class="p-text-center p-mb-3">{{ props.promptText }}</p>
+  <div class="flex flex-col items-center min-w-[300px]">
+    <h3 class="mt-4">{{ props.title }}</h3>
+    <p class="text-center mb-3">{{ props.promptText }}</p>
     <VuescapeSelect v-bind="props.selectProps" @change="onItemChange" />
   </div>
 </template>

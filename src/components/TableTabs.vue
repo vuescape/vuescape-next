@@ -75,11 +75,11 @@ clearSessionStorageByPrefix('/my-data/product')
 
 <template>
   <Tabs v-model:value="activeTabId" :lazy="true">
-    <div class="flex items-center justify-content-between">
+    <div class="flex items-center justify-between">
       <TabList>
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>
-      <div class="ml-4" v-if="props.selectComponent">
+      <div class="mr-5" v-if="props.selectComponent">
         <VuescapeSelect :key="props.id" @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
       </div>
     </div>

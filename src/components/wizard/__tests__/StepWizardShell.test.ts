@@ -116,8 +116,6 @@ describe('StepWizardShell', () => {
     const btns = wrapper.findAllComponents({ name: 'VuescapeButton' })
     // Back button
     expect(btns.at(0)!.props('disabled')).toBe(true)
-    // Cancel button
-    expect(btns.at(1)!.props('disabled')).toBe(true)
   })
 
   it('shows Cancel button if shouldShowCancelButton is true and emits cancel', async () => {

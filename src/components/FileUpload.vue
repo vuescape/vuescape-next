@@ -155,18 +155,18 @@ onMounted(() => {
 
         <div
           v-if="files.length > 0"
-          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 border-round p-4"
+          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 rounded-border p-6"
           style="min-height: 160px"
         >
           <div
             v-for="(file, index) of files"
             :key="file.name + file.type + file.size"
-            class="flex flex-col items-center w-20rem"
+            class="flex flex-col items-center w-80"
           >
             <span class="font-bold text-lg text-center text-color">
               {{ file.name }}
             </span>
-            <span class="text-sm text-color-secondary">
+            <span class="text-sm text-muted-color">
               {{ formatSize(file.size, sizes) }}
             </span>
             <Button
@@ -183,11 +183,11 @@ onMounted(() => {
 
       <template #empty>
         <div
-          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 border-round p-4"
+          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 rounded-border p-6"
           style="min-height: 160px"
           @click="chooseFileFn?.()"
         >
-          <div class="text-xl font-medium file-upload__p--instruction-text pb-3">
+          <div class="text-xl font-medium file-upload__p--instruction-text pb-4">
             {{ uploadInstructionText }}
           </div>
           <i class="fad fa-cloud-upload file-upload__upload--icon" />

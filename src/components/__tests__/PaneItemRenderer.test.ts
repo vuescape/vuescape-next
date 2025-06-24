@@ -37,9 +37,9 @@ describe('PaneItemRenderer', () => {
     const wrapper = mount(PaneItemRenderer, {
       props: { item: props.item }
     })
-    const div = wrapper.find('.pane-item')
+    const div = wrapper.find('div')
     expect(div.attributes('style')).toContain(`width: ${props.item.width}`)
-    expect(div.classes()).toContain(`p-jc-${props.item.horizontalAlignment}`)
-    expect(div.classes()).toContain(`p-ai-${props.item.verticalAlignment}`)
+    expect(div.classes()).toContain(`justify-${props.item.horizontalAlignment}`)
+    expect(div.classes()).toContain(`items-${props.item.verticalAlignment}`)
   })
 })

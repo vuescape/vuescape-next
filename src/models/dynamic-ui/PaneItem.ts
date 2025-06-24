@@ -5,7 +5,7 @@ import type { PaneComponent } from './pane-components/PaneComponent'
  */
 export interface PaneItem {
   /**
-   * Flexbox width, e.g., "30%", "flex-grow-1".
+   * Flexbox width, e.g., "30%", "grow".
    */
   width?: string
 

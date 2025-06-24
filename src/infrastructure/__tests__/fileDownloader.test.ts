@@ -1,12 +1,19 @@
-import * as fileSaver from 'file-saver'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { downloadFile } from '../../infrastructure/fileDownloader'
 
 // Mock the file-saver module
-vi.mock('file-saver', () => ({
-  saveAs: vi.fn(),
-}))
+vi.mock('file-saver', () => {
+  const saveAs = vi.fn()
+  const mockModule = {
+    saveAs,
+    default: { saveAs }
+  }
+  return mockModule
+})
+
+// Import after mocking
+import * as fileSaver from 'file-saver'
 
 describe('downloadFile', () => {
   beforeEach(() => {

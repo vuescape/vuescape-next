@@ -20,11 +20,11 @@ const props = defineProps<PaneItemRendererProps>()
 
 <template>
   <div
-    class="pane-item p-d-flex p-flex-col"
+    class="flex flex-col justify-start"
     :style="{ width: item.width }"
     :class="[
-      item.horizontalAlignment ? `p-jc-${item.horizontalAlignment}` : '',
-      item.verticalAlignment ? `p-ai-${item.verticalAlignment}` : ''
+      item.horizontalAlignment ? `justify-${item.horizontalAlignment}` : '',
+      item.verticalAlignment ? `items-${item.verticalAlignment}` : ''
     ]"
   >
     <!-- Future Feature: Add support for nested components or recursive components -->

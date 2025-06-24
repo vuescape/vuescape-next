@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { ref } from 'vue'
 import type { TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
@@ -31,7 +31,17 @@ const rows = ref<Array<TableRow>>([
 ])
 
 describe('VuescapeTable.vue', () => {
+  // Add ResizeObserver mock
+  beforeAll(() => {
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+  })
+  
   it('renders table with correct number of columns', () => {
+    console.info('Columns:', columns.value)
     const wrapper = mount(VuescapeTable, {
       props: {
         id: 'test-table',
@@ -41,7 +51,7 @@ describe('VuescapeTable.vue', () => {
       }
     })
 
-    // console.info(wrapper.html())
+    console.info(wrapper.html())
     const tableColumns = wrapper.findAllComponents({ name: 'Column' })
     expect(tableColumns.length).toBe(columns.value.length)
   })

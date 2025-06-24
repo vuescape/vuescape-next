@@ -65,7 +65,7 @@ const appInfoMessages = computed(
 
 <template>
   <div
-    class="flex flex-col min-h-screen"
+    class="flex min-h-screen flex-col"
     v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
   >
     <div>
@@ -74,14 +74,15 @@ const appInfoMessages = computed(
           :is="props.headerBootstrappedComponent.component"
           v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
           ref="theHeader"
-          class="fixed header-component"
+          class="header-component fixed"
           v-bind="props.headerBootstrappedComponent.props"
         ></component>
       </Suspense>
     </div>
     <div ref="appContainer" v-loading="false" class="app__container--scroll">
       <transition mode="out-in" name="app__component--transition">
-        <main ref="main" class="main-div flex-grow-1 overflow-y-auto" v-if="true">
+        <!-- class="main-div grow overflow-y-auto" v-if="true"> -->
+        <main ref="main" class="flex-1 mt-[36px]" v-if="true">
           <NotificationMessages
             v-if="appInfoMessages.length && !route.meta.hideLayout"
             :messages="appInfoMessages"
@@ -102,11 +103,12 @@ const appInfoMessages = computed(
       </transition>
     </div>
     <Suspense>
+        <!-- class="footer-component fixed" -->
       <component
         :is="props.footerBootstrappedComponent.component"
         v-if="props.footerBootstrappedComponent?.component"
         ref="theFooter"
-        class="footer-component fixed"
+        class="fixed bottom-0 inset-x-0 h-9 bg-white z-50"
         v-bind="props.footerBootstrappedComponent.props"
       ></component>
     </Suspense>

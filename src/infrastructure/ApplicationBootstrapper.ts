@@ -271,7 +271,7 @@ export class ApplicationBootstrapper {
 
       if (this.primeVue) {
         app.use(this.primeVue, {
-          unstyled: true,
+          // unstyled: true,
           ...this.theme
         })
       }

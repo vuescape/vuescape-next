@@ -151,7 +151,7 @@ onUnmounted(() => {
 <template>
   <div class="step-wizard-container">
     <!-- Render current step's component -->
-    <div v-if="uiElement.title" class="text-center text-xl font-semibold mb-4">
+    <div v-if="uiElement.title" class="text-center text-xl font-semibold mt-12 mb-6">
       {{ uiElement.title }}
     </div>
     <KeepAlive>
@@ -165,7 +165,7 @@ onUnmounted(() => {
         @can-continue="handleCanContinue"
       />
     </KeepAlive>
-    <div class="wizard-buttons fixed bottom-0 left-0 right-0 mb-6">
+    <div class="wizard-buttons fixed bottom-0 left-0 right-0 mb-12">
       <!-- Inner container to align buttons with main content -->
       <div
         class="mx-auto wizard-buttons-inner"
@@ -180,9 +180,8 @@ onUnmounted(() => {
               @click="handleBack"
             />
           </div>
-          <div v-if="uiElement.shouldShowCancelButton" class="flex ml-auto mr-4 items-center">
+          <div v-if="uiElement.shouldShowCancelButton" class="flex ml-auto mr-6 items-center">
             <VuescapeButton
-              :disabled="engine.context.history.length <= 1"
               label="Cancel"
               :outlined="true"
               @click="handleCancel"
