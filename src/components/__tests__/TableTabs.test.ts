@@ -1,16 +1,16 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import TableTabsComponent from '../TableTabs.vue'
 import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 
 // NOTE: This mocks PrimeVue’s internal layout calc to avoid test flakiness.
 // e.g. getOuterWidth can be called async after test is completed giving a reference error.
 // Be aware: tightly coupled to PrimeVue v4.3 implementation details.
 // If tabs break after upgrade, re-evaluate this.
-// vi.mock('@primeuix/src/dom/methods/getOuterWidth', () => ({
-//   getOuterWidth: () => 100 // or a reasonable fixed value
-// }))
+vi.mock('@primeuix/src/dom/methods/getOuterWidth', () => ({
+  getOuterWidth: () => 100 // or a reasonable fixed value
+}))
 
 describe('TableTabsComponent', () => {
   it('renders the correct label on each tab button', async () => {
