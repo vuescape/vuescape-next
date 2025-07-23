@@ -5,6 +5,7 @@ import { markRaw, ref, watch } from 'vue'
 import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
+import { FileUploadComponentPayload } from '../models/dynamic-ui/pane-components/FileUploadComponentPayload'
 
 // Props
 const props = defineProps<PaneComponentRendererProps>()
@@ -117,9 +118,43 @@ watch(
  *   - files: An array of File objects representing the selected files.
  */
 function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
-  const componentPayload = props.component.payload as FileUploadProps
-  const compositePayload = { componentType: props.component.type, ...payload }
-  emit('update', componentPayload.id, compositePayload)
+  onComponentUpdate('fileUpload', payload)
+}
+
+// If these components and their handlers below are used in a survey with a wizard 
+// then we will need an ID to correlate their data into the survey step state.
+
+/**
+ * Handles select component changes
+ */
+// function onSelectionChanged(payload: { selectedValue: any }) {
+//   onComponentUpdate('select', payload);
+// }
+
+/**
+ * Handles text input component changes
+ */
+// function onTextChanged(payload: { value: string }) {
+//   onComponentUpdate('textInput', payload);
+// }
+
+/**
+ * Generic handler for component updates
+ * Emits standardized update events for all component types
+ */
+function onComponentUpdate(componentType: string, payload: any) {
+  if (componentType === 'fileUpload') {
+    const fileUploadPayload = props.component.payload as FileUploadComponentPayload
+    const id = fileUploadPayload.id
+    const compositePayload = {
+      componentType,
+      ...payload
+    }
+    emit('update', id, compositePayload)
+  }
+
+  console.warn(`Unsupported component type for update: '${componentType}'`)
+  return
 }
 </script>
 
@@ -133,4 +168,5 @@ function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
     v-bind="component.payload"
     @files-changed="onFilesChanged"
   />
+  <!-- TODO: Add other event listeners above as needed -->
 </template>

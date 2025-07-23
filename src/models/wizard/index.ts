@@ -1,4 +1,5 @@
 export * from './logic'
+export * from './survey-components'
 export * from './WizardComponent'
 export * from './WizardComponentEmits'
 export * from './WizardContext'
