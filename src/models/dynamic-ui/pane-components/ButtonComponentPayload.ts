@@ -5,6 +5,11 @@ import type { Action } from '../actions/Action'
  */
 export interface ButtonComponentPayload {
   /**
+   * Unique identifier for the button component.
+   */
+  id: string
+
+  /**
    * The label text to display on the button.
    */
   label: string

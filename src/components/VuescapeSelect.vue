@@ -30,6 +30,7 @@ const router = useRouter()
 
 const props = defineProps<VuescapeSelectProps>()
 const initializedProps = ref<VuescapeSelectProps>({
+  id: props.id ?? '',
   options: props.options ?? [],
   // options: [props.options[0]],
   selectedValue: props.selectedValue,

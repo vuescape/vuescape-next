@@ -1,9 +1,14 @@
-import type { NavigationAction } from "../dynamic-ui/actions/NavigationAction"
+import type { NavigationAction } from '../dynamic-ui/actions/NavigationAction'
 
 /**
  * Interface representing the properties for a TextLinkComponent.
  */
 export interface TextLinkComponentProps {
+  /**
+   * Unique identifier for the component.
+   */
+  id: string
+
   /**
    * The text to show.
    */

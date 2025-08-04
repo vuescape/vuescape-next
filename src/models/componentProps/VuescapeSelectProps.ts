@@ -7,6 +7,11 @@ import type { SelectOption } from '../dynamic-ui/SelectOption'
  */
 export interface VuescapeSelectProps {
   /**
+   * Unique identifier for the select component.
+   */
+  id: string
+
+  /**
    * The options to display in the select component.
    */
   options: Array<SelectOption>
