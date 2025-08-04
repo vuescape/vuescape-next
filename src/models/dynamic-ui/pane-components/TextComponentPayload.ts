@@ -1,9 +1,21 @@
+import type { RenderTextAs } from '../RenderTextAs'
+
 /**
- * Represents the payload for a button component in the dynamic UI.
+ * Represents the payload for a text component in the dynamic UI.
  */
 export interface TextComponentPayload {
   /**
-   * The text to display.
+   * Unique identifier for the title component.
+   */
+  id: string
+
+  /**
+   * The title text to display.
    */
   text: string
+
+  /**
+   * The way to render the text.
+   */
+  renderTextAs: RenderTextAs
 }

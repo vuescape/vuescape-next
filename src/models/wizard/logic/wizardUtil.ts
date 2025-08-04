@@ -136,9 +136,9 @@ export function populateFormDataFromComponents(
         handleSelectComponent(formData, fieldKey, componentData)
         break
 
-      case 'textInput':
-        handleTextInputComponent(formData, fieldKey, componentData)
-        break
+      // case 'textInput':
+      //   handleTextInputComponent(formData, fieldKey, componentData)
+      //   break
 
       default:
         // Log unhandled component types for debugging
@@ -183,14 +183,14 @@ function handleSelectComponent(
   }
 }
 
-function handleTextInputComponent(
-  formData: FormData,
-  fieldKey: string,
-  componentData: TextInputComponentData
-): void {
-  const { value } = componentData as { value: string }
+// function handleTextInputComponent(
+//   formData: FormData,
+//   fieldKey: string,
+//   componentData: TextInputComponentData
+// ): void {
+//   const { value } = componentData as { value: string }
 
-  if (value !== undefined) {
-    formData.append(fieldKey, String(value))
-  }
-}
+//   if (value !== undefined) {
+//     formData.append(fieldKey, String(value))
+//   }
+// }
