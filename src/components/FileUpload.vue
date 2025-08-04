@@ -33,7 +33,6 @@ const files = ref<Array<File>>([])
 
 // props
 const props = withDefaults(defineProps<FileUploadProps>(), {
-  title: 'Upload a File',
   maxFileSizeInBytes: 5 * 1024 * 1024, // 5MB default
   acceptFileTypeExtensions: () => [],
   uploadInstructionText: 'Drag and drop or click to choose your file'
@@ -140,12 +139,12 @@ onMounted(() => {
       :accept="acceptFileTypes"
       @select="onSelectedFiles"
     >
-      <template #header="{ chooseCallback }">
+      <!-- <template #header="{ chooseCallback }">
         <div class="file-upload__header--title">
           {{ title }}
         </div>
         <template v-if="!chooseFileFn">{{ chooseFileFn = chooseCallback }}</template>
-      </template>
+      </template> -->
 
       <!-- 🔳 Shared border container for both content and empty -->
       <template #content="{ files, removeFileCallback }">

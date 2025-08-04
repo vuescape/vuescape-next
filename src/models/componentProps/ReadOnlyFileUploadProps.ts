@@ -5,8 +5,6 @@ import type { NavigationAction } from '../dynamic-ui/actions/NavigationAction'
  */
 export interface ReadOnlyFileUploadProps {
   id: string
-  title: string
-  descriptionText?: string
   fileName: string
   fileSizeInBytes: number
   downloadNavigationAction: NavigationAction

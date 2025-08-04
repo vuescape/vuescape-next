@@ -2,10 +2,10 @@
 import type { Component } from 'vue'
 import { markRaw, ref, watch } from 'vue'
 
-import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
+import type { FileUploadComponentPayload } from '../models/dynamic-ui/pane-components/FileUploadComponentPayload'
 import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
-import { FileUploadComponentPayload } from '../models/dynamic-ui/pane-components/FileUploadComponentPayload'
+import type { SelectComponentPayload } from '../models/dynamic-ui/pane-components/SelectComponentPayload'
 
 // Props
 const props = defineProps<PaneComponentRendererProps>()
@@ -19,7 +19,7 @@ const emit = defineEmits<{
  * These are still lazily loaded, so initial bundle size stays smaller.
  */
 const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Component }>> = {
-  title: () => import('./TitleComponentRenderer.vue'),
+  text: () => import('./TextComponentRenderer.vue'),
   button: () => import('./VuescapeButton.vue'),
   chicletGrid: () => import('./ChicletGrid.vue'),
   fileUpload: () => import('./FileUpload.vue'),
@@ -121,7 +121,7 @@ function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
   onComponentUpdate('fileUpload', payload)
 }
 
-// If these components and their handlers below are used in a survey with a wizard 
+// If these components and their handlers below are used in a survey with a wizard
 // then we will need an ID to correlate their data into the survey step state.
 
 /**
@@ -143,18 +143,29 @@ function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
  * Emits standardized update events for all component types
  */
 function onComponentUpdate(componentType: string, payload: any) {
+  let id = ''
+  let compositePayload: any = {}
   if (componentType === 'fileUpload') {
     const fileUploadPayload = props.component.payload as FileUploadComponentPayload
-    const id = fileUploadPayload.id
-    const compositePayload = {
+    id = fileUploadPayload.id
+    compositePayload = {
       componentType,
       ...payload
     }
-    emit('update', id, compositePayload)
+  } else if (componentType === 'select') {
+    const selectPayload = props.component.payload as SelectComponentPayload
+    id = selectPayload.id
+    compositePayload = {
+      componentType,
+      ...payload
+    }
+  } else {
+    // Unsupported component type
+    console.warn(`Unsupported component type for update: '${componentType}'`)
+    return
   }
 
-  console.warn(`Unsupported component type for update: '${componentType}'`)
-  return
+  emit('update', id, compositePayload)
 }
 </script>
 

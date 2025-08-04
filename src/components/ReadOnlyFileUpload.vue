@@ -40,9 +40,9 @@ const onDownloadClick = () => {
 
 <template>
   <div class="file-upload__container">
-    <div class="file-upload__header--title">
+    <!-- <div class="file-upload__header--title">
       {{ title }}
-    </div>
+    </div> -->
 
     <div
       v-if="props?.id"
