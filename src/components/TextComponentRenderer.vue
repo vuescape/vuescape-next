@@ -17,8 +17,8 @@ const props = defineProps<TextComponentPayload>()
 </script>
 
 <template>
-  <div v-if="props.renderTextAs === 'header'" class="header">{{ props.text }}</div>
-  <div v-else-if="props.renderTextAs === 'subheader'" class="subheader">{{ props.text }}</div>
+  <div v-if="props.renderTextAs === 'heading'" class="header">{{ props.text }}</div>
+  <div v-else-if="props.renderTextAs === 'subheading'" class="subheader">{{ props.text }}</div>
   <div v-else-if="props.renderTextAs === 'paragraph'" class="paragraph">{{ props.text }}</div>
   <div v-else-if="props.renderTextAs === 'html'" class="html" v-html="props.text"></div>
 </template>
