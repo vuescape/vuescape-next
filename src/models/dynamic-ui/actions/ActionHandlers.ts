@@ -94,6 +94,13 @@ export async function handleNavigationActionAsync(
     throw new Error('LinkTarget.Download Not implemented')
   } else if (target == LinkTarget.Modal) {
     throw new Error('LinkTarget.Modal Not implemented')
+  } else if (target === LinkTarget.Navigate) {
+    // Pure UI navigation without report loading
+    if (action.payload.replace === true) {
+      router.replace(action.payload.url)
+    } else {
+      router.push(action.payload.url)
+    }
   } else if (target == LinkTarget.None) {
     throw new Error('LinkTarget.None not supported')
   }
@@ -108,8 +115,10 @@ export async function handleNavigationActionAsync(
  */
 export function handleActionEvent(event: Event, action: Action, actionStore: ActionStore): void {
   const paneKind = getSourcePaneKind(event)
+  
+  // Spread the action to ensure we have a fresh copy and trigger reactivity updates
   const state: ActionStore = {
-    action: action,
+    action: { ...action },
     paneKind: toEnum(ReportPaneKind, paneKind)
   }
 

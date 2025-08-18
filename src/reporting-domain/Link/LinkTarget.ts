@@ -27,5 +27,8 @@ export enum LinkTarget {
   NewWindow = 'newWindow',
 
   /** Target is a download. */
-  Download = 'download'
+  Download = 'download',
+
+  /** Target is UI navigation without report loading. */
+  Navigate = 'navigate'
 }
