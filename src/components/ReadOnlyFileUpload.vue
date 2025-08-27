@@ -76,8 +76,6 @@ const onDownloadClick = () => {
 </template>
 
 <style scoped>
-.file-upload__container {
-}
 .file-upload__header--title {
   font-size: 20px;
   font-weight: 600;
