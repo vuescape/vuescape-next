@@ -35,10 +35,9 @@ const onDownloadClick = () => {
     return
   }
   actionStore.$patch({
-  action: { ...downloadNavigationAction }, // clone makes it new every call
-  paneKind: ReportPaneKind.None
-})
-  // actionStore.$patch({ action: downloadNavigationAction, paneKind: ReportPaneKind.None })
+    action: { ...downloadNavigationAction }, // clone makes it new every call
+    paneKind: ReportPaneKind.None
+  })
 }
 </script>
 
