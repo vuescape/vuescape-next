@@ -4,7 +4,7 @@
  *
  * This is a Vue Single File Component (SFC) that renders text.
  *
- * @prop {TextComponentRenderer} - the TitleComponent props
+ * @prop {TextComponentPayload} - the TextComponent props
  *
  */
 export default {}
@@ -13,14 +13,14 @@ export default {}
 <script lang="ts" setup>
 import type { TextComponentPayload } from '../models/dynamic-ui/pane-components/TextComponentPayload'
 
-const props = defineProps<TextComponentPayload>()
+defineProps<TextComponentPayload>()
 </script>
 
 <template>
-  <div v-if="props.renderTextAs === 'heading'" class="header">{{ props.text }}</div>
-  <div v-else-if="props.renderTextAs === 'subheading'" class="subheader">{{ props.text }}</div>
-  <div v-else-if="props.renderTextAs === 'paragraph'" class="paragraph">{{ props.text }}</div>
-  <div v-else-if="props.renderTextAs === 'html'" class="html" v-html="props.text"></div>
+  <div v-if="renderTextAs === 'heading'" class="header">{{ text }}</div>
+  <div v-else-if="renderTextAs === 'subheading'" class="subheader">{{ text }}</div>
+  <div v-else-if="renderTextAs === 'paragraph'" class="paragraph">{{ text }}</div>
+  <div v-else-if="renderTextAs === 'html'" class="html" v-html="text"></div>
 </template>
 
 <style scoped>
