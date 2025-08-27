@@ -1,37 +1,31 @@
 import type { Router } from 'vue-router'
 
 import { LinkTarget } from '../../../reporting-domain/Link/LinkTarget'
-import type { ActionStore } from '../../../stores/ActionStore'
+import type { ActionStore } from '../../../stores/useActionStore'
 import { ReportPaneKind } from '../../feature/ReportPaneKind'
 import type { Action } from './Action'
 import type { NavigationAction } from './NavigationAction'
 import type { NoAction } from './NoAction'
-import { toEnum } from '../../../infrastructure/converters'
 
 /* Handles different types of actions based on the action type in the action store state.
  *
- * @param actionStoreState - The state of the action store containing the action to be handled.
+ * @param state - The state of the action store containing the action to be handled.
  * @param router - The router instance used for navigation actions.
  * @param loadReport - A function to load a report given a URL.
  * @returns A promise that resolves when the action has been handled.
  * @throws Will throw an error if the action type is unknown.
  */
 export async function handleActionAsync(
-  actionStoreState: ActionStore,
+  state: { action: Action; paneKind: ReportPaneKind },
   router: Router,
   loadReport: (url: string) => Promise<void>
 ): Promise<void> {
-  if (actionStoreState.action.type === 'navigate') {
-    await handleNavigationActionAsync(
-      actionStoreState.action,
-      actionStoreState.paneKind,
-      router,
-      loadReport
-    )
-  } else if (actionStoreState.action.type === 'noAction') {
-    handleNoAction(actionStoreState.action, actionStoreState.paneKind)
+  if (state.action.type === 'navigate') {
+    await handleNavigationActionAsync(state.action, state.paneKind, router, loadReport)
+  } else if (state.action.type === 'noAction') {
+    handleNoAction(state.action, state.paneKind)
   } else {
-    throw new Error('Unknown action type: ' + actionStoreState.action)
+    throw new Error('Unknown action type: ' + state.action)
   }
 }
 
@@ -115,15 +109,7 @@ export async function handleNavigationActionAsync(
  */
 export function handleActionEvent(event: Event, action: Action, actionStore: ActionStore): void {
   const paneKind = getSourcePaneKind(event)
-  
-  // Spread the action to ensure we have a fresh copy and trigger reactivity updates
-  const state: ActionStore = {
-    action: { ...action },
-    paneKind: toEnum(ReportPaneKind, paneKind)
-  }
-
-  actionStore.action = state.action
-  actionStore.paneKind = state.paneKind
+  actionStore.dispatch(action, paneKind)
 }
 
 /**
@@ -133,15 +119,14 @@ export function handleActionEvent(event: Event, action: Action, actionStore: Act
  * @returns The pane kind as a string if the `data-panekind` attribute is found, otherwise returns `ReportPaneKind.None`.
  */
 export function getSourcePaneKind(event: Event): ReportPaneKind {
-  const clickedElement = event.target as HTMLElement;
-  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null;
+  const clickedElement = event.target as HTMLElement
+  const paneElement = clickedElement.closest('[data-panekind]') as HTMLElement | null
 
-  const paneKind = paneElement?.dataset.panekind;
+  const paneKind = paneElement?.dataset.panekind
 
   if (paneKind && Object.values(ReportPaneKind).includes(paneKind as ReportPaneKind)) {
-    return paneKind as ReportPaneKind;
+    return paneKind as ReportPaneKind
   }
 
-  return ReportPaneKind.None;
+  return ReportPaneKind.None
 }
-

@@ -34,10 +34,10 @@ const onDownloadClick = () => {
   if (!downloadNavigationAction) {
     return
   }
-  actionStore.$patch({
-    action: { ...downloadNavigationAction }, // clone makes it new every call
-    paneKind: ReportPaneKind.None
-  })
+  actionStore.dispatch(
+    downloadNavigationAction,
+    ReportPaneKind.None
+  )
 }
 </script>
 
