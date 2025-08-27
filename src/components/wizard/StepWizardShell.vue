@@ -151,7 +151,7 @@ onUnmounted(() => {
 <template>
   <div class="step-wizard-container">
     <!-- Render current step's component -->
-    <div v-if="uiElement.title" class="text-center text-xl font-semibold mt-12 mb-6">
+    <div v-if="uiElement.title" class="text-center text-xl font-semibold mb-6">
       {{ uiElement.title }}
     </div>
     <KeepAlive>

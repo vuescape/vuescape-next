@@ -82,7 +82,7 @@ const appInfoMessages = computed(
     <div ref="appContainer" v-loading="false" class="app__container--scroll">
       <transition mode="out-in" name="app__component--transition">
         <!-- class="main-div grow overflow-y-auto" v-if="true"> -->
-        <main ref="main" class="flex-1 mt-[36px]" v-if="true">
+        <main ref="main" class="flex-1 pt-[36px] mt-2 flow-root" v-if="true">
           <NotificationMessages
             v-if="appInfoMessages.length && !route.meta.hideLayout"
             :messages="appInfoMessages"

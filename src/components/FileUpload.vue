@@ -138,13 +138,12 @@ onMounted(() => {
       :multiple="false"
       :accept="acceptFileTypes"
       @select="onSelectedFiles"
+      :pt="{ header: { style: 'display:none' } }"
     >
-      <!-- <template #header="{ chooseCallback }">
-        <div class="file-upload__header--title">
-          {{ title }}
-        </div>
+      <template #header="{ chooseCallback }">
+        <div></div>
         <template v-if="!chooseFileFn">{{ chooseFileFn = chooseCallback }}</template>
-      </template> -->
+      </template>
 
       <!-- 🔳 Shared border container for both content and empty -->
       <template #content="{ files, removeFileCallback }">
@@ -154,39 +153,39 @@ onMounted(() => {
 
         <div
           v-if="files.length > 0"
-          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 rounded-border p-6"
+          class="border-primary-300 rounded-border flex flex-col items-center justify-center border-2 border-dashed p-6"
           style="min-height: 160px"
         >
           <div
             v-for="(file, index) of files"
             :key="file.name + file.type + file.size"
-            class="flex flex-col items-center w-80"
+            class="flex items-center gap-4"
           >
-            <span class="font-bold text-lg text-center text-color">
-              {{ file.name }}
-            </span>
-            <span class="text-sm text-muted-color">
-              {{ formatSize(file.size, sizes) }}
-            </span>
             <Button
               icon="fas fa-times"
               @click="onRemoveTemplatingFile(file, removeFileCallback, index)"
               outlined
               rounded
               severity="danger"
-              class="mt-2 file-upload__button--delete"
+              class="file-upload__button--delete mt-1"
             />
+            <span class="text-color truncate text-lg font-bold">
+              {{ file.name }}
+            </span>
+            <span class="text-muted-color mt-1 -ml-2 text-sm">
+              ({{ formatSize(file.size, sizes) }})
+            </span>
           </div>
         </div>
       </template>
 
       <template #empty>
         <div
-          class="flex flex-col items-center justify-center border-2 border-dashed border-primary-300 rounded-border p-6"
+          class="border-primary-300 rounded-border flex flex-col items-center justify-center border-2 border-dashed p-6"
           style="min-height: 160px"
           @click="chooseFileFn?.()"
         >
-          <div class="text-xl font-medium file-upload__p--instruction-text pb-4">
+          <div class="file-upload__p--instruction-text pb-4 text-xl font-medium">
             {{ uploadInstructionText }}
           </div>
           <i class="fad fa-cloud-upload file-upload__upload--icon" />
