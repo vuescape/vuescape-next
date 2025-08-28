@@ -11,7 +11,7 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, toRefs } from 'vue'
 import { fastHash } from '../../infrastructure/fastHash'
 import type { StepWizardShellProps } from '../../models/componentProps/StepWizardShellProps'
 import VuescapeButton from '../VuescapeButton.vue'
@@ -23,21 +23,22 @@ const emit = defineEmits<{
 }>()
 
 const props = defineProps<StepWizardShellProps>()
+const {
+  title,
+  backButtonText,
+  nextButtonText,
+  lastButtonText,
+  maxContainerWidth,
+  shouldShowCancelButton
+} = toRefs(props)
 
-/**
- * Computed property that returns an object representing the button text(s)
- * for the StepWizardShell component. The returned object may contain
- * dynamic values based on the current state of the wizard.
- *
- * @returns {Object} An object with button text(s) for the wizard UI.
- */
 const uiElement = computed(() => ({
-  previousStepButtonText: props.backButtonText ?? 'Back',
-  nextStepButtonText: props.nextButtonText ?? 'Next',
-  lastStepButtonText: props.lastButtonText ?? 'Finish',
-  title: props.title,
-  maxContainerWidth: props.maxContainerWidth ?? '1070px',
-  shouldShowCancelButton: props.shouldShowCancelButton ?? false
+  previousStepButtonText: backButtonText.value ?? 'Back',
+  nextStepButtonText: nextButtonText.value ?? 'Next',
+  lastStepButtonText: lastButtonText.value ?? 'Finish',
+  title: title.value,
+  maxContainerWidth: maxContainerWidth.value ?? '1070px',
+  shouldShowCancelButton: shouldShowCancelButton.value ?? false
 }))
 
 /**
@@ -151,7 +152,7 @@ onUnmounted(() => {
 <template>
   <div class="step-wizard-container">
     <!-- Render current step's component -->
-    <div v-if="uiElement.title" class="text-center text-xl font-semibold mb-6">
+    <div v-if="uiElement.title" class="mb-6 text-center text-xl font-semibold">
       {{ uiElement.title }}
     </div>
     <KeepAlive>
@@ -165,10 +166,10 @@ onUnmounted(() => {
         @can-continue="handleCanContinue"
       />
     </KeepAlive>
-    <div class="wizard-buttons fixed bottom-0 left-0 right-0 mb-12">
+    <div class="wizard-buttons fixed right-0 bottom-0 left-0 mb-12">
       <!-- Inner container to align buttons with main content -->
       <div
-        class="mx-auto wizard-buttons-inner"
+        class="wizard-buttons-inner mx-auto"
         style="width: calc(var(--p-max-container-width) + 40px)"
       >
         <div class="flex items-center">
@@ -180,15 +181,11 @@ onUnmounted(() => {
               @click="handleBack"
             />
           </div>
-          <div v-if="uiElement.shouldShowCancelButton" class="flex ml-auto mr-6 items-center">
-            <VuescapeButton
-              label="Cancel"
-              :outlined="true"
-              @click="handleCancel"
-            />
+          <div v-if="uiElement.shouldShowCancelButton" class="mr-6 ml-auto flex items-center">
+            <VuescapeButton label="Cancel" :outlined="true" @click="handleCancel" />
           </div>
           <!-- Right side container: Next/Finish butt~ons, pushed right with ml-auto -->
-          <div class="flex gap-2 ml-auto">
+          <div class="ml-auto flex gap-2">
             <VuescapeButton
               :disabled="!canContinue"
               :label="
