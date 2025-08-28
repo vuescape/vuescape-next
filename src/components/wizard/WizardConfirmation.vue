@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from 'primevue'
-import { ref, watch } from 'vue'
+import { onActivated, ref, watch } from 'vue'
 import type { WizardConfirmationProps } from '../../models/componentProps/WizardConfirmationProps'
 import type { WizardComponentEmits } from '../../models/wizard/WizardComponentEmits'
 
@@ -13,6 +13,10 @@ const isConfirmed = ref(false)
 watch(isConfirmed, (newValue) => {
   emit('update', newValue)
   emit('can-continue', newValue)
+})
+
+onActivated(() => {
+  emit('can-continue', isConfirmed.value)
 })
 
 emit('update', isConfirmed.value)

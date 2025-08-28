@@ -4,6 +4,7 @@ import VuescapeSelect from '../VuescapeSelect.vue'
 import type { WizardSelectProps } from '../../models/componentProps/WizardSelectProps'
 import type { SelectOption } from '../../models/dynamic-ui/SelectOption'
 import type { WizardComponentEmits } from '../../models/wizard/WizardComponentEmits'
+import { onActivated } from 'vue'
 
 const props = defineProps<WizardSelectProps>()
 const emit = defineEmits<WizardComponentEmits<SelectOption | undefined>>()
@@ -18,6 +19,10 @@ if (props.selectProps.selectedValue) {
   emit('update', props.selectProps.selectedValue)
   emit('can-continue', !!props.selectProps.selectedValue)
 }
+
+onActivated(() => {
+  emit('can-continue', !!props.selectProps.selectedValue)
+})
 </script>
 
 <template>

@@ -10,7 +10,7 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onActivated, ref } from 'vue'
 import type { WizardSectionRendererProps } from '../../models/componentProps/WizardSectionRendererProps'
 
 import PaneComponentRenderer from '../PaneComponentRenderer.vue'
@@ -33,35 +33,36 @@ const emit = defineEmits<{
 // A reactive store for all component values by id
 const componentState = ref<Record<string, any>>({})
 
-function onUpdate(id: string, payload: any) {
-  componentState.value[id] = payload
-  emit('update', { ...componentState.value })
-
+const isValid = () => {
   // Get all expected component IDs from props.section
   const expectedIds = props.section.items.flatMap((item) =>
-    item.components.map((component : { payload: any}) => component.payload.id)
+    item.components.map((component: { payload: any }) => component.payload.id)
   )
 
   // Check if all expected components have valid payloads
   const allValid = expectedIds.every((id) => {
     const entry = componentState.value[id]
+    // All expected components must be valid.
+    // If there is no validation then that component is valid.
     return hasValidation(entry) ? entry.isValid === true : true
   })
+
+  return allValid
+}
+
+function onUpdate(id: string, payload: any) {
+  componentState.value[id] = payload
+  emit('update', { ...componentState.value })
+debugger
+  const allValid = isValid()
 
   emit('can-continue', allValid)
 }
 
-// function onUpdate(id: string, payload: any) {
-//   debugger
-//   componentState.value[id] = payload
-//   emit('update', { ...componentState.value })
-
-//   // Re-evaluate whether all known components are valid
-//   const allValid = Object.values(componentState.value).every((entry) =>
-//     hasValidation(entry) ? entry.isValid === true : true
-//   )
-//   emit('can-continue', allValid)
-// }
+onActivated(() => {
+  // TODO: Do we need to emit an update?
+  emit('can-continue', isValid())
+})
 </script>
 
 <template>
@@ -71,7 +72,7 @@ function onUpdate(id: string, payload: any) {
         v-for="(component, compIndex) in item.components"
         :key="`${component.type}-${compIndex}`"
         :component="component"
-        @update="(id, payload) => onUpdate(id,  payload)"
+        @update="(id, payload) => onUpdate(id, payload)"
       />
     </template>
   </div>
