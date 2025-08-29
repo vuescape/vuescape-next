@@ -8,7 +8,6 @@ import { useActionStore } from '../../stores/useActionStore'
 
 const defaultProps: ReadOnlyFileUploadProps = {
   id: 'file-123',
-  title: 'Test File',
   fileName: 'document.pdf',
   fileSizeInBytes: 2048,
   downloadNavigationAction: { type: 'navigate', payload: { url: '/download/file-123' } }
@@ -16,7 +15,7 @@ const defaultProps: ReadOnlyFileUploadProps = {
 
 vi.mock('../stores/useActionStore', () => ({
   useActionStore: () => ({
-    $patch: vi.fn()
+    dispatch: vi.fn()
   })
 }))
 
@@ -46,7 +45,6 @@ const createWrapper = (props: ReadOnlyFileUploadProps) => {
 describe('ReadOnlyFileUpload', () => {
   it('renders file info when id is provided', () => {
     const wrapper = createWrapper(defaultProps)
-    expect(wrapper.text()).toContain('Test File')
     expect(wrapper.text()).toContain('document.pdf')
     expect(wrapper.text()).toContain('2 KB')
     expect(wrapper.find('button').exists()).toBe(true)
@@ -58,21 +56,20 @@ describe('ReadOnlyFileUpload', () => {
     expect(wrapper.find('button').exists()).toBe(false)
   })
 
-  it('calls actionStore.$patch with correct params on download click', async () => {
+  it('calls actionStore.dispatch with correct params on download click', async () => {
     const wrapper = createWrapper(defaultProps)
     const actionStore = useActionStore()
 
     await wrapper.find('button').trigger('click')
-    expect(actionStore.$patch).toHaveBeenCalledWith({
-      action: defaultProps.downloadNavigationAction,
-      paneKind: ReportPaneKind.None
-    })
+    expect(actionStore.dispatch).toHaveBeenCalledWith(
+      defaultProps.downloadNavigationAction,
+      ReportPaneKind.None
+    )
   })
 
-  it('does not call $patch if downloadNavigationAction is missing', async () => {
-    const wrapper = createWrapper({ ...defaultProps, downloadNavigationAction: undefined })
-    const actionStore = useActionStore()
-    await wrapper.find('button').trigger('click')
-    expect(actionStore.$patch).not.toHaveBeenCalled()
+  it('does not call render download button if downloadNavigationAction is missing', async () => {
+    const wrapper = createWrapper({ ...defaultProps, downloadNavigationAction: undefined as any })
+    const button = await wrapper.find('button')
+    expect(button.exists()).toBe(false)
   })
 })

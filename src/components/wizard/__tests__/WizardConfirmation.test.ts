@@ -32,41 +32,30 @@ describe('WizardConfirmation.vue', () => {
     expect(wrapper.text()).toContain(defaultProps.confirmationCheckboxLabel)
   })
 
-  it('emits update and can-continue when checkbox is checked', async () => {
+  it('emits update on mount', async () => {
     const wrapper = mount(WizardConfirmation, {
       props: defaultProps,
-      global: {
-        plugins: [PrimeVue]
-      }
+      global: { plugins: [PrimeVue] }
     })
 
-    const checkbox = wrapper.findComponent({ name: 'Checkbox' })
-    // Emit the update:modelValue event to trigger v-model
-    await checkbox.vm.$emit('update:modelValue', true)
-
-    // // Wait for Vue's reactivity system to update and trigger watchers
-    await nextTick()
-
-    expect(wrapper.emitted('update')).toBeTruthy()
-    expect(wrapper.emitted('can-continue')).toBeTruthy()
+    // On mount: only update emitted with false
+    expect(wrapper.emitted('update')).toEqual([[false]])
+    expect(wrapper.emitted('can-continue')).toBeUndefined()
   })
 
-  it('emits update and can-continue when checkbox is unchecked', () => {
+  it('emits emits update + can-continue when checked', async () => {
     const wrapper = mount(WizardConfirmation, {
       props: defaultProps,
-      global: {
-        plugins: [PrimeVue]
-      }
+      global: { plugins: [PrimeVue] }
     })
-    // const checkbox = wrapper.findComponent({ name: 'Checkbox' })
-    // // Emit the update:modelValue event to trigger v-model
-    // await checkbox.vm.$emit('update:modelValue', true)
 
-    // // Wait for Vue's reactivity system to update and trigger watchers
-    // await nextTick()
+    // Simulate checking the box
+    const input = wrapper.find('input.p-checkbox-input')
+    await input.setValue(true)
 
-    expect(wrapper.emitted('update')).toBeTruthy()
-    expect(wrapper.emitted('can-continue')).toBeUndefined()
+    // After check: update + can-continue emitted with true
+    expect(wrapper.emitted('update')).toEqual([[false], [true]])
+    expect(wrapper.emitted('can-continue')).toEqual([[true]])
   })
 
   it('renders default label if confirmationCheckboxLabel is not provided', () => {
