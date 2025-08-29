@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from 'primevue'
-import { onActivated, ref, watch } from 'vue'
+import { computed, onActivated, ref, watch } from 'vue'
 import type { WizardConfirmationProps } from '../../models/componentProps/WizardConfirmationProps'
 import type { WizardComponentEmits } from '../../models/wizard/WizardComponentEmits'
 
@@ -8,7 +8,9 @@ const emit = defineEmits<WizardComponentEmits<boolean>>()
 
 const props = defineProps<WizardConfirmationProps>()
 
-const isConfirmed = ref(false)
+const confirmationCheckboxValue = ref<Array<string>>([])
+
+const isConfirmed = computed(() => confirmationCheckboxValue.value.includes('isConfirmed'))
 
 watch(isConfirmed, (newValue) => {
   emit('update', newValue)
@@ -30,7 +32,7 @@ emit('update', isConfirmed.value)
     <div v-if="props.title" class="mt-2 text-xl font-semibold">{{ props.title }}</div>
     <div class="mt-2 mb-2 text-lg" v-html="props.messageHtml"></div>
     <div class="flex items-center">
-      <Checkbox v-model="isConfirmed" value="isConfirmed" size="small" />
+      <Checkbox v-model="confirmationCheckboxValue" value="isConfirmed" size="small" />
       <label for="confirmation" class="ml-2 text-lg">{{
         props.confirmationCheckboxLabel ?? 'Click to continue'
       }}</label>
