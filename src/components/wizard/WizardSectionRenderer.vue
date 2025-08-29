@@ -53,7 +53,6 @@ const isValid = () => {
 function onUpdate(id: string, payload: any) {
   componentState.value[id] = payload
   emit('update', { ...componentState.value })
-debugger
   const allValid = isValid()
 
   emit('can-continue', allValid)
