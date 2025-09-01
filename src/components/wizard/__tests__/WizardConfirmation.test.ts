@@ -1,8 +1,7 @@
 import { mount } from '@vue/test-utils'
+import PrimeVue from 'primevue/config'
 import { describe, expect, it } from 'vitest'
 import WizardConfirmation from '../WizardConfirmation.vue'
-import PrimeVue from 'primevue/config'
-import { nextTick } from 'vue'
 
 const defaultProps = {
   title: 'Confirm Action',
@@ -32,7 +31,7 @@ describe('WizardConfirmation.vue', () => {
     expect(wrapper.text()).toContain(defaultProps.confirmationCheckboxLabel)
   })
 
-  it('emits update on mount', async () => {
+  it('emits update on mount', () => {
     const wrapper = mount(WizardConfirmation, {
       props: defaultProps,
       global: { plugins: [PrimeVue] }

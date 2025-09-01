@@ -7,7 +7,6 @@ import type { WizardState } from '../WizardState'
 import type { FileUploadComponentData } from '../survey-components/FileUploadComponentData'
 import type { SelectComponentData } from '../survey-components/SelectComponentData'
 import type { SurveyStepState } from '../survey-components/SurveyStepState'
-import type { TextInputComponentData } from '../survey-components/TextInputComponentData'
 
 /**
  * Creates a wizard engine to manage the flow of steps in a wizard-like interface.
