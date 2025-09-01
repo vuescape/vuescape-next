@@ -1,8 +1,49 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import TableTabsComponent from '../TableTabs.vue'
-import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
+import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
+import TableTabsComponent from '../TableTabs.vue'
+
+import PrimeVue from 'primevue/config'
+
+const primeVuePlugin: [any, any] = [
+  PrimeVue,
+  {
+    ripple: false,
+    // minimal locale so TabList can read aria labels safely
+    locale: { aria: { next: 'Next', previous: 'Previous' } }
+  }
+]
+
+// Stub ResizeObserver locally for this test file.
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+class IntersectionObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+if (!(global as any).ResizeObserver) {
+  ;(global as any).ResizeObserver = ResizeObserverStub
+}
+if (!(global as any).IntersectionObserver) {
+  ;(global as any).IntersectionObserver = IntersectionObserverStub
+}
+
+const createWrapper = (props: TableTabsProps) => {
+  return mount(TableTabsComponent, {
+    props,
+    global: {
+      plugins: [primeVuePlugin],
+      // optional but nice: stub transitions to reduce flakiness
+      stubs: { transition: false, 'transition-group': false }
+    }
+  })
+}
 
 // NOTE: This mocks PrimeVue’s internal layout calc to avoid test flakiness.
 // e.g. getOuterWidth can be called async after test is completed giving a reference error.
@@ -23,7 +64,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -46,7 +87,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -73,7 +114,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -100,7 +141,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -114,7 +155,7 @@ describe('TableTabsComponent', () => {
 
   it('renders nothing when tabs array is empty', async () => {
     const props: TableTabsProps = { id: 'testTabSet', tabs: [] }
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await nextTick()
 
     expect(wrapper.findAll('button.p-tab').length).toBe(0)
@@ -127,7 +168,7 @@ describe('TableTabsComponent', () => {
       tabs: [{ id: 'tab1', label: 'Tab One', table: undefined }]
     }
 
-    const wrapper = mount(TableTabsComponent, { props })
+    const wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
