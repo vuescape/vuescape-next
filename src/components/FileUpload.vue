@@ -161,20 +161,20 @@ onMounted(() => {
             :key="file.name + file.type + file.size"
             class="flex items-center gap-4"
           >
-            <Button
-              icon="fas fa-times"
-              @click="onRemoveTemplatingFile(file, removeFileCallback, index)"
-              outlined
-              rounded
-              severity="danger"
-              class="file-upload__button--delete mt-1"
-            />
             <span class="text-color truncate text-lg font-bold">
               {{ file.name }}
             </span>
             <span class="text-muted-color mt-1 -ml-2 text-sm">
               ({{ formatSize(file.size, sizes) }})
             </span>
+            <Button
+              icon="fas fa-trash-can"
+              @click="onRemoveTemplatingFile(file, removeFileCallback, index)"
+              outlined
+              rounded
+              severity="secondary"
+              class="file-upload__button--delete mt-1"
+            />
           </div>
         </div>
       </template>
@@ -220,5 +220,6 @@ onMounted(() => {
 .file-upload__button--delete {
   width: 1.5rem !important;
   height: 1.5rem !important;
+  border: 0 !important;
 }
 </style>
