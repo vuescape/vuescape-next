@@ -14,14 +14,14 @@ export default {}
 import type { PaneLayoutRendererProps } from '../models/componentProps/PaneLayoutRendererProps'
 import PaneSectionRenderer from './PaneSectionRenderer.vue'
 
-const props = defineProps<PaneLayoutRendererProps>()
+defineProps<PaneLayoutRendererProps>()
 </script>
 
 <template>
   <div class="pane-layout">
     <PaneSectionRenderer
-      v-for="section in props.pane.sections"
-      :key="section.id"
+      v-for="section in pane.sections"
+      :key="`${pane.id}-${section.id}`"
       :section="section"
     />
   </div>

@@ -80,7 +80,7 @@ clearSessionStorageByPrefix('/my-data/product')
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>
       <div class="mr-5" v-if="props.selectComponent">
-        <VuescapeSelect :key="props.id" @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
+        <VuescapeSelect :key="`${props.id}-${props.selectComponent.payload.id}`" @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
       </div>
     </div>
     <TabPanels>
