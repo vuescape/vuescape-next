@@ -43,13 +43,6 @@ const initializedProps = ref<VuescapeSelectProps>({
 
 const mySelect = ref(null)
 
-/**
- * This component currently uses a typed event model (e.g. `@change`, `@update`).
- * If this component is later used inside a dynamic wizard or needs to emit
- * `can-continue` or unified `update` events, it may be wrapped in a
- * wizard-specific variant (e.g., `WizardFileUpload.vue`) to keep the core
- * component agnostic of wizard behavior.
- */
 const emit = defineEmits<{
   (evt: 'change', event: SelectChangeEvent): void
 }>()
@@ -121,8 +114,8 @@ onMounted(async () => {
     router.currentRoute.value.path != initializedProps.value?.selectedValue?.id
   ) {
     // Use the router here -- this can result in duplciate api calls if /my-data
-    //  only has one product and that call already returned the product info.
-    await router.push(initializedProps.value.selectedValue.id)
+    // only has one product and that call already returned the product info.
+    await router.replace(initializedProps.value.selectedValue.id)
   }
 })
 </script>
