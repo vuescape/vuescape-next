@@ -153,7 +153,7 @@ onMounted(() => {
 
         <div
           v-if="files.length > 0"
-          class="border-primary-300 rounded-border flex flex-col items-center justify-center border-2 border-dashed p-6"
+          class="border-primary rounded-border flex flex-col items-center justify-center border-2 border-dashed p-6"
           style="min-height: 160px"
         >
           <div

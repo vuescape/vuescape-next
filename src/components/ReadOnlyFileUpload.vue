@@ -34,34 +34,40 @@ const onDownloadClick = () => {
   if (!downloadNavigationAction) {
     return
   }
-  actionStore.dispatch(
-    downloadNavigationAction,
-    ReportPaneKind.None
-  )
+  actionStore.dispatch(downloadNavigationAction, ReportPaneKind.None)
 }
 </script>
 
 <template>
   <div class="file-upload__container mb-4">
-    <!-- <div class="file-upload__header--title">
-      {{ title }}
-    </div> -->
-
     <div
       v-if="props?.id"
-      class="border-primary-300 rounded-border flex flex-col items-center justify-center border-2 border-dashed p-6"
+      class="border-primary rounded-border flex flex-col items-center justify-center border-2 border-solid p-6"
       style="min-height: 160px"
     >
-      <div class="flex items-center gap-4">
-        <span v-if="fileName" class="text-color truncate text-lg font-bold">
+      <div v-if="fileName" class="flex items-center gap-4">
+        <span class="text-color truncate text-lg font-bold">
           {{ fileName }}
         </span>
-        <span v-if="fileName" class="text-muted-color mt-1 -ml-2 text-sm">
+        <span class="text-muted-color mt-1 -ml-2 text-sm">
           ({{ formatSize(fileSizeInBytes, fileSizeTypes) }})
         </span>
       </div>
+      <div v-else class="flex items-center gap-4">
+        <span class="text-color overflow-visible text-lg italic">
+          No file was uploaded
+        </span>
+      </div>
+      <div
+        v-for="(line, i) in metadataLineItems"
+        :key="i"
+        class="mt-1 mb-1 flex items-center justify-center gap-2 text-sm"
+      >
+        <i v-if="line?.icons?.length" :class="`${line.icons.join(' ')} ${line.iconClass}`"></i>
+        <span :class="line?.textClass">{{ line?.text }}</span>
+      </div>
       <VuescapeButton
-        class="mt-2"
+        class="mt-4"
         v-if="downloadNavigationAction"
         icon="fad fa-cloud-download-alt"
         :outlined="true"
@@ -70,12 +76,11 @@ const onDownloadClick = () => {
       >
       </VuescapeButton>
     </div>
-
     <div v-else class="text-muted-color text-center text-sm">No files available for download.</div>
   </div>
 </template>
 
-<style scoped>
+<style>
 .file-upload__header--title {
   font-size: 20px;
   font-weight: 600;

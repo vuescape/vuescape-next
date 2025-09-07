@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router'
 /**
  * Normalizes `params` and `query` values to always return a string or undefined.
  */
-function normalizeValue(
+export function normalizeValue(
   value: LocationQueryValue | LocationQueryValue[] | undefined
 ): string | undefined {
   if (Array.isArray(value)) {
