@@ -63,10 +63,10 @@ export async function handleNavigationActionAsync(
   ) {
     await loadReport(action.payload.url)
     if (action.payload.replace === true) {
-      router.replace(action.payload.url)
+      await router.replace(action.payload.url)
     } else {
       const route = action.payload.url
-      router.push(route)
+      await router.push(route)
     }
   } else if (target === LinkTarget.CurrentWindow) {
     if (action.payload.url.startsWith('http')) {
@@ -76,10 +76,10 @@ export async function handleNavigationActionAsync(
         window.location.assign(action.payload.url)
       }
     } else if (action.payload.replace === true) {
-      router.replace(action.payload.url)
+      await router.replace(action.payload.url)
     } else {
       // console.info('Navigating to for LinkTarget.CurrentWindow' + action.payload.url)
-      router.push(action.payload.url)
+      await router.push(action.payload.url)
     }
   } else if (target === LinkTarget.NewWindow) {
     // console.log('Opening new window ' + action.payload.url)
@@ -91,9 +91,9 @@ export async function handleNavigationActionAsync(
   } else if (target === LinkTarget.Navigate) {
     // Pure UI navigation without report loading
     if (action.payload.replace === true) {
-      router.replace(action.payload.url)
+      await router.replace(action.payload.url)
     } else {
-      router.push(action.payload.url)
+      await router.push(action.payload.url)
     }
   } else if (target == LinkTarget.None) {
     throw new Error('LinkTarget.None not supported')
