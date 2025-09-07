@@ -61,6 +61,9 @@ function tableKey(tabId: string) {
   return result
 }
 
+// This removes all session storage by prefix.
+// This is necessary because PrimeVue uses session storage for some state
+// and we need to clear it when the component is created.
 function clearSessionStorageByPrefix(prefix: string) {
   Object.keys(sessionStorage).forEach((key) => {
     if (key.startsWith(prefix)) {
@@ -80,7 +83,11 @@ clearSessionStorageByPrefix('/my-data/product')
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>
       </TabList>
       <div class="mr-5" v-if="props.selectComponent">
-        <VuescapeSelect :key="`${props.id}-${props.selectComponent.payload.id}`" @change="setEntity" v-bind="props.selectComponent.payload"></VuescapeSelect>
+        <VuescapeSelect
+          :key="`${props.id}-${props.selectComponent.payload.id}`"
+          @change="setEntity"
+          v-bind="props.selectComponent.payload"
+        ></VuescapeSelect>
       </div>
     </div>
     <TabPanels>
