@@ -94,7 +94,7 @@ export function constructUrl(
     }
     return url.toString()
   } catch (error) {
-    console.error(error)
+    console.error(error, baseUrl)
     throw new Error(`Invalid URL: ${baseUrl}`)
   }
 }
@@ -115,10 +115,13 @@ export function prepareRequest(
   init?: RequestInit
 ): RequestInit {
   const origin = window?.location?.origin
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const defaultHeaders = {
     'Access-Control-Allow-Origin': origin,
     Origin: origin,
-    Accept: 'application/json, text/plain, */*'
+    Accept: 'application/json, text/plain, */*',
+    'X-TimeZone': timeZone,
   } as any
 
   if (method === HttpMethod.Post && data && !init?.body) {
