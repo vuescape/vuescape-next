@@ -42,7 +42,7 @@ const onDownloadClick = () => {
   <div class="file-upload__container mb-4">
     <div
       v-if="props?.id"
-      class="border-primary rounded-border flex flex-col items-center justify-center border-2 border-solid p-6"
+      class="border-primary rounded-border flex flex-col items-center justify-center border-1 border-solid p-6"
       style="min-height: 160px"
     >
       <div v-if="fileName" class="flex items-center gap-4">
@@ -54,9 +54,7 @@ const onDownloadClick = () => {
         </span>
       </div>
       <div v-else class="flex items-center gap-4">
-        <span class="text-color overflow-visible text-lg italic">
-          No file was uploaded
-        </span>
+        <span class="text-color overflow-visible text-lg italic"> No file was uploaded </span>
       </div>
       <div
         v-for="(line, i) in metadataLineItems"
