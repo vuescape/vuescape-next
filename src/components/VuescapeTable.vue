@@ -239,6 +239,7 @@ initializeColumnIdToSortFieldMap()
     :virtualScrollerOptions="{ itemSize: 46 }"
     stateStorage="session"
     :stateKey="localState.id"
+    :resizable-columns="false"
   >
     <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
