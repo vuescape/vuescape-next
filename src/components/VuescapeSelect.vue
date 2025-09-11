@@ -12,7 +12,7 @@ export default {}
 <script lang="ts" setup>
 import type { SelectChangeEvent } from 'primevue/Select'
 import Select from 'primevue/Select'
-import { onMounted, onUnmounted, ref, useAttrs } from 'vue'
+import { onMounted, ref, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
 
 import type { VuescapeSelectProps } from '../models/componentProps/VuescapeSelectProps'
