@@ -15,6 +15,11 @@ export interface StepWizardShellProps {
   title?: string
 
   /**
+   * Optional help URL for the help documentation.
+   */
+  helpCenterUrl?: string
+
+  /**
    * Text for the button to navigate to the previous step.
    */
   backButtonText?: string

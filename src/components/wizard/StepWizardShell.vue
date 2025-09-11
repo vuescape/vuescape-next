@@ -25,6 +25,7 @@ const emit = defineEmits<{
 const props = defineProps<StepWizardShellProps>()
 const {
   title,
+  helpCenterUrl,
   backButtonText,
   nextButtonText,
   lastButtonText,
@@ -37,6 +38,7 @@ const uiElement = computed(() => ({
   nextStepButtonText: nextButtonText.value ?? 'Next',
   lastStepButtonText: lastButtonText.value ?? 'Finish',
   title: title.value,
+  helpCenterUrl: helpCenterUrl.value,
   maxContainerWidth: maxContainerWidth.value ?? '1070px',
   shouldShowCancelButton: shouldShowCancelButton.value ?? false
 }))
@@ -151,11 +153,23 @@ onUnmounted(() => {
 
 <template>
   <div class="step-wizard-container">
-    <!-- Render current step's component -->
-    <div v-if="uiElement.title" class="mb-6 text-center text-xl font-semibold">
-      {{ uiElement.title }}
+    <div v-if="uiElement.title || uiElement.helpCenterUrl" class="relative mb-6 flex items-center justify-center">
+      <!-- Centered title -->
+      <div v-if="uiElement.title" class="text-xl font-bold">
+        {{ uiElement.title }}
+      </div>
+      <div class="absolute right-0">
+        <a
+          v-if="uiElement.helpCenterUrl"
+          target="_blank"
+          :href="uiElement.helpCenterUrl"
+          class="text-primary font-bold text-xl"
+          title="Help">
+            <i class="far fa-circle-question primary"/>
+        </a>
+      </div>
     </div>
-    <KeepAlive>
+  <KeepAlive>
       <component
         v-if="stepComponent"
         :key="`${engine.currentStepId.value}-${propsHash}`"
