@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Component } from 'vue'
-import { markRaw, ref, watch } from 'vue'
+import { markRaw, ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
 import type { FileUploadComponentPayload } from '../models/dynamic-ui/pane-components/FileUploadComponentPayload'
@@ -13,6 +14,31 @@ const props = defineProps<PaneComponentRendererProps>()
 const emit = defineEmits<{
   (e: 'update', id: string, payload: any): void
 }>()
+
+const router = useRouter()
+
+// Track if this component is still valid for the current route context
+const isActive = ref(true)
+const currentRoute = ref(router.currentRoute.value.path)
+
+// Watch for route changes and mark component as inactive if route changes
+watch(() => router.currentRoute.value.path, (newPath) => {
+  if (newPath !== currentRoute.value) {
+    isActive.value = false
+  }
+})
+
+// Load the initial component on mount
+onMounted(async () => {
+  if (isActive.value) {
+    // Trigger the watch manually for initial load
+    await loadComponentType(props.component.type)
+  }
+})
+
+onUnmounted(() => {
+  isActive.value = false
+})
 
 /**
  * A map of component "type" to an async import function.
@@ -32,8 +58,10 @@ const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Compo
 
 /**
  * A cache to store either:
- * - A **Promise** for a module that’s in the process of loading, or
+ * - A **Promise** for a module that's in the process of loading, or
  * - A **Component** that has finished loading.
+ * Note: We cache by component type only, not by instance, since components are stateless templates.
+ * The actual data/props differentiate instances.
  */
 const moduleCache: Record<string, Promise<{ default: Component }> | Component | undefined> = {}
 
@@ -49,6 +77,62 @@ const resolvedComponent = ref<Component | null>(null)
 const error = ref<string | null>(null)
 
 /**
+ * Loads a component by type, handling caching and error states.
+ */
+async function loadComponentType(newType: PaneComponent['type']) {
+  // Don't process component changes if this renderer is no longer active for the current route
+  if (!isActive.value) {
+    return
+  }
+  
+  debugger
+  if (!componentMap[newType]) {
+    // Type not in our map
+    console.warn(`Unsupported component type: '${newType}'`)
+    error.value = `Unsupported component type: '${newType}'`
+    resolvedComponent.value = null
+    return
+  }
+
+  // If we already have a cached "final" component, use it right away.
+  if (
+    typeof moduleCache[newType] === 'object' &&
+    'setup' in (moduleCache[newType] as Component)
+  ) {
+    error.value = null
+    resolvedComponent.value = moduleCache[newType] as Component
+    return
+  }
+
+  // If we have a cached Promise, re-use it. Otherwise, call the import fn now.
+  if (!moduleCache[newType]) {
+    moduleCache[newType] = componentMap[newType]() // store the Promise
+  }
+
+  try {
+    error.value = null
+
+    // If moduleCache[newType] is a Promise, await it.
+    if (moduleCache[newType] instanceof Promise) {
+      const module = await moduleCache[newType]
+      const component = markRaw(module.default)
+      // Cache the final component so future calls are instant.
+      moduleCache[newType] = component
+      resolvedComponent.value = component
+    }
+    // If moduleCache[newType] was already resolved between the check above and now,
+    // it's a Component, so reassign it directly.
+    else {
+      resolvedComponent.value = moduleCache[newType] as Component
+    }
+  } catch (e) {
+    console.error(`Error loading component type: ${newType}`, e)
+    error.value = `Error loading component type: '${newType}'`
+    resolvedComponent.value = null
+  }
+}
+
+/**
  * Watch the "component.type" for changes.
  * - If we have it cached, return it immediately.
  * - Otherwise, dynamically import it and store in cache.
@@ -56,53 +140,12 @@ const error = ref<string | null>(null)
 watch(
   () => props.component.type,
   async (newType) => {
-    if (!componentMap[newType]) {
-      // Type not in our map
-      console.warn(`Unsupported component type: '${newType}'`)
-      error.value = `Unsupported component type: '${newType}'`
-      resolvedComponent.value = null
-      return
-    }
-
-    // If we already have a cached "final" component, use it right away.
-    if (
-      typeof moduleCache[newType] === 'object' &&
-      'setup' in (moduleCache[newType] as Component)
-    ) {
-      error.value = null
-      resolvedComponent.value = moduleCache[newType] as Component
-      return
-    }
-
-    // If we have a cached Promise, re-use it. Otherwise, call the import fn now.
-    if (!moduleCache[newType]) {
-      moduleCache[newType] = componentMap[newType]() // store the Promise
-    }
-
-    try {
-      error.value = null
-
-      // If moduleCache[newType] is a Promise, await it.
-      if (moduleCache[newType] instanceof Promise) {
-        const module = await moduleCache[newType]
-        const component = markRaw(module.default)
-        // Cache the final component so future calls are instant.
-        moduleCache[newType] = component
-        resolvedComponent.value = component
-      }
-      // If moduleCache[newType] was already resolved between the check above and now,
-      // it’s a Component, so reassign it directly.
-      else {
-        resolvedComponent.value = moduleCache[newType] as Component
-      }
-    } catch (e) {
-      console.error(`Error loading component type: ${newType}`, e)
-      error.value = `Error loading component type: '${newType}'`
-      resolvedComponent.value = null
-    } finally {
-    }
+    await loadComponentType(newType)
   },
-  { immediate: true }
+  { 
+    flush: 'post' // Wait for DOM updates to complete before firing
+    // Removed immediate: true to prevent firing during component transitions
+  }
 )
 
 /*
@@ -169,6 +212,7 @@ function onComponentUpdate(componentType: string, payload: any) {
   <component
     v-else
     :is="resolvedComponent"
+    :key="`${component.type}-${JSON.stringify(component.payload)}`"
     v-bind="component.payload"
     @files-changed="onFilesChanged"
   />
