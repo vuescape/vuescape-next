@@ -7,4 +7,5 @@ export { useActionStore } from './useActionStore'
 export { useAppInfoStore } from './useAppInfoStore'
 export { useNotificationStore } from './useNotificationStore'
 export { useReportLayoutStore } from './useReportLayoutStore'
+export { useRetainQueryStore } from './useRetainQueryStore'
 

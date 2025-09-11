@@ -25,6 +25,7 @@ import { defineAsyncComponent } from 'vue'
 
 import type { SelectChangeEvent } from 'primevue/select'
 import { ref } from 'vue'
+import { useRetainedField } from '../composables/useRetainedField'
 import type { TableTabsProps } from '../models/componentProps/TableTabsProps'
 
 const VuescapeSelect = defineAsyncComponent(() => import('./VuescapeSelect.vue'))
@@ -32,8 +33,16 @@ const VuescapeTable = defineAsyncComponent(() => import('./VuescapeTable.vue'))
 
 const props = defineProps<TableTabsProps>()
 
-// Assign the first tab as the active tab
-const activeTabId = ref<string | number>(props.tabs[0]?.id)
+const initialTabId = props.tabs[0]?.id ?? 'default'
+const queryKey = 'tab'
+
+// Auto: if route.meta.retainQuery is true, this will sync to URL+store.
+// If false, it just behaves like a normal local state ref.
+const { value: activeTab } = useRetainedField<string>(queryKey, initialTabId)
+
+// if (props.tabs.some((_) => _.id === initalTabId) === false) {
+//   activeTab.value = initalTabId
+// }
 const selectedEntity = ref<string | null>(null)
 
 const tableToInitialScrollPositionMap = new Map<string, number>()
@@ -53,11 +62,11 @@ function getInitialScrollPosition(tabId: string) {
 }
 
 function setEntity(event: SelectChangeEvent) {
-  selectedEntity.value = event.value.id
+  selectedEntity.value = event?.value?.id ?? null
 }
 
 function tableKey(tabId: string) {
-  const result = '/my-data/product/' + tabId + (selectedEntity.value ?? '')
+  const result = `${props.id}::${tabId}::${selectedEntity.value ?? ''}`
   return result
 }
 
@@ -77,7 +86,7 @@ clearSessionStorageByPrefix('/my-data/product')
 </script>
 
 <template>
-  <Tabs v-model:value="activeTabId" :lazy="true">
+  <Tabs v-model:value="activeTab" :lazy="true">
     <div class="flex items-center justify-between">
       <TabList>
         <Tab v-for="tab in props.tabs" :key="tab.id" :value="tab.id">{{ tab.label }}</Tab>

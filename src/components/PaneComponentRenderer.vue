@@ -132,13 +132,6 @@ function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
 // }
 
 /**
- * Handles text input component changes
- */
-// function onTextChanged(payload: { value: string }) {
-//   onComponentUpdate('textInput', payload);
-// }
-
-/**
  * Generic handler for component updates
  * Emits standardized update events for all component types
  */
