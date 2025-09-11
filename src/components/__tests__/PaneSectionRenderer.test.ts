@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import PaneSectionRenderer from '../../components/PaneSectionRenderer.vue'
 import type { PaneSectionRendererProps } from '../../models/componentProps/PaneSectionRendererProps'
@@ -8,9 +9,21 @@ import { createPinia, setActivePinia } from 'pinia'
 
 setActivePinia(createPinia())
 
+// Mock router setup
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: { template: '<div>Home</div>' } },
+    { path: '/:pathMatch(.*)*', component: { template: '<div>Not Found</div>' } }
+  ]
+})
+
 describe('PaneSectionRenderer', () => {
   it('renders the correct number of items', () => {
     const wrapper = mount(PaneSectionRenderer, {
+      global: {
+        plugins: [router]
+      },
       props: { section: props.section }
     })
 
@@ -20,6 +33,9 @@ describe('PaneSectionRenderer', () => {
 
   it('passes the correct props to PaneItemView', () => {
     const wrapper = mount(PaneSectionRenderer, {
+      global: {
+        plugins: [router]
+      },
       props: { section: props.section }
     })
     const items = wrapper.findAllComponents(PaneItemView)

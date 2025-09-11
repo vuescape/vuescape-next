@@ -40,7 +40,6 @@ describe('FileUpload.vue', () => {
       },
       props: {
         id: 'test-upload',
-        title: 'Test Upload',
         isRequired: false,
         uploadInstructionText: 'Click or drag to upload a file',
         maxFileSizeInBytes: 1024 * 1024

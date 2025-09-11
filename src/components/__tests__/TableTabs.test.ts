@@ -1,10 +1,21 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import { createTestingPinia } from '@pinia/testing'
 import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
 import TableTabsComponent from '../TableTabs.vue'
 
 import PrimeVue from 'primevue/config'
+
+// Mock router setup
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: { template: '<div>Home</div>' } },
+    { path: '/:pathMatch(.*)*', component: { template: '<div>Not Found</div>' } }
+  ]
+})
 
 const primeVuePlugin: [any, any] = [
   PrimeVue,
@@ -38,7 +49,13 @@ const createWrapper = (props: TableTabsProps) => {
   return mount(TableTabsComponent, {
     props,
     global: {
-      plugins: [primeVuePlugin],
+      plugins: [
+        primeVuePlugin, 
+        router, 
+        createTestingPinia({
+          createSpy: vi.fn
+        })
+      ],
       // optional but nice: stub transitions to reduce flakiness
       stubs: { transition: false, 'transition-group': false }
     }

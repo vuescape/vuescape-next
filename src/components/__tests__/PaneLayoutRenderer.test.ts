@@ -1,6 +1,7 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { createRouter, createWebHistory } from 'vue-router'
 
 import PaneLayoutRenderer from '../PaneLayoutRenderer.vue'
 import PaneSectionRenderer from '../PaneSectionRenderer.vue'
@@ -9,9 +10,21 @@ import type { PaneLayoutRendererProps } from '../../models/componentProps/PaneLa
 
 setActivePinia(createPinia())
 
+// Mock router setup
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: { template: '<div>Home</div>' } },
+    { path: '/:pathMatch(.*)*', component: { template: '<div>Not Found</div>' } }
+  ]
+})
+
 describe('PaneSectionsRenderer', () => {
   it('renders the correct number of sections', () => {
     const wrapper = mount(PaneLayoutRenderer, {
+      global: {
+        plugins: [router]
+      },
       props: { pane: props.pane }
     })
     expect(wrapper.findAllComponents(PaneSectionRenderer).length).toBe(props.pane.sections.length)
@@ -19,6 +32,9 @@ describe('PaneSectionsRenderer', () => {
 
   it('passes the correct props to PaneSectionRenderer', () => {
     const wrapper = mount(PaneLayoutRenderer, {
+      global: {
+        plugins: [router]
+      },
       props: { pane: props.pane }
     })
     const sectionRenderers = wrapper.findAllComponents(PaneSectionRenderer)
