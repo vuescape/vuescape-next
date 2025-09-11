@@ -12,7 +12,7 @@ export default {}
 <script lang="ts" setup>
 import type { SelectChangeEvent } from 'primevue/Select'
 import Select from 'primevue/Select'
-import { onMounted, ref, useAttrs } from 'vue'
+import { onMounted, onUnmounted, ref, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
 
 import type { VuescapeSelectProps } from '../models/componentProps/VuescapeSelectProps'
@@ -108,15 +108,43 @@ const handleChangeAsync = async (event: SelectChangeEvent) => {
 
 onMounted(async () => {
   if (
-    mySelect.value &&
-    initializedProps.value.onChangeAction &&
-    initializedProps.value.selectedValue?.id &&
-    router.currentRoute.value.path != initializedProps.value?.selectedValue?.id
+    !mySelect.value ||
+    !initializedProps.value.onChangeAction ||
+    !initializedProps.value.selectedValue?.id ||
+    router.currentRoute.value.path === initializedProps.value?.selectedValue?.id
   ) {
-    // Use the router here -- this can result in duplciate api calls if /my-data
-    // only has one product and that call already returned the product info.
-    await router.replace(initializedProps.value.selectedValue.id)
+    return
   }
+
+
+  const currentPath = router.currentRoute.value.path
+  const selectedPath = initializedProps.value.selectedValue.id
+  
+  // Extract the base path without query parameters for comparison
+  const currentBasePath = currentPath.split('?')[0]
+  const selectedBasePath = selectedPath.split('?')[0]
+  
+  // Check if we're navigating "upward" in the route hierarchy
+  // e.g., from /my-data/product/123 to /my-data
+  // In this case, don't auto-navigate back down
+  const isNavigatingUpward = selectedBasePath.startsWith(currentBasePath + '/') && currentBasePath.length < selectedBasePath.length
+  
+  // Check if the selectedValue route is contextually appropriate
+  // Don't auto-navigate if the selected route is a "child" of the current route
+  // This prevents unwanted navigation when a parent route loads a report containing this component
+  const isChildRoute = selectedBasePath.startsWith(currentBasePath + '/') || selectedBasePath.startsWith(currentBasePath + '?')
+  
+  // Don't auto-navigate if:
+  // 1. We're already on the selected route
+  // 2. We're on a parent route and the selected route is a child (user navigated "up" the hierarchy)
+  // 3. The selected route is contextually inappropriate for the current route
+  if (currentBasePath === selectedBasePath || isNavigatingUpward || isChildRoute) {
+    return
+  }
+  
+  // Only auto-navigate for legitimate cases where we're on an unrelated route
+  // that should redirect to the selected route
+  await router.replace(initializedProps.value.selectedValue.id)
 })
 </script>
 
