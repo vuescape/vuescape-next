@@ -13,14 +13,12 @@ export default {}
 <script setup lang="ts">
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
-// import { ref, computed } from 'vue'
-// import type { DataTableSortEvent } from 'primevue/datatable'
 import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableProps'
 import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 
-import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch, computed } from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
@@ -59,6 +57,18 @@ function onScroll(e: Event) {
   emit('update:scrollPosition', (e.target as HTMLElement).scrollTop)
 }
 
+/**
+ * Lifecycle hook that runs after the component is mounted to the DOM.
+ * Sets up scroll event handling and restores the initial scroll position if provided.
+ * 
+ * This method:
+ * 1. Gets a reference to the virtual scroller element from the DataTable component
+ * 2. Adds a scroll event listener to track scroll position changes
+ * 3. Restores the initial scroll position if one was provided via props
+ * 
+ * The scroll restoration uses setTimeout with 0 delay to ensure it runs after
+ * the virtual scroller has fully initialized and rendered its content.
+ */
 onMounted(() => {
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   if (scrollerEl) {
@@ -128,7 +138,13 @@ onBeforeUnmount(() => {
 function getDisplayValue(row: TableRow, columnId: string): string {
   const cell = row.cells[columnId]
   // Don't use the raw value even if there is no display value.
-  const result = cell?.displayValue ?? ''
+  let result = cell?.displayValue ?? ''
+
+  // Convert null character back to empty string for display
+  if (result === '\u0000') {
+    result = ''
+  }
+
   return result
 }
 
@@ -205,16 +221,40 @@ function initializeColumnIdToSortFieldMap() {
 }
 
 initializeColumnIdToSortFieldMap()
-// const sortingState = reactive({
-//   sortField: '',
-//   sortOrder: 1
-// })
-// function stateRestore(event: DataTableStateEvent) {
-//   console.log('stateRestore', event)
-// }
-// function stateSave(event: DataTableStateEvent) {
-//   console.log('stateSave', event)
-// }
+
+/**
+ * Enhanced rows with null character preprocessing for empty string sorting.
+ * Replaces empty displayValue and comparableValue.stringValue with null character (\u0000)
+ * which sorts before any other character, ensuring empty strings appear first.
+ */
+const enhancedRows = computed(() => {
+  return localState.rows.map(row => {
+    const enhancedRow = { ...row, cells: { ...row.cells } }
+
+    // Only modify cells that have empty string values
+    Object.keys(row.cells).forEach(columnId => {
+      const cell = row.cells[columnId]
+      if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
+        const enhancedCell = { ...cell }
+
+        if (cell.displayValue === '') {
+          enhancedCell.displayValue = '\u0000' // Null character sorts first
+        }
+
+        if (cell.comparableValue?.stringValue === '') {
+          enhancedCell.comparableValue = {
+            ...cell.comparableValue,
+            stringValue: '\u0000'
+          }
+        }
+
+        enhancedRow.cells[columnId] = enhancedCell
+      }
+    })
+
+    return enhancedRow
+  })
+})
 </script>
 
 <template>
@@ -230,7 +270,7 @@ initializeColumnIdToSortFieldMap()
 
   <DataTable
     ref="dtRef"
-    :value="localState.rows"
+    :value="enhancedRows"
     :scrollable="true"
     scroll-height="500px"
     :stripedRows="true"
