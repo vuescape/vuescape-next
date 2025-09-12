@@ -85,7 +85,6 @@ async function loadComponentType(newType: PaneComponent['type']) {
     return
   }
   
-  debugger
   if (!componentMap[newType]) {
     // Type not in our map
     console.warn(`Unsupported component type: '${newType}'`)
