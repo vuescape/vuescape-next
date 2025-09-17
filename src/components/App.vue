@@ -13,26 +13,21 @@ export default {}
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { RouterView, useRoute, useRouter } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 
-import { useNotificationStore } from '../stores/useNotificationStore'
 import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
+import { useNotificationStore } from '../stores/useNotificationStore'
 import NotificationMessages from './NotificationMessages.vue'
 
-import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
 import { Guid, type AppInfo } from '../models'
 import type { NotificationMessage } from '../models/NotificationMessage'
+import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
 
 const notificationStore = useNotificationStore() as NotificationStore
 const messages = notificationStore.messages as Array<NotificationMessage>
 const props = defineProps<AppComponentProps>()
 
-const router = useRouter()
 const route = useRoute()
-router.afterEach((to, from) => {
-  document.title = typeof to.meta.title === 'string' ? to.meta.title : 'CoMetrics'
-  props.trackingService?.handleRouteChanged(to, from ?? to)
-})
 
 if (props.trackingService) {
   props.trackingService.initializeProvider()
