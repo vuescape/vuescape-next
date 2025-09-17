@@ -1,4 +1,5 @@
 export * from './usePropertyWatch'
 export * from './useRetainedField'
 export * from './useRouteProps'
+export * from './useTitle'
 export * from './watchRouteProps'

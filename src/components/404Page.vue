@@ -9,6 +9,11 @@
 export default {}
 </script>
 
+<script setup lang="ts">
+import { useTitle } from '../composables/useTitle'
+
+useTitle('Page Not Found', '')
+</script>
 <template>
   <h3>Page Not Found</h3>
   <div>
