@@ -10,7 +10,7 @@ const defaultProps: ReadOnlyFileUploadProps = {
   id: 'file-123',
   fileName: 'document.pdf',
   fileSizeInBytes: 2048,
-  downloadNavigationAction: { type: 'navigate', payload: { url: '/download/file-123' } }
+  downloadNavigationAction: { typeName: 'action.navigate', payload: { url: '/download/file-123' } }
 }
 
 vi.mock('../stores/useActionStore', () => ({

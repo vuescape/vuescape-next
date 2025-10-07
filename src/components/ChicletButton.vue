@@ -40,7 +40,7 @@ const actionStore = useActionStore()
 
 const url = computed(() => {
   const action = props.chiclet?.action as Action
-  if (action?.type === 'navigate') {
+  if (action?.typeName === 'action.navigate') {
     return action.payload.url
   }
   return ''

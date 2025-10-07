@@ -20,12 +20,12 @@ export async function handleActionAsync(
   router: Router,
   loadReport: (url: string) => Promise<void>
 ): Promise<void> {
-  if (state.action.type === 'navigate') {
+  if (state.action.typeName === 'action.navigate') {
     await handleNavigationActionAsync(state.action, state.paneKind, router, loadReport)
-  } else if (state.action.type === 'noAction') {
+  } else if (state.action.typeName === 'action.noAction') {
     handleNoAction(state.action, state.paneKind)
   } else {
-    throw new Error('Unknown action type: ' + state.action)
+    throw new Error('Unknown action typeName: ' + state.action)
   }
 }
 

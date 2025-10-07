@@ -5,7 +5,7 @@ import type { SelectComponentPayload } from './SelectComponentPayload'
  */
 export interface SelectComponent {
   /** The type of the component, which is always 'select'. */
-  type: 'select'
+  typeName: 'component.select'
 
   /** The payload associated with the tab component. */
   payload: SelectComponentPayload

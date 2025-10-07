@@ -7,7 +7,7 @@ export interface TableTabsComponent {
   /**
    * The type of the component, which is always 'tableTabs'.
    */
-  type: 'tableTabs'
+  typeName: 'component.tableTabs'
 
   /**
    * The payload associated with the TableTabs component.

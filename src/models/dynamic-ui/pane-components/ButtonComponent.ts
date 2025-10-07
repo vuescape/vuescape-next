@@ -5,7 +5,7 @@ import type { ButtonComponentPayload } from './ButtonComponentPayload'
  */
 export interface ButtonComponent {
   /** The type of the component, which is always 'button'. */
-  type: 'button'
+  typeName: 'component.button'
 
   /** The payload associated with the button component. */
   payload: ButtonComponentPayload

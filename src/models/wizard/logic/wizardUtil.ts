@@ -127,14 +127,14 @@ export function populateFormDataFromComponents(
 
     // Handle different component types
     switch (componentData.componentType) {
-      case 'fileUpload':
+      case 'component.fileUpload':
         handleFileUploadComponent(formData, fieldKey, componentData)
         break
 
-      case 'select':
+      case 'component.select':
         handleSelectComponent(formData, fieldKey, componentData)
         break
-
+ 
       // case 'textInput':
       //   handleTextInputComponent(formData, fieldKey, componentData)
       //   break

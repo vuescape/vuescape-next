@@ -5,7 +5,7 @@ import type { TextLinkComponentPayload } from './TextLinkComponentPayload'
  */
 export interface TextLinkComponent {
   /** The type of the component, which is always 'textLink'. */
-  type: 'textLink'
+  typeName: 'component.textLink'
 
   /** The payload associated with the text link component. */
   payload: TextLinkComponentPayload

@@ -22,17 +22,20 @@ const isActive = ref(true)
 const currentRoute = ref(router.currentRoute.value.path)
 
 // Watch for route changes and mark component as inactive if route changes
-watch(() => router.currentRoute.value.path, (newPath) => {
-  if (newPath !== currentRoute.value) {
-    isActive.value = false
+watch(
+  () => router.currentRoute.value.path,
+  (newPath) => {
+    if (newPath !== currentRoute.value) {
+      isActive.value = false
+    }
   }
-})
+)
 
 // Load the initial component on mount
 onMounted(async () => {
   if (isActive.value) {
     // Trigger the watch manually for initial load
-    await loadComponentType(props.component.type)
+    await loadComponentType(props.component.typeName)
   }
 })
 
@@ -44,16 +47,16 @@ onUnmounted(() => {
  * A map of component "type" to an async import function.
  * These are still lazily loaded, so initial bundle size stays smaller.
  */
-const componentMap: Record<PaneComponent['type'], () => Promise<{ default: Component }>> = {
-  text: () => import('./TextComponentRenderer.vue'),
-  button: () => import('./VuescapeButton.vue'),
-  chicletGrid: () => import('./ChicletGrid.vue'),
-  fileUpload: () => import('./FileUpload.vue'),
-  readOnlyFileUpload: () => import('./ReadOnlyFileUpload.vue'),
-  table: () => import('./VuescapeTable.vue'),
-  select: () => import('./VuescapeSelect.vue'),
-  tableTabs: () => import('./TableTabs.vue'),
-  textLink: () => import('./TextLinkComponent.vue')
+const componentMap: Record<PaneComponent['typeName'], () => Promise<{ default: Component }>> = {
+  'component.text': () => import('./TextComponentRenderer.vue'),
+  'component.button': () => import('./VuescapeButton.vue'),
+  'component.chicletGrid': () => import('./ChicletGrid.vue'),
+  'component.fileUpload': () => import('./FileUpload.vue'),
+  'component.readOnlyFileUpload': () => import('./ReadOnlyFileUpload.vue'),
+  'component.table': () => import('./VuescapeTable.vue'),
+  'component.select': () => import('./VuescapeSelect.vue'),
+  'component.tableTabs': () => import('./TableTabs.vue'),
+  'component.textLink': () => import('./TextLinkComponent.vue')
 }
 
 /**
@@ -79,25 +82,22 @@ const error = ref<string | null>(null)
 /**
  * Loads a component by type, handling caching and error states.
  */
-async function loadComponentType(newType: PaneComponent['type']) {
+async function loadComponentType(newType: PaneComponent['typeName']) {
   // Don't process component changes if this renderer is no longer active for the current route
   if (!isActive.value) {
     return
   }
-  
+
   if (!componentMap[newType]) {
     // Type not in our map
-    console.warn(`Unsupported component type: '${newType}'`)
-    error.value = `Unsupported component type: '${newType}'`
+    console.warn(`Unsupported component typeName: '${newType}'`)
+    error.value = `Unsupported component typeName: '${newType}'`
     resolvedComponent.value = null
     return
   }
 
   // If we already have a cached "final" component, use it right away.
-  if (
-    typeof moduleCache[newType] === 'object' &&
-    'setup' in (moduleCache[newType] as Component)
-  ) {
+  if (typeof moduleCache[newType] === 'object' && 'setup' in (moduleCache[newType] as Component)) {
     error.value = null
     resolvedComponent.value = moduleCache[newType] as Component
     return
@@ -125,8 +125,8 @@ async function loadComponentType(newType: PaneComponent['type']) {
       resolvedComponent.value = moduleCache[newType] as Component
     }
   } catch (e) {
-    console.error(`Error loading component type: ${newType}`, e)
-    error.value = `Error loading component type: '${newType}'`
+    console.error(`Error loading component typeName: ${newType}`, e)
+    error.value = `Error loading component typeName: '${newType}'`
     resolvedComponent.value = null
   }
 }
@@ -137,11 +137,11 @@ async function loadComponentType(newType: PaneComponent['type']) {
  * - Otherwise, dynamically import it and store in cache.
  */
 watch(
-  () => props.component.type,
+  () => props.component.typeName,
   async (newType) => {
     await loadComponentType(newType)
   },
-  { 
+  {
     flush: 'post' // Wait for DOM updates to complete before firing
     // Removed immediate: true to prevent firing during component transitions
   }
@@ -160,7 +160,7 @@ watch(
  *   - files: An array of File objects representing the selected files.
  */
 function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
-  onComponentUpdate('fileUpload', payload)
+  onComponentUpdate('component.fileUpload', payload)
 }
 
 // If these components and their handlers below are used in a survey with a wizard
@@ -177,17 +177,17 @@ function onFilesChanged(payload: { isValid: boolean; files: Array<File> }) {
  * Generic handler for component updates
  * Emits standardized update events for all component types
  */
-function onComponentUpdate(componentType: string, payload: any) {
+function onComponentUpdate(componentType: PaneComponent['typeName'], payload: any) {
   let id = ''
   let compositePayload: any = {}
-  if (componentType === 'fileUpload') {
+  if (componentType === 'component.fileUpload') {
     const fileUploadPayload = props.component.payload as FileUploadComponentPayload
     id = fileUploadPayload.id
     compositePayload = {
       componentType,
       ...payload
     }
-  } else if (componentType === 'select') {
+  } else if (componentType === 'component.select') {
     const selectPayload = props.component.payload as SelectComponentPayload
     id = selectPayload.id
     compositePayload = {
@@ -211,7 +211,7 @@ function onComponentUpdate(componentType: string, payload: any) {
   <component
     v-else
     :is="resolvedComponent"
-    :key="`${component.type}-${JSON.stringify(component.payload)}`"
+    :key="`${component.typeName}-${JSON.stringify(component.payload)}`"
     v-bind="component.payload"
     @files-changed="onFilesChanged"
   />

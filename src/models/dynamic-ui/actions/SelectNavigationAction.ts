@@ -5,7 +5,7 @@ import type { NavigationActionPayload } from './NavigationActionPayload'
  */
 export interface SelectNavigationAction {
   /** The type of action, which is always 'navigate' in order to identify this type. */
-  type: 'selectNavigate'
+  typeName: 'action.selectNavigate'
 
   /** The payload containing navigation details. */
   payload: NavigationActionPayload

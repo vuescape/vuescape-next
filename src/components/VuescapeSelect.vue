@@ -81,7 +81,7 @@ const handleChangeAsync = async (event: SelectChangeEvent) => {
   if (initializedProps.value.onChangeAction) {
     // This handler will not load a report but instead will simply navigate to a new route.
     const loadReportAsync = async (url: string) => {}
-    if (initializedProps.value.onChangeAction.type === 'selectNavigate') {
+    if (initializedProps.value.onChangeAction.typeName === 'action.selectNavigate') {
       if (!initializedProps.value.selectedValue) {
         console.warn('No selected value to navigate to')
         return
@@ -91,7 +91,7 @@ const handleChangeAsync = async (event: SelectChangeEvent) => {
       const eventToUse = (event as unknown as any).originalEvent ?? event
       const sourcePaneKind = getSourcePaneKind(eventToUse)
       const navigationAction: NavigationAction = {
-        type: 'navigate',
+        typeName: 'action.navigate',
         payload: {
           url: selectedOption.value.id,
           target: initializedProps.value.onChangeAction.payload.target

@@ -3,5 +3,5 @@
  * This can be used as a placeholder or default action.
  */
 export interface NoAction {
-  type: 'noAction'
+  typeName: 'action.noAction'
 }

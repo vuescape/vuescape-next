@@ -19,7 +19,7 @@ const props: PaneItemRendererProps = {
     horizontalAlignment: 'center',
     verticalAlignment: 'top',
     components: [{ 
-      type: 'text', 
+      typeName: 'component.text', 
       payload: { 
         id: 'test-text-1',
         text: 'This is the title',

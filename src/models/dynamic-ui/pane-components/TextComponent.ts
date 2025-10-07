@@ -5,7 +5,7 @@ import type { TextComponentPayload } from './TextComponentPayload'
  */
 export interface TextComponent {
   /** The type of the component, which is always 'text'. */
-  type: 'text'
+  typeName: 'component.text'
 
   /** The payload associated with the text component. */
   payload: TextComponentPayload

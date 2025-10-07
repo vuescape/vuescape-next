@@ -1,10 +1,10 @@
-import type { ComponentData } from "./ComponentData"
+import type { ComponentData } from './ComponentData'
 
 /**
  * File upload component data
  */
 export interface FileUploadComponentData extends ComponentData {
-  componentType: 'fileUpload'
+  componentType: 'component.fileUpload'
   files: File[]
   isValid: boolean
 }

@@ -57,7 +57,7 @@ const props: PaneLayoutRendererProps = {
             verticalAlignment: 'top',
             components: [
               {
-                type: 'chicletGrid',
+                typeName: 'component.chicletGrid',
                 payload: {
                   chiclets: [
                     {
@@ -65,28 +65,28 @@ const props: PaneLayoutRendererProps = {
                       title: 'Benchmarking for a Company',
                       isVisible: true,
                       icons: ['fas', 'fa-bullseye'],
-                      action: { type: 'navigate', payload: { url: '/benchmarking/company' } }
+                      action: { typeName: 'action.navigate', payload: { url: '/benchmarking/company' } }
                     },
                     {
                       id: '2',
                       title: 'Benchmarking',
                       isVisible: true,
                       icons: ['fa-solid', 'fa-bullseye'],
-                      action: { type: 'navigate', payload: { url: '/benchmarking' } }
+                      action: { typeName: 'action.navigate', payload: { url: '/benchmarking' } }
                     },
                     {
                       id: '3',
                       title: 'This is a really really really long Chart label',
                       isVisible: true,
                       icons: ['fas', 'fa-chart-scatter'],
-                      action: { type: 'navigate', payload: { url: '/coscore/long-company' } }
+                      action: { typeName: 'action.navigate', payload: { url: '/coscore/long-company' } }
                     },
                     {
                       id: '4',
                       title: 'Chart',
                       isVisible: true,
                       icons: ['fas', 'fa-chart-scatter'],
-                      action: { type: 'navigate', payload: { url: '/coscore' } }
+                      action: { typeName: 'action.navigate', payload: { url: '/coscore' } }
                     }
                   ]
                 }

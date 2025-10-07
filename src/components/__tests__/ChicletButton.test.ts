@@ -46,7 +46,7 @@ describe('ChicletButton.vue', () => {
 
     await buttonElement.trigger('click')
 
-    expect(actionStore.action.type).toBe('navigate')
+    expect(actionStore.action.typeName).toBe('action.navigate')
     const payload = actionStore.action.payload as NavigationActionPayload
     expect(payload.url).toBe(chiclet.value.action.payload.url)
     expect(payload.target).toBe(LinkTarget.NewWindow)
@@ -67,7 +67,7 @@ const chiclet = ref<Chiclet>({
   icons: ['pi pi-check'],
   cssClass: 'custom-class',
   action: {
-    type: 'navigate',
+    typeName: 'action.navigate',
     payload: {
       url: 'http://example.com',
       target: LinkTarget.NewWindow

@@ -37,7 +37,7 @@ const chicletGridProps: ChicletGridProps = {
       icons: ['pi pi-check1'],
       cssClass: 'custom-class1',
       action: {
-        type: 'navigate',
+        typeName: 'action.navigate',
         payload: {
           url: 'http://example1.com',
           target: LinkTarget.CurrentWindow
@@ -51,7 +51,7 @@ const chicletGridProps: ChicletGridProps = {
       icons: ['pi pi-check2'],
       cssClass: 'custom-class2',
       action: {
-        type: 'navigate',
+        typeName: 'action.navigate',
         payload: {
           url: 'http://example2.com',
           target: LinkTarget.CurrentWindow
@@ -65,7 +65,7 @@ const chicletGridProps: ChicletGridProps = {
       icons: ['pi pi-check3'],
       cssClass: 'custom-class3',
       action: {
-        type: 'navigate',
+        typeName: 'action.navigate',
         payload: {
           url: 'http://example3.com',
           target: LinkTarget.CurrentWindow

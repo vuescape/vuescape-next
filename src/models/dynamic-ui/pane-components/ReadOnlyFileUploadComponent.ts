@@ -5,7 +5,7 @@ import type { FileUploadComponentPayload } from './FileUploadComponentPayload'
  */
 export interface ReadOnlyFileUploadComponent {
   /** The type of the component, which is always 'readOnlyFileUpload'. */
-  type: 'readOnlyFileUpload'
+  typeName: 'component.readOnlyFileUpload'
 
   /** The payload associated with the button component. */
   payload: FileUploadComponentPayload

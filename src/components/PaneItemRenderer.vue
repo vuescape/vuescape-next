@@ -30,7 +30,7 @@ const props = defineProps<PaneItemRendererProps>()
     <!-- Future Feature: Add support for nested components or recursive components -->
     <PaneComponentRenderer
       v-for="(component, index) in props.item.components"
-      :key="`${component.type}-${index}`"
+      :key="`${component.typeName}-${index}`"
       :component="component"
     />
   </div>

@@ -69,7 +69,7 @@ onActivated(() => {
     <template v-for="(item, itemIndex) in props.section.items" :key="`section-item-${itemIndex}`">
       <PaneComponentRenderer
         v-for="(component, compIndex) in item.components"
-        :key="`${component.type}-${compIndex}`"
+        :key="`${component.typeName}-${compIndex}`"
         :component="component"
         @update="(id, payload) => onUpdate(id, payload)"
       />

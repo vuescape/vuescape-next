@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TextLinkComponent from '../TextLinkComponent.vue'
 
 const navigationActionMock = {
-  type: 'NAVIGATE',
+  typeName: 'action.navigate',
   payload: {
     url: '/test-url'
   }

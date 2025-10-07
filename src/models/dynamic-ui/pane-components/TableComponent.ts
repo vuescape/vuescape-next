@@ -5,7 +5,7 @@ import type { TableComponentPayload } from './TableComponentPayload'
  */
 export interface TableComponent {
   /** The type of the component, which is always 'table'. */
-  type: 'table'
+  typeName: 'component.table'
   /** The payload containing the data and configuration for the table component. */
   payload: TableComponentPayload
 }

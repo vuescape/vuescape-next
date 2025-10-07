@@ -9,7 +9,7 @@ import { ReportPaneKind } from '../models/feature/ReportPaneKind'
  * @returns {ActionStore} The state and actions for managing navigation actions and pane kinds.
  */
 export const useActionStore = defineStore('useActionStore', () => {
-  const noAction: NoAction = Object.freeze({ type: 'noAction' } as const)
+  const noAction: NoAction = Object.freeze({ typeName: 'action.noAction' } as const)
 
   // state
   const action = shallowRef<Action>(noAction)
