@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
@@ -62,15 +62,54 @@ const createWrapper = (props: TableTabsProps) => {
   })
 }
 
-// NOTE: This mocks PrimeVue’s internal layout calc to avoid test flakiness.
+// NOTE: This mocks PrimeVue's internal layout calc to avoid test flakiness.
 // e.g. getOuterWidth can be called async after test is completed giving a reference error.
 // Be aware: tightly coupled to PrimeVue v4.3 implementation details.
 // If tabs break after upgrade, re-evaluate this.
-vi.mock('@primeuix/src/dom/methods/getOuterWidth', () => ({
+vi.mock('@primeuix/utils/src/dom/methods/getOuterWidth', () => ({
   getOuterWidth: () => 100 // or a reasonable fixed value
 }))
 
+// Mock HTMLElement methods that might be called asynchronously
+Object.defineProperty(global, 'HTMLElement', {
+  value: class HTMLElement {
+    getBoundingClientRect() {
+      return {
+        width: 100,
+        height: 100,
+        top: 0,
+        left: 0,
+        bottom: 100,
+        right: 100,
+        x: 0,
+        y: 0
+      }
+    }
+    getClientRects() {
+      return [this.getBoundingClientRect()]
+    }
+    offsetWidth = 100
+    offsetHeight = 100
+    scrollWidth = 100
+    scrollHeight = 100
+  },
+  writable: true
+})
+
 describe('TableTabsComponent', () => {
+  let wrapper: any
+
+  afterEach(async () => {
+    // Clear any pending timers to prevent async operations from running after test completion
+    vi.clearAllTimers()
+    
+    // Properly unmount the component to clean up any async operations
+    if (wrapper) {
+      await wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   it('renders the correct label on each tab button', async () => {
     const props: TableTabsProps = {
       id: 'testTabSet',
@@ -81,7 +120,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -104,7 +143,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -131,7 +170,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -158,7 +197,7 @@ describe('TableTabsComponent', () => {
       ]
     }
 
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
@@ -172,7 +211,7 @@ describe('TableTabsComponent', () => {
 
   it('renders nothing when tabs array is empty', async () => {
     const props: TableTabsProps = { id: 'testTabSet', tabs: [] }
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await nextTick()
 
     expect(wrapper.findAll('button.p-tab').length).toBe(0)
@@ -185,7 +224,7 @@ describe('TableTabsComponent', () => {
       tabs: [{ id: 'tab1', label: 'Tab One', table: undefined }]
     }
 
-    const wrapper = createWrapper(props)
+    wrapper = createWrapper(props)
     await flushPromises()
     await nextTick()
 
