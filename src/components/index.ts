@@ -1,3 +1,4 @@
+export { default as ActionButton } from './ActionButton.vue'
 export { default as NotFoundPage } from './404Page.vue'
 export { default as App } from './App.vue'
 export { default as AppInfoHandler } from './AppInfoHandler.vue'
