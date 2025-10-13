@@ -111,7 +111,30 @@ describe('HttpApiUtil', () => {
     })
 
     it('returns error on fetch failure', async () => {
-      mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
+      const mockResponse = {
+        ok: false,
+        status: 500,
+        statusText: 'test error',
+        bodyUsed: false,
+        clone: () => mockResponse,
+        json: () => Promise.resolve({}),
+        headers: new Headers(),
+        url: 'https://example.com',
+        redirected: false,
+        type: 'basic' as ResponseType,
+        body: null,
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+        blob: () => Promise.resolve(new Blob()),
+        formData: () => Promise.resolve(new FormData()),
+        text: () => Promise.resolve('')
+      } as Response
+      
+      // Mock multiple responses for retries
+      mockFetch.mockResolvedValueOnce(mockResponse)
+      mockFetch.mockResolvedValueOnce(mockResponse)
+      mockFetch.mockResolvedValueOnce(mockResponse)
+      mockFetch.mockResolvedValueOnce(mockResponse)
+      
       const result = await withErrorHandlingAsync(apiFetchAsync, 'https://example.com')
       expect(result.data).toBeNull()
       expect(result.error).toBeInstanceOf(ApiFetchError)
