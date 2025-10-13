@@ -36,12 +36,10 @@ export async function usingRetryForFetchAsync(
       response = await fetch(url, init)
 
       if (response.ok || response.status === 400 || response.status === 401) {
-        // console.log('Successful fetch or client error')
         return response
       }
 
       if (!retryStatusCodes.includes(response.status)) {
-        // console.log('Status not in retryStatusCodes, returning response')
         return response
       }
 
@@ -115,13 +113,13 @@ export function prepareRequest(
   init?: RequestInit
 ): RequestInit {
   const origin = window?.location?.origin
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const defaultHeaders = {
     'Access-Control-Allow-Origin': origin,
     Origin: origin,
     Accept: 'application/json, text/plain, */*',
-    'X-TimeZone': timeZone,
+    'X-TimeZone': timeZone
   } as any
 
   if (method === HttpMethod.Post && data && !init?.body) {
@@ -289,13 +287,56 @@ export async function withErrorHandlingAsync<T = unknown>(
     if (error instanceof ApiFetchError) {
       const notificationStore = useNotificationStore() as NotificationStore
       const messages = notificationStore.messages as Array<NotificationMessage>
+
+      let displayMessage: string
+      let severity: NotificationSeverity
+
+      if (error.response.status === 400) {
+        // For 400 errors, try to extract the actual error message from the response
+        try {
+          // Check if the response body is still readable
+          if (error.response.bodyUsed) {
+            // If body was already consumed, use status text
+            displayMessage = error.response.statusText || 'Invalid request'
+          } else {
+            // Clone the response to avoid consuming the body stream
+            const responseClone = error.response.clone()
+            const body = await responseClone.json()
+
+            // Try to extract error message from common response formats
+            displayMessage =
+              body.message ||
+              body.error ||
+              body.detail ||
+              body.title ||
+              body.description ||
+              body.errorMessage ||
+              body.Message || // Try capitalized versions (for .NET Framework)
+              body.Error ||
+              body.Detail ||
+              error.response.statusText ||
+              'We could not process your request. Please try again.'
+          }
+        } catch {
+          // If JSON parsing fails then display a generic message
+          displayMessage = 'We could not process your request. Please try again.'
+        }
+
+        severity = NotificationSeverity.Warning
+      } else {
+        // For other errors, use the generic network error message
+        displayMessage =
+          'Sorry, there was temporary problem connecting over the network. ' +
+          'Please verify you are connected to the internet and try again.'
+        severity = NotificationSeverity.Error
+      }
+
       messages.push({
         id: Guid.newGuid(),
-        text:
-          'Sorry, there was temporary problem connecting over the network. ' +
-          'Please verify you are connected to the internet and try again.',
-        severity: NotificationSeverity.Error
+        text: displayMessage,
+        severity: severity
       })
+
       // Handle known ApiFetchError
       return { data: null, error }
     } else {
