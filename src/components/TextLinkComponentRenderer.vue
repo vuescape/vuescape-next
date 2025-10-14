@@ -11,28 +11,20 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
 import type { TextLinkComponentProps } from '../models/componentProps/TextLinkComponentProps'
 import {
-  getSourcePaneKind,
-  handleActionAsync
+  handleActionEvent
 } from '../models/dynamic-ui/actions/ActionHandlers'
-import { useDownloadService } from '../composables/useDownloadService'
+import { useActionStore } from '../stores/useActionStore'
 
-const router = useRouter()
-const downloadService = useDownloadService()
+const actionStore = useActionStore()
 
 const props = defineProps<TextLinkComponentProps>()
-const handleClickAsync = async (event: Event) => {
-  // This handler will not load a report but instead will simply navigate to a new route.
-  // Sometimes event can be wrap the original event.
+const handleClickAsync = (event: Event) => {
+  // This handler dispatches the action to the action store instead of handling it directly.
+  // The ActionStoreWatcher component will process the action using domain-specific handlers.
   const eventToUse = (event as unknown as any).originalEvent ?? event
-  const sourcePaneKind = getSourcePaneKind(eventToUse)
-  await handleActionAsync(
-    { action: props.action, paneKind: sourcePaneKind },
-    router,
-    downloadService.downloadReportAsync
-  )
+  handleActionEvent(eventToUse, props.action, actionStore)
 }
 </script>
 
