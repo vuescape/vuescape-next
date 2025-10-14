@@ -43,7 +43,7 @@ const menuActions = computed(() =>
 )
 
 const icons = computed(() => {
-  return props.icons?.join(' ') ?? ''
+  return props.icons?.join(' ')
 })
 
 const iconPos = computed(() => {
