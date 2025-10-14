@@ -4,4 +4,5 @@
  */
 export interface NoAction {
   typeName: 'action.noAction'
+  payload: any
 }
