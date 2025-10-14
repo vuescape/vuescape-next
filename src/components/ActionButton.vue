@@ -55,6 +55,7 @@ const toggleMenu = (e: Event) => menuRef.value.toggle(e)
 
 <template>
   <Button
+    class="action-button"
     :label="label"
     :icon="icons"
     :iconPos="iconPos"
@@ -64,3 +65,10 @@ const toggleMenu = (e: Event) => menuRef.value.toggle(e)
   />
   <Menu ref="menuRef" :model="menuActions" popup />
 </template>
+
+<style scoped>
+/* TODO: Add this to the theme */
+.action-button {
+  font-size: 14px;
+}
+</style>
