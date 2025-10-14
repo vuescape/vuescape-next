@@ -1,4 +1,4 @@
-import type { NavigationAction } from '../dynamic-ui/actions/NavigationAction'
+import type { Action } from '../dynamic-ui/actions/Action'
 
 /**
  * Interface representing the properties for a TextLinkComponent.
@@ -17,7 +17,7 @@ export interface TextLinkComponentProps {
   /**
    * The navigation action.
    */
-  navigationAction: NavigationAction
+  action: Action
 
   /**
    * The inline styles of the cell.
