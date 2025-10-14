@@ -15,24 +15,29 @@ import { useRouter } from 'vue-router'
 import type { TextLinkComponentProps } from '../models/componentProps/TextLinkComponentProps'
 import {
   getSourcePaneKind,
-  handleNavigationActionAsync
+  handleActionAsync
 } from '../models/dynamic-ui/actions/ActionHandlers'
+import { useDownloadService } from '../composables/useDownloadService'
 
 const router = useRouter()
+const downloadService = useDownloadService()
 
 const props = defineProps<TextLinkComponentProps>()
 const handleClickAsync = async (event: Event) => {
   // This handler will not load a report but instead will simply navigate to a new route.
-  const loadReportAsync = async (url: string) => {}
   // Sometimes event can be wrap the original event.
   const eventToUse = (event as unknown as any).originalEvent ?? event
   const sourcePaneKind = getSourcePaneKind(eventToUse)
-  await handleNavigationActionAsync(props.navigationAction, sourcePaneKind, router, loadReportAsync)
+  await handleActionAsync(
+    { action: props.action, paneKind: sourcePaneKind },
+    router,
+    downloadService.downloadReportAsync
+  )
 }
 </script>
 
 <template>
-  <a class="link" @click.prevent="handleClickAsync" :href="props.navigationAction.payload.url">{{
+  <a class="link" @click.prevent="handleClickAsync" :href="props.action.payload.url">{{
     props.text
   }}</a>
 </template>

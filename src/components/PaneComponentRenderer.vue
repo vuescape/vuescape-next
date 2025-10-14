@@ -56,7 +56,8 @@ const componentMap: Record<PaneComponent['typeName'], () => Promise<{ default: C
   'component.table': () => import('./VuescapeTable.vue'),
   'component.select': () => import('./VuescapeSelect.vue'),
   'component.tableTabs': () => import('./TableTabs.vue'),
-  'component.textLink': () => import('./TextLinkComponent.vue')
+  'component.textLink': () => import('./TextLinkComponentRenderer.vue'),
+  'component.actionButton': () => import('./ActionButton.vue')
 }
 
 /**
