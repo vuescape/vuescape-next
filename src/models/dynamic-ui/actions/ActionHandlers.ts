@@ -4,6 +4,7 @@ import { LinkTarget } from '../../../reporting-domain/Link/LinkTarget'
 import type { ActionStore } from '../../../stores/useActionStore'
 import { ReportPaneKind } from '../../feature/ReportPaneKind'
 import type { Action } from './Action'
+import type { DownloadAction } from './DownloadAction'
 import type { NavigationAction } from './NavigationAction'
 import type { NoAction } from './NoAction'
 
@@ -22,6 +23,8 @@ export async function handleActionAsync(
 ): Promise<void> {
   if (state.action.typeName === 'action.navigate') {
     await handleNavigationActionAsync(state.action, state.paneKind, router, loadReport)
+  } else if (state.action.typeName === 'action.download') {
+    handleDownloadActionAsync(state.action, loadReport)
   } else if (state.action.typeName === 'action.noAction') {
     handleNoAction(state.action, state.paneKind)
   } else {
@@ -31,6 +34,24 @@ export async function handleActionAsync(
 
 export function handleNoAction(action: NoAction, sourcePane: ReportPaneKind): void {
   console.warn('No action handler invoked. No action to take.', action, sourcePane)
+}
+
+/**
+ * Handles download actions based on the specified options.
+ *
+ * @param {DownloadAction} action - The download action containing the payload and options.
+ *
+ * @returns {void} Resolves when the download action is handled.
+ */
+export function handleDownloadActionAsync(
+  action: DownloadAction,
+  downloadReportAsync: (url: string) => Promise<void>
+): void {
+  if (action.payload.shouldResolveDownloadFile) {
+    handleResolveDownloadAsync(action.payload.url, downloadReportAsync)
+  } else {
+    handleDirectDownloadAsync(action.payload.url)
+  }
 }
 
 /**
@@ -84,9 +105,7 @@ export async function handleNavigationActionAsync(
   } else if (target === LinkTarget.NewWindow) {
     // console.log('Opening new window ' + action.payload.url)
     window.open(action.payload.url, '_blank')
-  } else if (target === LinkTarget.Download) {
-    throw new Error('LinkTarget.Download Not implemented')
-  } else if (target == LinkTarget.Modal) {
+  } else if (target === LinkTarget.Modal) {
     throw new Error('LinkTarget.Modal Not implemented')
   } else if (target === LinkTarget.Navigate) {
     // Pure UI navigation without report loading
@@ -129,4 +148,98 @@ export function getSourcePaneKind(event: Event): ReportPaneKind {
   }
 
   return ReportPaneKind.None
+}
+
+/**
+ * Handles direct download by posting a form to a hidden iframe.
+ * This is used when we already know the file is valid and ready to download.
+ *
+ * @param url - The download URL with query parameters
+ */
+function handleDirectDownloadAsync(url: string): void {
+  try {
+    // Parse URL to extract endpoint and fields
+    const { endpoint, fields } = parseUrlToEndpointAndFields(url)
+
+    // Convert fields arrays to single values and add auth token
+    const flatFields: Record<string, string> = {}
+    Object.entries(fields).forEach(([key, values]) => {
+      flatFields[key] = values[0] // Take first value if multiple
+    })
+
+    // Get auth token from auth store (this would need to be imported)
+    // For now, we'll assume it's available in the global scope
+    const token = (window as any).authenticationStore?.authState?.userProfile?.authorizationToken
+    if (token) {
+      flatFields['authorizationToken'] = token
+    }
+
+    // Fire the form POST into the hidden iframe (download begins)
+    postDownloadForm(endpoint, flatFields)
+  } catch (error) {
+    console.error('Direct download failed:', error)
+    throw error
+  }
+}
+
+/**
+ * Handles two-phase download by invoking the delegated the logic,
+ *
+ * @param url - The URL containing datasetId and cellId parameters
+ */
+async function handleResolveDownloadAsync(
+  url: string,
+  downloadReportAsync: (url: string) => Promise<void>
+): Promise<void> {
+  await downloadReportAsync(url)
+}
+
+/**
+ * Parses a URL to extract endpoint and query parameters.
+ */
+export function parseUrlToEndpointAndFields(urlStr: string): {
+  endpoint: string
+  fields: Record<string, string[]>
+} {
+  const u = new URL(urlStr)
+  const endpoint = u.origin + u.pathname // keeps scheme, host, port, path
+  const fields: Record<string, string[]> = {}
+  u.searchParams.forEach((value, key) => {
+    ;(fields[key] ??= []).push(value)
+  })
+  return { endpoint, fields }
+}
+
+/**
+ * Posts a download form to a hidden iframe.
+ */
+export function postDownloadForm(actionUrl: string, fields: Record<string, string>): void {
+  // Reuse a single hidden iframe as a download sink
+  const iframeName = 'download_iframe_sink'
+  let sink = document.querySelector<HTMLIFrameElement>(`iframe[name="${iframeName}"]`)
+  if (!sink) {
+    sink = document.createElement('iframe')
+    sink.name = iframeName
+    sink.style.display = 'none'
+    document.body.appendChild(sink)
+  }
+
+  // Build a classic form POST (no CORS/fetch needed for the download itself)
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = actionUrl
+  form.target = iframeName
+  form.style.display = 'none'
+
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement('input')
+    input.type = 'hidden'
+    input.name = name
+    input.value = value
+    form.appendChild(input)
+  })
+
+  document.body.appendChild(form)
+  form.submit()
+  form.remove()
 }

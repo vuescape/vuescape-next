@@ -1,5 +1,7 @@
 export * from './Action'
 export * from './ActionHandlers'
+export * from './DownloadAction'
+export * from './DownloadActionPayload'
 export * from './NavigationAction'
 export * from './NavigationActionPayload'
 export * from './NoAction'

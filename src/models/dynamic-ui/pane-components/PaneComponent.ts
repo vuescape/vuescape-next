@@ -1,3 +1,4 @@
+import type { ActionButtonComponent } from './ActionButtonComponent'
 import type { ButtonComponent } from './ButtonComponent'
 import type { ChicletGridComponent } from './ChicletGridComponent'
 import type { FileUploadComponent } from './FileUploadComponent'
@@ -13,6 +14,7 @@ import type { TextLinkComponent } from './TextLinkComponent'
  * This type is a union of all possible component types.
  */
 export type PaneComponent =
+  | ActionButtonComponent
   | TextComponent
   | ButtonComponent
   | ChicletGridComponent

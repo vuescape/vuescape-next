@@ -1,3 +1,4 @@
+export * from './ActionButtonProps'
 export * from './AppComponentProps'
 export * from './ChicletGridProps'
 export * from './CustomLoadingProps'

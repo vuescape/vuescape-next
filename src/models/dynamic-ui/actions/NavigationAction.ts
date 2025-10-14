@@ -4,7 +4,7 @@ import type { NavigationActionPayload } from './NavigationActionPayload'
  * Represents an action to navigate within the application.
  */
 export interface NavigationAction {
-  /** The type of action, which is always 'navigate' in order to identify this type. */
+  /** The type of action, which is always 'action.navigate' in order to identify this type. */
   typeName: 'action.navigate'
 
   /** The payload containing navigation details. */
