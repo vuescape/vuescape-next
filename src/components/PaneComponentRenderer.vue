@@ -2,6 +2,7 @@
 import type { Component } from 'vue'
 import { markRaw, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { fastHash } from '../infrastructure/fastHash'
 
 import type { PaneComponentRendererProps } from '../models/componentProps/PaneComponentRendererProps'
 import type { FileUploadComponentPayload } from '../models/dynamic-ui/pane-components/FileUploadComponentPayload'
@@ -212,7 +213,7 @@ function onComponentUpdate(componentType: PaneComponent['typeName'], payload: an
   <component
     v-else
     :is="resolvedComponent"
-    :key="`${component.typeName}-${JSON.stringify(component.payload)}`"
+    :key="`${component.typeName}-${fastHash(component.payload)}`"
     v-bind="component.payload"
     @files-changed="onFilesChanged"
   />
