@@ -30,7 +30,7 @@ const fileSizeTypes = usePrimeVue().config.locale?.fileSizeTypes
 const actionStore = useActionStore()
 
 const onDownloadClick = () => {
-  const downloadNavigationAction = props.downloadNavigationAction
+  const downloadNavigationAction = props.downloadAction
   if (!downloadNavigationAction) {
     return
   }
@@ -66,7 +66,7 @@ const onDownloadClick = () => {
       </div>
       <VuescapeButton
         class="mt-4"
-        v-if="downloadNavigationAction"
+        v-if="downloadAction"
         icon="fad fa-cloud-download-alt"
         :outlined="true"
         label="Download"

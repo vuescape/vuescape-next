@@ -1,4 +1,4 @@
-import type { NavigationAction } from '../dynamic-ui/actions/NavigationAction'
+import type { DownloadAction } from '../dynamic-ui/actions/DownloadAction'
 import type { MetadataLineItem } from '../dynamic-ui/MetadataLineItem'
 
 /**
@@ -23,7 +23,7 @@ export interface ReadOnlyFileUploadProps {
   /**
    * Navigation action to trigger file download.
    */
-  downloadNavigationAction: NavigationAction
+  downloadAction: DownloadAction
 
   /**
    * List of metadata line items associated with the file.
