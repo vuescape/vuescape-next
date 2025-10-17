@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Component } from 'vue'
-import { markRaw, ref, watch, onMounted, onUnmounted } from 'vue'
+import { markRaw, ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { fastHash } from '../infrastructure/fastHash'
 
@@ -62,6 +62,26 @@ const componentMap: Record<PaneComponent['typeName'], () => Promise<{ default: C
 }
 
 /**
+ * Map of component types to their supported event listeners.
+ * This allows us to conditionally bind events only to components that support them.
+ * Adding new events is as simple as adding them to the appropriate component type.
+ */
+const componentEventMap: Record<PaneComponent['typeName'], Record<string, (...args: any[]) => void>> = {
+  'component.text': {},
+  'component.button': {},
+  'component.chicletGrid': {},
+  'component.fileUpload': {
+    'files-changed': onFilesChanged
+  },
+  'component.readOnlyFileUpload': {},
+  'component.table': {},
+  'component.select': {},
+  'component.tableTabs': {},
+  'component.textLink': {},
+  'component.actionButton': {}
+}
+
+/**
  * A cache to store either:
  * - A **Promise** for a module that's in the process of loading, or
  * - A **Component** that has finished loading.
@@ -80,6 +100,15 @@ const resolvedComponent = ref<Component | null>(null)
  * Error messages if a load fails or an unsupported type is requested.
  */
 const error = ref<string | null>(null)
+
+/**
+ * Computed property that returns the event listeners for the current component type.
+ * This ensures we only bind events that the component actually supports.
+ */
+const eventListeners = computed(() => {
+  const componentType = props.component.typeName
+  return componentEventMap[componentType] || {}
+})
 
 /**
  * Loads a component by type, handling caching and error states.
@@ -215,7 +244,6 @@ function onComponentUpdate(componentType: PaneComponent['typeName'], payload: an
     :is="resolvedComponent"
     :key="`${component.typeName}-${fastHash(component.payload)}`"
     v-bind="component.payload"
-    @files-changed="onFilesChanged"
+    v-on="eventListeners"
   />
-  <!-- TODO: Add other event listeners above as needed -->
 </template>
