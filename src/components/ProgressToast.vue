@@ -199,7 +199,7 @@ defineExpose({
 .p-toast-message-icon {
   flex-shrink: 0;
   font-size: 1.25rem;
-  color: #ffffff !important;
+  color: #e8e8e8 !important;
 }
 
 .p-toast-message-text {
@@ -210,14 +210,14 @@ defineExpose({
 .p-toast-summary {
   font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #ffffff !important;
+  color: #e8e8e8 !important;
 }
 
 .p-toast-detail {
   font-size: 0.875rem;
   opacity: 1;
   line-height: 1.4;
-  color: #ffffff !important;
+  color: #e8e8e8 !important;
 }
 
 /* Top Right Close Button */
@@ -236,7 +236,7 @@ defineExpose({
 
 .p-toast-icon-close:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: #e8e8e8;
 }
 
 .p-toast-icon-close:active {
@@ -249,7 +249,7 @@ defineExpose({
 .p-toast-message-warn,
 .p-toast-message-error {
   background: #323232;
-  color: #ffffff;
+  color: #e8e8e8;
 }
 
 /* Responsive design */
