@@ -199,6 +199,7 @@ defineExpose({
 .p-toast-message-icon {
   flex-shrink: 0;
   font-size: 1.25rem;
+  color: #ffffff !important;
 }
 
 .p-toast-message-text {
@@ -209,12 +210,14 @@ defineExpose({
 .p-toast-summary {
   font-weight: 600;
   margin-bottom: 0.25rem;
+  color: #ffffff !important;
 }
 
 .p-toast-detail {
   font-size: 0.875rem;
-  opacity: 0.9;
+  opacity: 1;
   line-height: 1.4;
+  color: #ffffff !important;
 }
 
 /* Top Right Close Button */
@@ -246,7 +249,7 @@ defineExpose({
 .p-toast-message-warn,
 .p-toast-message-error {
   background: #323232;
-  color: #e8e8e8;
+  color: #ffffff;
 }
 
 /* Responsive design */
