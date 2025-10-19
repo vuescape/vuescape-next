@@ -21,4 +21,17 @@ export interface ReportLayoutStore {
    * @param reportLayout - A ReportLayout object to set.
    */
   setReportLayout: (reportLayout: ReportLayout) => void
+
+  /**
+   * Gets the bare page title from the report layouts (no loading states or fallbacks).
+   * @returns The raw page title from the report layouts, or empty string if no title is found
+   */
+  getBarePageTitle: () => string
+
+  /**
+   * Gets the page title with loading states and fallbacks.
+   * @param isLoading - Whether the report is currently loading
+   * @returns The page title with loading states and fallbacks
+   */
+  getPageTitle: (isLoading?: boolean) => string
 }
