@@ -10,75 +10,70 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { computeBreadcrumbs, type BreadcrumbItem } from '../composables/useBreadcrumb'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import type { BreadcrumbItem } from '../utils/breadcrumbHelpers'
 
-const route = useRoute()
 const router = useRouter()
 
-// Simple reactive state for breadcrumbs
-const breadcrumbs = ref<BreadcrumbItem[]>([])
-const isTransitioning = ref(false)
+// Props for custom breadcrumbs
+const props = defineProps<{
+  customBreadcrumbs?: BreadcrumbItem[] | null
+}>()
 
-// Function to update breadcrumbs - called by parent component
-const updateBreadcrumbs = () => {
-  isTransitioning.value = true
-  setTimeout(() => {
-    breadcrumbs.value = computeBreadcrumbs(route, router)
-    isTransitioning.value = false
-  }, 100)
-}
+// Use only custom breadcrumbs - no URL-based logic
+const computedBreadcrumbs = computed(() => {
+  // If customBreadcrumbs is explicitly null, don't show any breadcrumbs
+  if (props.customBreadcrumbs === null) {
+    return []
+  }
+  return props.customBreadcrumbs || []
+})
 
-const navigateToBreadcrumb = async (path: string) => {
+const handleBreadcrumbClick = async (event: Event, path: string) => {
+  // Prevent default link behavior
+  event.preventDefault()
+  // Use Vue Router for navigation
   await router.push(path)
 }
-
-// Initialize breadcrumbs when component mounts
-onMounted(() => {
-  updateBreadcrumbs()
-})
-
-// Expose updateBreadcrumbs for parent components
-defineExpose({
-  updateBreadcrumbs
-})
 </script>
 
 <template>
-  <nav
-    v-if="breadcrumbs.length > 1"
-    class="breadcrumb"
-    :class="{ 'breadcrumb--transitioning': isTransitioning }"
-    aria-label="Breadcrumb"
-  >
-    <ol class="breadcrumb__list">
-      <li
-        v-for="(crumb, index) in breadcrumbs"
-        :key="`breadcrumb-${index}`"
-        class="breadcrumb__item"
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <transition name="fade" mode="out-in">
+      <ol
+        v-if="computedBreadcrumbs && computedBreadcrumbs.length > 1"
+        class="breadcrumb__list"
+        key="breadcrumbs"
       >
-        <component
-          :is="crumb.clickable ? 'button' : 'span'"
-          :class="{
-            breadcrumb__link: crumb.clickable,
-            breadcrumb__text: !crumb.clickable
-          }"
-          @click="crumb.clickable ? navigateToBreadcrumb(crumb.path) : undefined"
-          :aria-current="index === breadcrumbs.length - 1 ? 'page' : undefined"
+        <li
+          v-for="(crumb, index) in computedBreadcrumbs"
+          :key="`breadcrumb-${index}`"
+          class="breadcrumb__item"
         >
-          {{ crumb.label }}
-        </component>
+          <component
+            :is="crumb.clickable ? 'a' : 'span'"
+            :href="crumb.clickable ? crumb.path : undefined"
+            :class="{
+              breadcrumb__link: crumb.clickable,
+              breadcrumb__text: !crumb.clickable
+            }"
+            @click="crumb.clickable ? handleBreadcrumbClick($event, crumb.path) : undefined"
+            :aria-current="index === computedBreadcrumbs.length - 1 ? 'page' : undefined"
+          >
+            {{ crumb.label }}
+          </component>
 
-        <span
-          v-if="index < breadcrumbs.length - 1"
-          class="breadcrumb__separator"
-          aria-hidden="true"
-        >
-          /
-        </span>
-      </li>
-    </ol>
+          <span
+            v-if="index < computedBreadcrumbs.length - 1"
+            class="breadcrumb__separator"
+            aria-hidden="true"
+          >
+            /
+          </span>
+        </li>
+      </ol>
+    </transition>
   </nav>
 </template>
 
@@ -87,11 +82,7 @@ defineExpose({
   padding: 1px 0;
   font-size: 14px;
   color: #666;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.breadcrumb--transitioning {
-  opacity: 0.7;
+  min-height: 20px; /* Reserve space even when empty */
 }
 
 .breadcrumb__list {
@@ -114,9 +105,20 @@ defineExpose({
   color: var(--p-cometrics-primary-color);
   cursor: pointer;
   padding: 2px 4px;
-  text-decoration: underline;
+  text-decoration: none;
   font-weight: 500;
 }
+
+.breadcrumb__link:hover {
+  text-decoration: underline;
+}
+
+/* 
+.breadcrumb__link:focus {
+  outline: 2px solid #2196f3;
+  outline-offset: 2px;
+}
+*/
 
 .breadcrumb__text {
   color: #333;
