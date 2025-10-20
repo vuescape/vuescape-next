@@ -12,7 +12,7 @@ export default {}
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { BreadcrumbItem } from '../utils/breadcrumbHelpers'
+import type { BreadcrumbItem } from '../models/BreadcrumbItem'
 
 const router = useRouter()
 

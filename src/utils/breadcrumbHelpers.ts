@@ -1,8 +1,4 @@
-export interface BreadcrumbItem {
-  label: string
-  path: string
-  clickable: boolean
-}
+import type { BreadcrumbItem } from "../models/BreadcrumbItem"
 
 /**
  * Simple function to create breadcrumb items

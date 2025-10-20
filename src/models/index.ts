@@ -1,6 +1,7 @@
 export * from './ApiFetchError'
 export * from './AppInfo'
 export * from './BootstrappedComponent'
+export * from './BreadcrumbItem'
 // Chiclet name conflicts with new Chiclet in dynamic-ui so exclude from export since it's not used right now
 // export * from './Chiclet'
 export * from './componentProps'
