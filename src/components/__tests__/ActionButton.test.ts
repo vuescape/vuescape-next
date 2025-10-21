@@ -105,9 +105,8 @@ describe('ActionButton.vue', () => {
       icons: undefined
     }
     const wrapper = createWrapper(propsWithoutIcons)
-
     const button = wrapper.findComponent({ name: 'Button' })
-    expect(button.props('icon')).toBe('')
+    expect(button.props('icon')).toBe(null)
   })
 
   it('renders button as disabled when isDisabled is true', () => {

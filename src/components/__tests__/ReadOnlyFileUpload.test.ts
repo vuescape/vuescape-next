@@ -10,7 +10,10 @@ const defaultProps: ReadOnlyFileUploadProps = {
   id: 'file-123',
   fileName: 'document.pdf',
   fileSizeInBytes: 2048,
-  downloadNavigationAction: { typeName: 'action.navigate', payload: { url: '/download/file-123' } }
+  downloadAction: {
+    typeName: 'action.download',
+    payload: { url: '/download/file-123', shouldResolveDownloadFile: false }
+  }
 }
 
 vi.mock('../stores/useActionStore', () => ({
@@ -62,13 +65,13 @@ describe('ReadOnlyFileUpload', () => {
 
     await wrapper.find('button').trigger('click')
     expect(actionStore.dispatch).toHaveBeenCalledWith(
-      defaultProps.downloadNavigationAction,
+      defaultProps.downloadAction,
       ReportPaneKind.None
     )
   })
 
   it('does not call render download button if downloadNavigationAction is missing', async () => {
-    const wrapper = createWrapper({ ...defaultProps, downloadNavigationAction: undefined as any })
+    const wrapper = createWrapper({ ...defaultProps, downloadAction: undefined as any })
     const button = await wrapper.find('button')
     expect(button.exists()).toBe(false)
   })
