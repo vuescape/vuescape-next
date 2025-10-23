@@ -159,7 +159,4 @@ watch(isToastReady, (ready) => {
 .notification-messages-toast .p-toast-message-content {
   align-items: center!important;
 }
-.notification-messages-toast .p-toast-close-button {
-  align-items: self-end!important;
-}
 </style>
