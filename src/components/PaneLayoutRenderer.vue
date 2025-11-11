@@ -29,10 +29,12 @@ defineProps<PaneLayoutRendererProps>()
 
 <style scoped>
 .pane-layout {
-  padding-top: 0!important;
+  padding-top: 0 !important;
   padding-bottom: 1rem;
+  /*   
   padding-left: 1rem;
   padding-right: 1rem;
+ */
   box-sizing: border-box;
 }
 </style>
