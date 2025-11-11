@@ -33,6 +33,8 @@ const props = defineProps<VuescapeTableProps & { initialScrollPosition: number |
 const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 
 const dtRef = ref<any>(null)
+const tableWrapperRef = ref<HTMLElement | null>(null)
+const dynamicScrollHeight = ref('600px')
 
 const localState = reactive({
   id: props.id,
@@ -58,14 +60,34 @@ function onScroll(e: Event) {
 }
 
 /**
+ * Calculates the available height for the table based on viewport and wrapper position.
+ * Uses getBoundingClientRect to determine how much vertical space is available.
+ */
+function updateTableHeight() {
+  if (tableWrapperRef.value) {
+    const rect = tableWrapperRef.value.getBoundingClientRect()
+    // Calculate available height: viewport height - current top position - buffer for footer
+    const viewportHeight = window.innerHeight
+    const topPosition = rect.top
+    const footerBuffer = 60 // Space for footer and padding
+    const availableHeight = viewportHeight - topPosition - footerBuffer
+
+    // Use available height with minimum of 300px
+    const tableHeight = Math.max(300, availableHeight)
+    dynamicScrollHeight.value = `${tableHeight}px`
+  }
+}
+
+/**
  * Lifecycle hook that runs after the component is mounted to the DOM.
  * Sets up scroll event handling and restores the initial scroll position if provided.
- * 
+ *
  * This method:
  * 1. Gets a reference to the virtual scroller element from the DataTable component
  * 2. Adds a scroll event listener to track scroll position changes
  * 3. Restores the initial scroll position if one was provided via props
- * 
+ * 4. Calculates table height once on mount and on window resize only
+ *
  * The scroll restoration uses setTimeout with 0 delay to ensure it runs after
  * the virtual scroller has fully initialized and rendered its content.
  */
@@ -80,6 +102,23 @@ onMounted(() => {
       }, 0)
     }
   }
+
+  // Calculate table height on mount
+  // Use setTimeout to ensure DOM is fully rendered
+  setTimeout(() => {
+    updateTableHeight()
+  }, 0)
+
+  // Only recalculate on window resize (not on every parent change)
+  const handleResize = () => {
+    updateTableHeight()
+  }
+  window.addEventListener('resize', handleResize)
+
+  // Clean up on unmount
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize)
+  })
 })
 
 onBeforeUnmount(() => {
@@ -261,26 +300,27 @@ const enhancedRows = computed(() => {
   <!-- :sortOrder="sortingState.sortOrder"
     @sort="onSort"
     @update:sortField="(value) => (sortingState.sortField = value)"
-    @update:sortOrder="(value) => (sortingState.sortOrder = value)" 
+    @update:sortOrder="(value) => (sortingState.sortOrder = value)"
             :sortField="(item) => getComparableValue(item, column.id)"
 
             paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50]"
 
     -->
 
-  <DataTable
-    ref="dtRef"
-    :value="enhancedRows"
-    :scrollable="true"
-    scroll-height="500px"
-    :stripedRows="true"
-    :showGridlines="true"
-    tableStyle="min-width: 100%;"
-    :virtualScrollerOptions="{ itemSize: 46 }"
-    stateStorage="session"
-    :stateKey="localState.id"
-    :resizable-columns="false"
-  >
+  <div ref="tableWrapperRef">
+    <DataTable
+      ref="dtRef"
+      :value="enhancedRows"
+      :scrollable="true"
+      :scrollHeight="dynamicScrollHeight"
+      :stripedRows="true"
+      :showGridlines="true"
+      tableStyle="min-width: 100%;"
+      :virtualScrollerOptions="{ itemSize: 46 }"
+      stateStorage="session"
+      :stateKey="localState.id"
+      :resizable-columns="false"
+    >
     <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
     @state-restore="stateRestore"
@@ -308,8 +348,9 @@ const enhancedRows = computed(() => {
       </Column>
     </template>
   </DataTable>
+  </div>
 </template>
 
 <style scoped>
-/* Add custom styles for your table if needed */
+/* Table styles if needed */
 </style>
