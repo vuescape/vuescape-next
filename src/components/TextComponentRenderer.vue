@@ -28,6 +28,7 @@ defineProps<TextComponentPayload>()
   margin-bottom: 24px;
   font-size: 20px;
   font-weight: 700;
+  align-self: center;
 }
 .subheader {
   font-size: 20px;
