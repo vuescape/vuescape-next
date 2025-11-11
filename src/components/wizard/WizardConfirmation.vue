@@ -26,16 +26,46 @@ emit('update', isConfirmed.value)
 
 <template>
   <div
-    class="flex flex-col items-center justify-center px-6 pb-6 text-center"
-    style="min-height: 100%; border: 1px solid var(--p-primary-color); border-radius: 8px"
+    class="flex flex-col rounded-lg shadow-lg overflow-hidden mx-auto"
+    style="
+      background: var(--p-content-background);
+      border: 1px solid var(--p-content-border-color);
+      max-width: 680px;
+    "
   >
-    <div v-if="props.title" class="mt-2 text-xl font-semibold">{{ props.title }}</div>
-    <div class="mt-2 mb-2 text-lg" v-html="props.messageHtml"></div>
-    <div class="flex items-center">
-      <Checkbox v-model="confirmationCheckboxValue" value="isConfirmed" size="small" />
-      <label for="confirmation" class="ml-2 text-lg">{{
-        props.confirmationCheckboxLabel ?? 'Click to continue'
-      }}</label>
+    <!-- Dialog Header -->
+    <div
+      v-if="props.title"
+      class="px-6 py-4 border-b"
+      style="
+        background: var(--p-surface-50);
+        border-color: var(--p-content-border-color);
+      "
+    >
+      <h3 class="text-xl font-semibold m-0" style="color: var(--p-text-color)">
+        {{ props.title }}
+      </h3>
+    </div>
+
+    <!-- Dialog Content -->
+    <div class="px-6 py-5 flex-grow">
+      <div class="text-base leading-relaxed" style="color: var(--p-text-color)" v-html="props.messageHtml"></div>
+    </div>
+
+    <!-- Dialog Footer with Checkbox -->
+    <div
+      class="px-6 py-4 border-t"
+      style="
+        background: var(--p-surface-50);
+        border-color: var(--p-content-border-color);
+      "
+    >
+      <div class="flex items-center">
+        <Checkbox v-model="confirmationCheckboxValue" value="isConfirmed" inputId="confirmation" />
+        <label for="confirmation" class="ml-3 text-base font-medium cursor-pointer" style="color: var(--p-text-color)">{{
+          props.confirmationCheckboxLabel ?? 'Click to continue'
+        }}</label>
+      </div>
     </div>
   </div>
 </template>
