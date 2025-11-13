@@ -11,7 +11,7 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref, toRefs } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { fastHash } from '../../infrastructure/fastHash'
 import type { StepWizardShellProps } from '../../models/componentProps/StepWizardShellProps'
 import VuescapeButton from '../VuescapeButton.vue'
@@ -119,41 +119,14 @@ function handleBack() {
 function handleCancel() {
   emit('cancel')
 }
-
-let styleTag: HTMLStyleElement | null = null
-
-/**
- * Dynamically add CSS to handle responsive layout.
- * Use the maxContainerWidth from the theme to set the max-width of the inner container.
- * This is done as a dynamic style because media query must be a static value so to avoid
- * hardcoding the value, we use the theme prop injected dynamically.
- */
-onMounted(() => {
-  styleTag = document.createElement('style')
-  styleTag.textContent = `
-    @media (max-width: ${uiElement.value.maxContainerWidth}) {
-      .wizard-buttons-inner {
-        max-width: 100%;
-        padding: 0 1rem;
-      }
-    }
-  `
-  document.head.appendChild(styleTag)
-})
-
-/**
- * Remove the style tag from the parent when the component is unmounted
- */
-onUnmounted(() => {
-  if (styleTag && styleTag.parentNode) {
-    styleTag.parentNode.removeChild(styleTag)
-  }
-})
 </script>
 
 <template>
   <div class="step-wizard-container">
-    <div v-if="uiElement.title || uiElement.helpCenterUrl" class="relative mb-6 flex items-center justify-center">
+    <div
+      v-if="uiElement.title || uiElement.helpCenterUrl"
+      class="relative mb-6 flex items-center justify-center"
+    >
       <!-- Centered title -->
       <div v-if="uiElement.title" class="text-xl font-bold">
         {{ uiElement.title }}
@@ -163,13 +136,14 @@ onUnmounted(() => {
           v-if="uiElement.helpCenterUrl"
           target="_blank"
           :href="uiElement.helpCenterUrl"
-          class="text-primary font-bold text-xl"
-          title="Help">
-            <i class="far fa-circle-question primary"/>
+          class="text-primary text-xl font-bold"
+          title="Help"
+        >
+          <i class="far fa-circle-question primary" />
         </a>
       </div>
     </div>
-  <KeepAlive>
+    <KeepAlive>
       <component
         v-if="stepComponent"
         :key="`${engine.currentStepId.value}-${propsHash}`"
@@ -180,12 +154,9 @@ onUnmounted(() => {
         @can-continue="handleCanContinue"
       />
     </KeepAlive>
-    <div class="wizard-buttons fixed right-0 bottom-0 left-0 mb-12">
+    <div class="wizard-buttons mt-12 mb-12">
       <!-- Inner container to align buttons with main content -->
-      <div
-        class="wizard-buttons-inner mx-auto"
-        style="width: calc(var(--p-max-container-width) + 40px)"
-      >
+      <div class="wizard-buttons-inner mx-auto">
         <div class="flex items-center">
           <!-- Left side container: Back button (if any) -->
           <div class="flex flex-none">
