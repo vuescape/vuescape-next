@@ -30,7 +30,6 @@ emit('update', isConfirmed.value)
     style="
       background: var(--p-content-background);
       border: 1px solid var(--p-content-border-color);
-      max-width: 680px;
     "
   >
     <!-- Dialog Header -->
@@ -42,7 +41,7 @@ emit('update', isConfirmed.value)
         border-color: var(--p-content-border-color);
       "
     >
-      <h3 class="text-xl font-semibold m-0" style="color: var(--p-text-color)">
+      <h3 class="text-xl font-semibold text-center m-0" style="color: var(--p-text-color)">
         {{ props.title }}
       </h3>
     </div>
