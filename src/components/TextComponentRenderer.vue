@@ -41,6 +41,11 @@ defineProps<TextComponentPayload>()
   margin-bottom: 0.5rem;
 }
 .html {
+  font-size: 18px;
   margin-bottom: 0.5rem;
+}
+.html :deep(a) {
+  text-decoration: underline;
+  color: var(--p-primary-color);
 }
 </style>
