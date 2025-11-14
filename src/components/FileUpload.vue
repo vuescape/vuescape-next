@@ -35,7 +35,7 @@ const files = ref<Array<File>>([])
 const props = withDefaults(defineProps<FileUploadProps>(), {
   maxFileSizeInBytes: 5 * 1024 * 1024, // 5MB default
   acceptFileTypeExtensions: () => [],
-  uploadInstructionText: 'Drag and drop or click to choose your file'
+  uploadInstructionText: 'drag and drop or click to choose your file'
 })
 
 const isValid = computed(() => {
