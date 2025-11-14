@@ -14,7 +14,9 @@ export default {}
 import { computed, ref, toRefs } from 'vue'
 import { fastHash } from '../../infrastructure/fastHash'
 import type { StepWizardShellProps } from '../../models/componentProps/StepWizardShellProps'
-import VuescapeButton from '../VuescapeButton.vue'
+import type { ButtonConfig, ButtonDefinition, ButtonPosition } from '../../models/wizard/ButtonConfig'
+import { DEFAULT_BUTTON_CONFIG } from '../../models/wizard/ButtonConfig'
+import WizardNavigationButtons from './WizardNavigationButtons.vue'
 
 const emit = defineEmits<{
   (e: 'update', stepId: string, payload: any): void
@@ -26,21 +28,13 @@ const props = defineProps<StepWizardShellProps>()
 const {
   title,
   helpCenterUrl,
-  backButtonText,
-  nextButtonText,
-  lastButtonText,
-  maxContainerWidth,
-  shouldShowCancelButton
+  maxContainerWidth
 } = toRefs(props)
 
 const uiElement = computed(() => ({
-  previousStepButtonText: backButtonText.value ?? 'Back',
-  nextStepButtonText: nextButtonText.value ?? 'Next',
-  lastStepButtonText: lastButtonText.value ?? 'Finish',
   title: title.value,
   helpCenterUrl: helpCenterUrl.value,
-  maxContainerWidth: maxContainerWidth.value ?? '1070px',
-  shouldShowCancelButton: shouldShowCancelButton.value ?? false
+  maxContainerWidth: maxContainerWidth.value ?? '1070px'
 }))
 
 /**
@@ -74,6 +68,100 @@ const propsHash = computed(() => {
 })
 
 const canContinue = ref(false)
+
+/**
+ * Helper function to merge button definitions with fallback priority
+ */
+function mergeButtonDefinition(
+  stepDef: ButtonDefinition | undefined,
+  defaultDef: ButtonDefinition | undefined,
+  baseDef: ButtonDefinition
+): ButtonDefinition {
+  return {
+    visible: stepDef?.visible ?? defaultDef?.visible ?? baseDef.visible,
+    position: stepDef?.position ?? defaultDef?.position ?? baseDef.position,
+    label: stepDef?.label ?? defaultDef?.label ?? baseDef.label,
+    variant: stepDef?.variant ?? defaultDef?.variant ?? baseDef.variant,
+    disabled: stepDef?.disabled ?? defaultDef?.disabled ?? baseDef.disabled
+  }
+}
+
+/**
+ * Resolves the button configuration for the current step.
+ * Priority: step buttonConfig → defaultButtonConfig → DEFAULT_BUTTON_CONFIG
+ */
+const resolvedButtonConfig = computed<ButtonConfig>(() => {
+  const currentNode = props.engine.currentNode.value
+  const nodeConfig = currentNode.buttonConfig
+
+  // Resolve node button config (could be static or function)
+  let stepConfig: ButtonConfig | undefined
+  if (nodeConfig) {
+    stepConfig = typeof nodeConfig === 'function'
+      ? nodeConfig(props.engine.context)
+      : nodeConfig
+  }
+
+  const defaultConfig = props.defaultButtonConfig
+
+  // Merge configurations with fallbacks
+  const previous = mergeButtonDefinition(
+    stepConfig?.previous,
+    defaultConfig?.previous,
+    DEFAULT_BUTTON_CONFIG.previous!
+  )
+
+  const next = mergeButtonDefinition(
+    stepConfig?.next,
+    defaultConfig?.next,
+    DEFAULT_BUTTON_CONFIG.next!
+  )
+
+  const cancel = mergeButtonDefinition(
+    stepConfig?.cancel,
+    defaultConfig?.cancel,
+    DEFAULT_BUTTON_CONFIG.cancel!
+  )
+
+  // Apply dynamic overrides for disabled states and labels
+  return {
+    previous: {
+      ...previous,
+      disabled: stepConfig?.previous?.disabled ?? defaultConfig?.previous?.disabled ?? props.engine.context.history.length <= 1
+    },
+    next: {
+      ...next,
+      label: stepConfig?.next?.label ?? defaultConfig?.next?.label ??
+        (props.engine.isLastStep.value ? 'Finish' : DEFAULT_BUTTON_CONFIG.next!.label),
+      disabled: stepConfig?.next?.disabled ?? defaultConfig?.next?.disabled ?? !canContinue.value
+    },
+    cancel
+  }
+})
+
+/**
+ * Groups buttons by position for rendering
+ */
+const buttonsByPosition = computed(() => {
+  const config = resolvedButtonConfig.value
+  const groups: Record<ButtonPosition, Array<{ type: 'previous' | 'next' | 'cancel', config: ButtonDefinition }>> = {
+    left: [],
+    center: [],
+    right: []
+  }
+
+  if (config.previous?.visible) {
+    groups[config.previous.position!].push({ type: 'previous', config: config.previous })
+  }
+  if (config.next?.visible) {
+    groups[config.next.position!].push({ type: 'next', config: config.next })
+  }
+  if (config.cancel?.visible) {
+    groups[config.cancel.position!].push({ type: 'cancel', config: config.cancel })
+  }
+
+  return groups
+})
 
 /**
  * Handles updates triggered by wizard step changes.
@@ -157,31 +245,12 @@ function handleCancel() {
     <div class="wizard-buttons mt-12 mb-12">
       <!-- Inner container to align buttons with main content -->
       <div class="wizard-buttons-inner mx-auto">
-        <div class="flex items-center">
-          <!-- Left side container: Back button (if any) -->
-          <div class="flex flex-none">
-            <VuescapeButton
-              :disabled="engine.context.history.length <= 1"
-              :label="uiElement.previousStepButtonText"
-              @click="handleBack"
-            />
-          </div>
-          <div v-if="uiElement.shouldShowCancelButton" class="mr-6 ml-auto flex items-center">
-            <VuescapeButton label="Cancel" :outlined="true" @click="handleCancel" />
-          </div>
-          <!-- Right side container: Next/Finish butt~ons, pushed right with ml-auto -->
-          <div class="ml-auto flex gap-2">
-            <VuescapeButton
-              :disabled="!canContinue"
-              :label="
-                engine.isLastStep
-                  ? props.lastButtonText || 'Finish'
-                  : props.nextButtonText || 'Next'
-              "
-              @click="handleNext"
-            />
-          </div>
-        </div>
+        <WizardNavigationButtons
+          :buttonsByPosition="buttonsByPosition"
+          @previous="handleBack"
+          @next="handleNext"
+          @cancel="handleCancel"
+        />
       </div>
     </div>
   </div>

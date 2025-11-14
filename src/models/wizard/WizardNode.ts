@@ -1,5 +1,6 @@
 import type { WizardComponent } from './WizardComponent'
 import type { WizardContext } from './WizardContext'
+import type { WizardButtonConfig } from './ButtonConfig'
 
 /**
  * Represents a node in a wizard flow, defining the component to render,
@@ -42,4 +43,14 @@ export interface WizardNode<Props = any> {
    * @returns The ID of the next wizard node, or `null` if there is no next node.
    */
   next: (ctx: WizardContext) => string | null
+
+  /**
+   * Optional configuration for the wizard navigation buttons (previous, next, cancel).
+   * Can be a static ButtonConfig object or a function that generates the config
+   * based on the current wizard context.
+   *
+   * @param ctx - The current context of the wizard.
+   * @returns Button configuration for this step.
+   */
+  buttonConfig?: WizardButtonConfig
 }
