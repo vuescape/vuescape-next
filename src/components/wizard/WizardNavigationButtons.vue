@@ -25,9 +25,9 @@ function handleButtonClick(type: 'previous' | 'next' | 'cancel') {
 </script>
 
 <template>
-  <div class="flex w-full items-center justify-between">
+  <div class="grid grid-cols-3 w-full items-center">
     <!-- Left position buttons -->
-    <div class="flex gap-2">
+    <div class="flex gap-2 justify-start">
       <template v-for="button in props.buttonsByPosition.left" :key="button.type">
         <VuescapeButton
           :disabled="button.config.disabled"
@@ -39,7 +39,7 @@ function handleButtonClick(type: 'previous' | 'next' | 'cancel') {
     </div>
 
     <!-- Center position buttons -->
-    <div class="flex gap-2">
+    <div class="flex gap-2 justify-center">
       <template v-for="button in props.buttonsByPosition.center" :key="button.type">
         <VuescapeButton
           :disabled="button.config.disabled"
@@ -51,7 +51,7 @@ function handleButtonClick(type: 'previous' | 'next' | 'cancel') {
     </div>
 
     <!-- Right position buttons -->
-    <div class="flex gap-2">
+    <div class="flex gap-2 justify-end">
       <template v-for="button in props.buttonsByPosition.right" :key="button.type">
         <VuescapeButton
           :disabled="button.config.disabled"
