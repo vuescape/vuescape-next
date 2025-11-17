@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import StepWizardShell from '../../wizard/StepWizardShell.vue'
-import { ref, defineComponent, markRaw } from 'vue'
+import { ref, defineComponent, markRaw, computed } from 'vue'
+import type { WizardButtonConfig } from '../../../models/wizard/ButtonConfig'
 
 // Mock step component for testing
 const DummyStep = markRaw(defineComponent({
@@ -10,15 +11,16 @@ const DummyStep = markRaw(defineComponent({
   template: `<div data-testid="dummy-step">{{ foo }}</div>`
 }))
 
-function createEngineMock({ isLastStep = false, historyLength = 2 } = {}) {
+function createEngineMock({ isLastStep = false, historyLength = 2, buttonConfig = undefined }: { isLastStep?: boolean, historyLength?: number, buttonConfig?: WizardButtonConfig } = {}) {
   return {
-    currentNode: ref({
-      value: {
-        component: DummyStep,
-        props: { foo: 'bar' },
-        hash: undefined
-      }
-    }),
+    currentNode: computed(() => ({
+      id: 'step-1',
+      component: DummyStep,
+      props: { foo: 'bar' },
+      hash: undefined,
+      buttonConfig,
+      next: () => null
+    })),
     props: ref({ foo: 'bar' }),
     currentStepId: ref('step-1'),
     isLastStep: ref(isLastStep),
@@ -37,7 +39,7 @@ describe('StepWizardShell', () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
       props: {
-        engine,        
+        engine: engine as any,
         title: 'My Wizard'
       }
     })
@@ -48,7 +50,7 @@ describe('StepWizardShell', () => {
   it.skip('renders step component with correct props', () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
-      props: { engine }
+      props: { engine: engine as any }
     })
     expect(wrapper.find('[data-testid="dummy-step"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="dummy-step"]').text()).toBe('bar')
@@ -57,7 +59,7 @@ describe('StepWizardShell', () => {
   it.skip('emits update and calls engine.updateStepState on step update', async () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
-      props: { engine }
+      props: { engine: engine as any }
     })
     await wrapper.findComponent(DummyStep).vm.$emit('update', { foo: 'baz' })
     expect(engine.updateStepState).toHaveBeenCalledWith('step-1', { foo: 'baz' })
@@ -68,7 +70,7 @@ describe('StepWizardShell', () => {
   it.skip('enables Next button only when canContinue is true', async () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
-      props: { engine }
+      props: { engine: engine as any }
     })
     // Initially disabled
     const nextBtn = wrapper.findAllComponents({ name: 'VuescapeButton' }).at(-1)!
@@ -84,7 +86,7 @@ describe('StepWizardShell', () => {
   it.skip('calls engine.goNext or emits finished on Next button click', async () => {
     // Not last step
     const engine = createEngineMock({ isLastStep: false })
-    const wrapper = mount(StepWizardShell, { props: { engine } })    
+    const wrapper = mount(StepWizardShell, { props: { engine: engine as any } })
     await wrapper.findComponent(DummyStep).vm.$emit('can-continue', true)
     await wrapper.vm.$nextTick()
     await wrapper.findAllComponents({ name: 'VuescapeButton' }).at(-1)!.trigger('click')
@@ -92,7 +94,7 @@ describe('StepWizardShell', () => {
 
     // Last step
     const engine2 = createEngineMock({ isLastStep: true })
-    const wrapper2 = mount(StepWizardShell, { props: { engine: engine2 } })
+    const wrapper2 = mount(StepWizardShell, { props: { engine: engine2 as any } })
     await wrapper2.findComponent(DummyStep).vm.$emit('can-continue', true)
     await wrapper2.vm.$nextTick()
     await wrapper2.findAllComponents({ name: 'VuescapeButton' }).at(-1)!.trigger('click')
@@ -102,7 +104,7 @@ describe('StepWizardShell', () => {
 
   it('calls engine.goBack on Back button click', async () => {
     const engine = createEngineMock()
-    const wrapper = mount(StepWizardShell, { props: { engine } })
+    const wrapper = mount(StepWizardShell, { props: { engine: engine as any } })
     await wrapper.findAllComponents({ name: 'VuescapeButton' }).at(0)!.trigger('click')
     expect(engine.goBack).toHaveBeenCalled()
   })
@@ -110,7 +112,7 @@ describe('StepWizardShell', () => {
   it('disables Back and Cancel buttons if history length <= 1', () => {
     const engine = createEngineMock({ historyLength: 1 })
     const wrapper = mount(StepWizardShell, {
-      props: { engine, shouldShowCancelButton: true }
+      props: { engine: engine as any, shouldShowCancelButton: true }
     })
     const btns = wrapper.findAllComponents({ name: 'VuescapeButton' })
     // Back button
@@ -120,7 +122,7 @@ describe('StepWizardShell', () => {
   it('shows Cancel button if shouldShowCancelButton is true and emits cancel', async () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
-      props: { engine, shouldShowCancelButton: true }
+      props: { engine: engine as any, shouldShowCancelButton: true }
     })
     const cancelBtn = wrapper
       .findAllComponents({ name: 'VuescapeButton' })
@@ -130,19 +132,45 @@ describe('StepWizardShell', () => {
     expect(wrapper.emitted('cancel')).toBeTruthy()
   })
 
-  it('uses custom button texts if provided', () => {
+  it('uses custom button config if provided', () => {
     const engine = createEngineMock()
     const wrapper = mount(StepWizardShell, {
       props: {
-        engine,
-        backButtonText: 'Go Back',
-        nextButtonText: 'Proceed',
-        lastButtonText: 'Complete'
+        engine: engine as any,
+        defaultButtonConfig: {
+          previous: { label: 'Go Back', position: 'left', visible: true },
+          next: { label: 'Proceed', position: 'right', visible: true },
+          cancel: { label: 'Cancel', position: 'center', visible: true }
+        }
       }
     })
     const btns = wrapper.findAllComponents({ name: 'VuescapeButton' })
     expect(btns.at(0)!.text()).toBe('Go Back')
-    // Next/Finish button
-    expect(btns.at(-1)!.text()).toBe('Complete')
+    expect(btns.at(1)!.text()).toBe('Cancel')
+    expect(btns.at(2)!.text()).toBe('Proceed')
+  })
+
+  it('merges step-level buttonConfig with default buttonConfig', () => {
+    const engineWithStepConfig = createEngineMock({
+      buttonConfig: {
+        next: { label: 'Continue', position: 'right', visible: true }
+      }
+    })
+
+    const wrapper = mount(StepWizardShell, {
+      props: {
+        engine: engineWithStepConfig as any,
+        defaultButtonConfig: {
+          previous: { label: 'Go Back', position: 'left', visible: true },
+          cancel: { label: 'Cancel', position: 'center', visible: true }
+        }
+      }
+    })
+
+    const btns = wrapper.findAllComponents({ name: 'VuescapeButton' })
+    expect(btns.at(0)!.text()).toBe('Go Back')
+    expect(btns.at(1)!.text()).toBe('Cancel')
+    // Step-level config should override for next button
+    expect(btns.at(2)!.text()).toBe('Continue')
   })
 })
