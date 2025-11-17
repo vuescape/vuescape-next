@@ -34,7 +34,7 @@ const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 
 const dtRef = ref<any>(null)
 const tableWrapperRef = ref<HTMLElement | null>(null)
-const dynamicScrollHeight = ref('600px')
+const dynamicScrollHeight = ref('576px')
 
 const localState = reactive({
   id: props.id,
@@ -69,11 +69,11 @@ function updateTableHeight() {
     // Calculate available height: viewport height - current top position - buffer for footer
     const viewportHeight = window.innerHeight
     const topPosition = rect.top
-    const footerBuffer = 60 // Space for footer and padding
+    const footerBuffer = 84 // Space for footer and padding
     const availableHeight = viewportHeight - topPosition - footerBuffer
 
-    // Use available height with minimum of 300px
-    const tableHeight = Math.max(300, availableHeight)
+    // Use available height with minimum of 276px
+    const tableHeight = Math.max(276, availableHeight)
     dynamicScrollHeight.value = `${tableHeight}px`
   }
 }
@@ -267,11 +267,11 @@ initializeColumnIdToSortFieldMap()
  * which sorts before any other character, ensuring empty strings appear first.
  */
 const enhancedRows = computed(() => {
-  return localState.rows.map(row => {
+  return localState.rows.map((row) => {
     const enhancedRow = { ...row, cells: { ...row.cells } }
 
     // Only modify cells that have empty string values
-    Object.keys(row.cells).forEach(columnId => {
+    Object.keys(row.cells).forEach((columnId) => {
       const cell = row.cells[columnId]
       if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
         const enhancedCell = { ...cell }
@@ -321,33 +321,33 @@ const enhancedRows = computed(() => {
       :stateKey="localState.id"
       :resizable-columns="false"
     >
-    <!-- v-model:sortField="sortingState.sortField"
+      <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
     @state-restore="stateRestore"
     @state-save="stateSave" -->
-    <template #empty>
-      <div class="text-center">
-        <p>No Results Found</p>
-      </div>
-    </template>
+      <template #empty>
+        <div class="text-center">
+          <p>No Results Found</p>
+        </div>
+      </template>
 
-    <template v-for="column in localState.columns" :key="column.id">
-      <Column
-        :field="column.id"
-        :header="column.headerText"
-        :sortable="column.isSortable"
-        :style="column.style"
-        :sortField="columnIdToSortFieldMap.get(column.id)"
-      >
-        <template #body="slotProps">
-          <span v-if="slotProps.data.cells[column.id].component">
-            <PaneComponentRenderer :component="slotProps.data.cells[column.id].component" />
-          </span>
-          <span v-else>{{ getDisplayValue(slotProps.data, column.id) }}</span>
-        </template>
-      </Column>
-    </template>
-  </DataTable>
+      <template v-for="column in localState.columns" :key="column.id">
+        <Column
+          :field="column.id"
+          :header="column.headerText"
+          :sortable="column.isSortable"
+          :style="column.style"
+          :sortField="columnIdToSortFieldMap.get(column.id)"
+        >
+          <template #body="slotProps">
+            <span v-if="slotProps.data.cells[column.id].component">
+              <PaneComponentRenderer :component="slotProps.data.cells[column.id].component" />
+            </span>
+            <span v-else>{{ getDisplayValue(slotProps.data, column.id) }}</span>
+          </template>
+        </Column>
+      </template>
+    </DataTable>
   </div>
 </template>
 

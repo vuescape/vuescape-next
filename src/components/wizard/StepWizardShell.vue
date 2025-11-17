@@ -256,4 +256,8 @@ function handleCancel() {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.step-wizard-container {
+  margin-top: 1.5rem;
+}
+</style>
