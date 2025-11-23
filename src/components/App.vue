@@ -18,16 +18,28 @@ import { RouterView, useRoute } from 'vue-router'
 import type { AppComponentProps } from '../models/componentProps/AppComponentProps'
 import { useNotificationStore } from '../stores/useNotificationStore'
 import NotificationMessages from './NotificationMessages.vue'
+import AppNavigation from './AppNavigation.vue'
 
 import { Guid, type AppInfo } from '../models'
 import type { NotificationMessage } from '../models/NotificationMessage'
-import { useAppInfoStore, type AppInfoStore, type NotificationStore } from '../stores'
+import {
+  useAppInfoStore,
+  useNavigationStore,
+  type AppInfoStore,
+  type NotificationStore
+} from '../stores'
 
 const notificationStore = useNotificationStore() as NotificationStore
 const messages = notificationStore.messages as Array<NotificationMessage>
 const props = defineProps<AppComponentProps>()
 
 const route = useRoute()
+
+// Navigation state from store
+const navigationStore = useNavigationStore()
+
+// Determine if current route needs navigation
+const showNav = computed(() => route.meta.showNav === true)
 
 if (props.trackingService) {
   props.trackingService.initializeProvider()
@@ -60,62 +72,97 @@ const appInfoMessages = computed(
 
 <template>
   <div
-    class="flex min-h-screen flex-col"
-    v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
+    class="app__component--container"
+    :class="[
+      {
+        'app__component--pinned': showNav && navigationStore.isPinned
+      }
+    ]"
   >
-    <div>
+    <div
+      class="flex min-h-screen flex-col"
+      :style="{
+        marginLeft: showNav && navigationStore.isPinned ? `${navigationStore.navWidth}px` : '',
+        marginRight: showNav && navigationStore.isPinned ? '0' : ''
+      }"
+      v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
+    >
+      <!-- Fixed Header -->
+      <div>
+        <Suspense>
+          <component
+            :is="props.headerBootstrappedComponent.component"
+            v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
+            ref="theHeader"
+            class="header-component fixed"
+            v-bind="props.headerBootstrappedComponent.props"
+          ></component>
+        </Suspense>
+      </div>
+
+      <!-- Main Content Area with Optional Navigation -->
+      <div ref="appContainer" v-loading="false" class="app__container--scroll">
+        <transition mode="out-in" name="app__component--transition">
+          <div
+            v-if="true"
+            class="mt-2 flex pt-[36px]"
+            :class="{ 'pb-[36px]': props.footerBootstrappedComponent?.component }"
+          >
+            <!-- Main Content -->
+            <main ref="main" class="flow-root flex-1">
+              <NotificationMessages
+                v-if="appInfoMessages.length && !route.meta.hideLayout"
+                :messages="appInfoMessages"
+                @remove="removeMessage"
+              />
+              <NotificationMessages
+                v-if="messages.length && !route.meta.hideLayout"
+                :messages="messages"
+                @remove="removeMessage"
+              />
+              <Suspense>
+                <RouterView />
+              </Suspense>
+            </main>
+          </div>
+        </transition>
+      </div>
+
+      <!-- Fixed Footer -->
       <Suspense>
         <component
-          :is="props.headerBootstrappedComponent.component"
-          v-if="props.headerBootstrappedComponent?.component && !route.meta.hideLayout"
-          ref="theHeader"
-          class="header-component fixed"
-          v-bind="props.headerBootstrappedComponent.props"
+          :is="props.footerBootstrappedComponent.component"
+          v-if="props.footerBootstrappedComponent?.component"
+          ref="theFooter"
+          class="fixed inset-x-0 bottom-0 z-50 h-9 bg-white"
+          v-bind="props.footerBootstrappedComponent.props"
         ></component>
       </Suspense>
-    </div>
-    <div ref="appContainer" v-loading="false" class="app__container--scroll">
-      <transition mode="out-in" name="app__component--transition">
-        <!-- class="main-div grow overflow-y-auto" v-if="true"> -->
-        <main ref="main" class="flex-1 pt-[36px] mt-2 flow-root" v-if="true">
-          <NotificationMessages
-            v-if="appInfoMessages.length && !route.meta.hideLayout"
-            :messages="appInfoMessages"
-            @remove="removeMessage"
-          />
-          <NotificationMessages
-            v-if="messages.length && !route.meta.hideLayout"
-            :messages="messages"
-            @remove="removeMessage"
-          />
-          <!--          Style margin-bottom used because icon throws alignment off by 1px -->
-          <!--          <Button label="Submit2"  iconPos="right" icon="fad fa-trash-alt" style="margin-bottom: 1px" />-->
-          <!--          Maybe need to do instance management using key -->
-          <Suspense>
-            <RouterView />
-          </Suspense>
-        </main>
-      </transition>
-    </div>
-    <Suspense>
-        <!-- class="footer-component fixed" -->
-      <component
-        :is="props.footerBootstrappedComponent.component"
-        v-if="props.footerBootstrappedComponent?.component"
-        ref="theFooter"
-        class="fixed bottom-0 inset-x-0 h-9 bg-white z-50"
-        v-bind="props.footerBootstrappedComponent.props"
-      ></component>
-    </Suspense>
 
-    <template v-if="props.additionalComponents?.length">
-      <component
-        :is="additionalComponent.component"
-        v-for="additionalComponent in props.additionalComponents"
-        :key="additionalComponent.component.name"
-        v-bind="additionalComponent.props"
-      />
-    </template>
+      <!-- Navigation Component (handles drawer and teleport) -->
+      <AppNavigation
+        v-if="showNav && props.navigationBootstrappedComponent?.component"
+        v-model:pinned="navigationStore.isPinned"
+        v-model:startOpen="navigationStore.isOpen"
+        :navWidth="navigationStore.navWidth"
+        @update:navWidth="navigationStore.setNavWidth"
+      >
+        <component
+          :is="props.navigationBootstrappedComponent.component"
+          v-bind="props.navigationBootstrappedComponent.props"
+        />
+      </AppNavigation>
+
+      <!-- Additional Components -->
+      <template v-if="props.additionalComponents?.length">
+        <component
+          :is="additionalComponent.component"
+          v-for="additionalComponent in props.additionalComponents"
+          :key="additionalComponent.component.name"
+          v-bind="additionalComponent.props"
+        />
+      </template>
+    </div>
   </div>
 </template>
 
