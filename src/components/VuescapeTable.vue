@@ -320,6 +320,7 @@ const enhancedRows = computed(() => {
       stateStorage="session"
       :stateKey="localState.id"
       :resizable-columns="false"
+      size="small"
     >
       <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
