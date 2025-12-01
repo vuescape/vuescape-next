@@ -70,5 +70,7 @@ const toggleMenu = (e: Event) => menuRef.value.toggle(e)
 /* TODO: Add this to the theme */
 .action-button {
   font-size: 14px;
+  line-height: 0;
+  height: 26px;
 }
 </style>
