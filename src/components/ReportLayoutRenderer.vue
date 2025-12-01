@@ -26,12 +26,12 @@ import type { ReportLayout } from '../models'
 const props = defineProps<ReportLayoutRendererProps>()
 
 // Set up reactive reportLayout that initializes from props and updates reactively
-const reportLayouts = ref(
+const reportLayouts = ref<ReportLayout[]>(
   props.reportLayouts || [
     {
       id: 'null-report',
       title: '',
-      paneTarget: ReportPaneKind.CenterPane,
+      targetPane: ReportPaneKind.CenterPane,
       content: null
     }
   ]
