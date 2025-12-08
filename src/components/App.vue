@@ -38,9 +38,6 @@ const route = useRoute()
 // Navigation state from store
 const navigationStore = useNavigationStore()
 
-// Determine if current route needs navigation
-const showNav = computed(() => route.meta.showNav === true)
-
 if (props.trackingService) {
   props.trackingService.initializeProvider()
 }
@@ -68,6 +65,11 @@ const appInfoMessages = computed(
         }) as NotificationMessage
     ) || []
 )
+
+const isFullWidth = computed(() => {
+  const result = route.meta.fullWidth === true
+  return result
+})
 </script>
 
 <template>
@@ -75,15 +77,15 @@ const appInfoMessages = computed(
     class="app__component--container"
     :class="[
       {
-        'app__component--pinned': showNav && navigationStore.isPinned
+        'app__component--full-width': navigationStore.isPinned || isFullWidth
       }
     ]"
   >
     <div
       class="flex min-h-screen flex-col"
       :style="{
-        marginLeft: showNav && navigationStore.isPinned ? `${navigationStore.navWidth}px` : '',
-        marginRight: showNav && navigationStore.isPinned ? '0' : ''
+        marginLeft: navigationStore.isPinned ? `${navigationStore.navWidth}px` : '',
+        marginRight: navigationStore.isPinned ? '0' : ''
       }"
       v-on="globalClickHandler ? { click: props.globalClickHandler } : {}"
     >
@@ -141,7 +143,7 @@ const appInfoMessages = computed(
 
       <!-- Navigation Component (handles drawer and teleport) -->
       <AppNavigation
-        v-if="showNav && props.navigationBootstrappedComponent?.component"
+        v-if="props.navigationBootstrappedComponent?.component"
         v-model:pinned="navigationStore.isPinned"
         v-model:startOpen="navigationStore.isOpen"
         :navWidth="navigationStore.navWidth"
