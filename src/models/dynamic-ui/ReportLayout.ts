@@ -1,4 +1,5 @@
 import type { ReportPaneKind } from '../feature/ReportPaneKind'
+import { ActionButtonComponent } from './pane-components'
 import type { PaneLayout } from './PaneLayout'
 
 /**
@@ -35,4 +36,17 @@ export interface ReportLayout {
    * @optional
    */
   targetPane?: ReportPaneKind
+
+  /**
+   * The detail text or identifier for the report.
+   * This provides additional information about the report's content or purpose.
+   * @optional
+   */
+  reportDetail?: string
+
+  /**
+   * The action button component configuration for the report.
+   * Defines the button that triggers report-specific actions.
+   */
+  actionButton?: ActionButtonComponent
 }
