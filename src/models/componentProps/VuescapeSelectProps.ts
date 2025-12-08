@@ -56,4 +56,11 @@ export interface VuescapeSelectProps {
    * @optional
    */
   cssClass?: string
+
+  /**
+   * The size variant of the select component.
+   * @optional
+   * @default 'default'
+   */
+  size?: 'default' | 'small'
 }

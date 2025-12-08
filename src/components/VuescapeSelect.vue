@@ -38,7 +38,8 @@ const initializedProps = ref<VuescapeSelectProps>({
   name: props.name ?? '',
   placeholder: props.placeholder ?? 'Select an Item',
   disabled: props.disabled ?? false,
-  cssClass: props.cssClass ?? ''
+  cssClass: props.cssClass ?? '',
+  size: props.size ?? 'default'
 })
 
 const mySelect = ref(null)
@@ -160,7 +161,7 @@ onMounted(async () => {
       :placeholder="initializedProps.placeholder"
       option-label="displayName"
       class="my-class"
-      :class="initializedProps.cssClass"
+      :class="[initializedProps.cssClass, { 'vuescape-select--small': initializedProps.size === 'small' }]"
       :disabled="initializedProps.disabled"
       v-bind="attrs"
       v-on="listeners"
@@ -178,5 +179,24 @@ onMounted(async () => {
 .single-option-text {
   font-weight: 500;
   margin-right: 1rem;
+}
+
+/* Small size variant */
+:deep(.vuescape-select--small) {
+  min-height: 1.5rem;
+  height: 1.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+}
+
+:deep(.vuescape-select--small .p-select-label) {
+  padding: 0;
+  padding-left: 0.25rem;
+  font-size: .875rem;
+}
+:deep(.vuescape-select--small .p-select-dropdown) {
+  justify-content: end;
 }
 </style>
