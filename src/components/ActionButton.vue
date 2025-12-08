@@ -23,6 +23,7 @@ import { ReportPaneKind } from '../models/feature/ReportPaneKind'
 
 const props = defineProps<ActionButtonProps>()
 const menuRef = ref()
+const buttonRef = ref()
 const actionStore = useActionStore()
 
 function handleActionEvent(actionMenuItem: ActionMenuItem) {
@@ -50,11 +51,17 @@ const iconPos = computed(() => {
   return props.iconPosition ?? 'left'
 })
 
+const menuStyle = computed(() => {
+  const width = buttonRef.value?.$el?.offsetWidth
+  return width ? { minWidth: `${width}px` } : {}
+})
+
 const toggleMenu = (e: Event) => menuRef.value.toggle(e)
 </script>
 
 <template>
   <Button
+    ref="buttonRef"
     class="action-button"
     :label="label"
     :icon="icons"
@@ -63,7 +70,7 @@ const toggleMenu = (e: Event) => menuRef.value.toggle(e)
     :title="tooltip"
     @click="toggleMenu"
   />
-  <Menu ref="menuRef" :model="menuActions" popup />
+  <Menu ref="menuRef" :model="menuActions" :style="menuStyle" popup />
 </template>
 
 <style scoped>
