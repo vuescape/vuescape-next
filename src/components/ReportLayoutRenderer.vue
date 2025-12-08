@@ -14,6 +14,7 @@ export default {}
 <script setup lang="ts">
 import { ref, watch, computed, onMounted } from 'vue'
 
+import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import PaneLayoutRenderer from './PaneLayoutRenderer.vue'
 
 import Splitter from 'primevue/splitter'
@@ -73,6 +74,11 @@ const rightReportLayout = computed(() =>
   reportLayouts.value.find((layout) => layout.targetPane === ReportPaneKind.RightPane)
 )
 
+const actionButton = computed(() => {
+  const result = centerReportLayout.value?.actionButton
+  return result
+})
+
 // Computed properties checking if a specified pane exists and has > 0 width
 const leftPaneExistsWithWidth = computed(() => (leftReportLayout.value?.paneWidthPercent ?? 0) > 0)
 const centerPaneExistsWithWidth = computed(
@@ -89,31 +95,36 @@ const isOnlyCenterPane = computed(
     centerPaneExistsWithWidth.value
 )
 
-const getPageTitle = (reportLayouts: Array<ReportLayout>) => {
-  let title
-  const centerReportLayout = reportLayouts.find(
-    (layout) => layout.targetPane === ReportPaneKind.CenterPane
-  )
-  const leftReportLayout = reportLayouts.find(
-    (layout) => layout.targetPane === ReportPaneKind.LeftPane
-  )
-  const rightReportLayout = reportLayouts.find(
-    (layout) => layout.targetPane === ReportPaneKind.RightPane
-  )
+const reportDetail = computed(() => {
+  let result
 
-  if (centerReportLayout?.title) {
-    title = centerReportLayout.title
-  } else if (leftReportLayout?.title) {
-    title = leftReportLayout.title
-  } else if (rightReportLayout?.title) {
-    title = rightReportLayout.title
+  if (centerReportLayout.value?.reportDetail) {
+    result = centerReportLayout.value.reportDetail
+  } else if (leftReportLayout.value?.reportDetail) {
+    result = leftReportLayout.value.reportDetail
+  } else if (rightReportLayout.value?.reportDetail) {
+    result = rightReportLayout.value.reportDetail
+  }
+
+  return result
+})
+
+const pageTitle = computed(() => {
+  let title
+
+  if (centerReportLayout.value?.title) {
+    title = centerReportLayout.value.title
+  } else if (leftReportLayout.value?.title) {
+    title = leftReportLayout.value.title
+  } else if (rightReportLayout.value?.title) {
+    title = rightReportLayout.value.title
   }
 
   return title
-}
+})
 
 onMounted(() => {
-  const title = getPageTitle(reportLayouts.value)
+  const title = pageTitle.value
   if (title) {
     document.title = title
   }
@@ -122,6 +133,10 @@ onMounted(() => {
 
 <template>
   <!-- <h3>{{ reportLayout.title }}</h3> -->
+  <div v-if="reportDetail || actionButton" class="flex items-center justify-end gap-2">
+    <span class="mr-2">{{ reportDetail }}</span>
+    <PaneComponentRenderer :component="actionButton" v-if="actionButton"></PaneComponentRenderer>
+  </div>
   <PaneLayoutRenderer
     :data-paneKind="ReportPaneKind.CenterPane"
     :class="ReportPaneKind.CenterPane"
