@@ -187,6 +187,20 @@ function getDisplayValue(row: TableRow, columnId: string): string {
   return result
 }
 
+/**
+ * Retrieves the CSS style for a cell.
+ *
+ * @param row - The row object containing data.
+ * @param  columnId - The identifier for the column.
+ * @returns The style for the specified row and column.
+ */
+function getCellStyle(row: TableRow, columnId: string): Record<string, string> | undefined {
+  const cell = row.cells[columnId]
+  // Don't use the raw value even if there is no display value.
+  let result = cell?.cssStyles ?? undefined
+  return result
+}
+
 // function getDisplayHtml(row: TableRow, columnId: string): string {
 //   const text = getDisplayValue(row, columnId)
 //   return `<a href="https://www.cometrics.com">${text}</a>`
@@ -265,15 +279,18 @@ initializeColumnIdToSortFieldMap()
  * Enhanced rows with null character preprocessing for empty string sorting.
  * Replaces empty displayValue and comparableValue.stringValue with null character (\u0000)
  * which sorts before any other character, ensuring empty strings appear first.
+ * Optimized to only create new objects when necessary to reduce memory pressure.
  */
 const enhancedRows = computed(() => {
   return localState.rows.map((row) => {
-    const enhancedRow = { ...row, cells: { ...row.cells } }
+    // Check if any cells need modification first
+    let needsEnhancement = false
+    const cellsToEnhance: Record<string, any> = {}
 
-    // Only modify cells that have empty string values
-    Object.keys(row.cells).forEach((columnId) => {
+    for (const columnId in row.cells) {
       const cell = row.cells[columnId]
       if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
+        needsEnhancement = true
         const enhancedCell = { ...cell }
 
         if (cell.displayValue === '') {
@@ -287,11 +304,23 @@ const enhancedRows = computed(() => {
           }
         }
 
-        enhancedRow.cells[columnId] = enhancedCell
+        cellsToEnhance[columnId] = enhancedCell
       }
-    })
+    }
 
-    return enhancedRow
+    // Only create new row/cells objects if modifications are needed
+    if (needsEnhancement) {
+      return {
+        ...row,
+        cells: {
+          ...row.cells,
+          ...cellsToEnhance
+        }
+      }
+    }
+
+    // Return original row if no enhancement needed
+    return row
   })
 })
 </script>
@@ -341,10 +370,10 @@ const enhancedRows = computed(() => {
           :sortField="columnIdToSortFieldMap.get(column.id)"
         >
           <template #body="slotProps">
-            <span v-if="slotProps.data.cells[column.id].component">
+            <div v-if="slotProps.data.cells[column.id].component" class="cell-content">
               <PaneComponentRenderer :component="slotProps.data.cells[column.id].component" />
-            </span>
-            <span v-else>{{ getDisplayValue(slotProps.data, column.id) }}</span>
+            </div>
+            <div v-else :style="getCellStyle(slotProps.data, column.id)" class="cell-content">{{ getDisplayValue(slotProps.data, column.id) }}</div>
           </template>
         </Column>
       </template>
@@ -352,6 +381,19 @@ const enhancedRows = computed(() => {
   </div>
 </template>
 
-<style scoped>
-/* Table styles if needed */
+<style>
+  .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+    padding: 0 !important;
+  }
+  .p-datatable-tbody > tr > td {
+    padding: 0 !important;
+  }
+
+  .cell-content {
+    padding: var(--p-datatable-body-cell-sm-padding);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 </style>
