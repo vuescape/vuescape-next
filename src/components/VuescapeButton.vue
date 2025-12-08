@@ -22,7 +22,8 @@ const props = withDefaults(defineProps<VuescapeButtonProps>(), {
   iconPos: '' as IconPosition,
   disabled: false,
   cssClass: '',
-  outlined: false
+  outlined: false,
+  size: 'default'
 })
 
 /**
@@ -44,7 +45,10 @@ const handleClick = (event: Event) => {
 
 <template>
   <Button
-    :class="[props.cssClass, { 'vuescape-button--with-icon': props.icon }]"
+    :class="[
+      props.cssClass,
+      { 'vuescape-button--with-icon': props.icon, 'vuescape-button--small': props.size === 'small' }
+    ]"
     :disabled="props.disabled"
     :icon="props.icon"
     :iconPos="props.iconPos"
@@ -57,5 +61,27 @@ const handleClick = (event: Event) => {
 <style scoped>
 .vuescape-button--with-icon {
   margin-bottom: 1px;
+}
+
+/* Small size variant - applying to the component wrapper */
+.vuescape-button--small {
+  min-height: 1.5rem !important;
+  height: 1.5rem !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.875rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+/* Target the PrimeVue button's internal label */
+.vuescape-button--small :deep(.p-button-label) {
+  font-size: 0.875rem !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 2px;
 }
 </style>

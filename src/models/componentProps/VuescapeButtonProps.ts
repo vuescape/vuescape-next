@@ -40,4 +40,11 @@ export interface VuescapeButtonProps {
    * @default false
    */
   outlined?: boolean
+
+  /**
+   * The size variant of the button.
+   * @optional
+   * @default 'default'
+   */
+  size?: 'default' | 'small'
 }
