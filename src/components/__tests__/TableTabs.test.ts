@@ -228,8 +228,8 @@ describe('TableTabsComponent', () => {
     await flushPromises()
     await nextTick()
 
-    // Initially, only one tab is rendered
-    expect(wrapper.findAll('button.p-tab').length).toBe(1)
+    // Initially, no tabs are rendered (tabs are hidden when there's only 1)
+    expect(wrapper.findAll('button.p-tab').length).toBe(0)
 
     // Update props to add a new tab
     await wrapper.setProps({
@@ -239,7 +239,44 @@ describe('TableTabsComponent', () => {
       ]
     })
 
+    await flushPromises()
+    await nextTick()
+
     // Verify two tabs are now rendered
     expect(wrapper.findAll('button.p-tab').length).toBe(2)
+  })
+
+  it('renders tabs when there are exactly 2 tabs', async () => {
+    const props: TableTabsProps = {
+      id: 'testTabSet',
+      tabs: [
+        { id: 'tab1', label: 'First Tab', table: undefined },
+        { id: 'tab2', label: 'Second Tab', table: undefined }
+      ]
+    }
+
+    wrapper = createWrapper(props)
+    await flushPromises()
+    await nextTick()
+
+    // With 2 tabs, tabs should be rendered
+    const tabButtons = wrapper.findAll('button.p-tab')
+    expect(tabButtons.length).toBe(2)
+
+    // Verify labels are correct
+    expect(tabButtons[0].text()).toBe('First Tab')
+    expect(tabButtons[1].text()).toBe('Second Tab')
+
+    // Verify the first tab is active by default
+    expect(tabButtons[0].attributes('aria-selected')).toBe('true')
+    expect(tabButtons[1].attributes('aria-selected')).toBe('false')
+
+    // Click on the second tab
+    await tabButtons[1].trigger('click')
+    await nextTick()
+
+    // Verify the second tab is now active
+    expect(tabButtons[0].attributes('aria-selected')).toBe('false')
+    expect(tabButtons[1].attributes('aria-selected')).toBe('true')
   })
 })
