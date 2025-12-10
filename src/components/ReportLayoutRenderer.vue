@@ -12,7 +12,7 @@ export default {}
 </script>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted, provide } from 'vue'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import PaneLayoutRenderer from './PaneLayoutRenderer.vue'
@@ -25,6 +25,9 @@ import { ReportPaneKind } from '../models/feature/'
 import type { ReportLayout } from '../models'
 
 const props = defineProps<ReportLayoutRendererProps>()
+
+// Provide deepWatch setting to all child components (including dynamically loaded ones like VuescapeTable)
+provide('deepWatch', props.deepWatch ?? true)
 
 // Set up reactive reportLayout that initializes from props and updates reactively
 const reportLayouts = ref<ReportLayout[]>(
@@ -60,7 +63,7 @@ watch(
       reportLayouts.value = newReportLayouts
     }
   },
-  { immediate: true, deep: true } // Syncs immediately on mount and responds to deep changes
+  { immediate: true, deep: props.deepWatch ?? true } // Syncs immediately on mount; deep watch can be disabled for large datasets
 )
 
 // Computed properties for each pane layout

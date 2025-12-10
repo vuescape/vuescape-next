@@ -28,4 +28,11 @@ export interface VuescapeTableProps {
    * @default 0
    */
   initialScrollPosition?: number
+
+  /**
+   * Whether to use deep watching for prop changes.
+   * Set to false for large datasets to improve performance.
+   * @default true
+   */
+  deepWatch?: boolean
 }

@@ -18,10 +18,15 @@ import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 
-import { onBeforeUnmount, onMounted, reactive, ref, watch, computed } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject } from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
+
+// Inject deepWatch from parent (ReportLayoutRenderer provides it)
+// Prefer prop value if explicitly set, otherwise use injected value, fallback to true
+const injectedDeepWatch = inject<boolean>('deepWatch', true)
+const shouldDeepWatch = props.deepWatch ?? injectedDeepWatch
 
 /**
  * This component currently uses a typed event model (e.g. `@change`, `@update`).
@@ -52,7 +57,7 @@ watch(
 
     initializeColumnIdToSortFieldMap()
   },
-  { deep: true }
+  { deep: shouldDeepWatch } // Deep watch can be disabled for large datasets via prop or inject
 )
 
 function onScroll(e: Event) {
@@ -91,6 +96,11 @@ function updateTableHeight() {
  * The scroll restoration uses setTimeout with 0 delay to ensure it runs after
  * the virtual scroller has fully initialized and rendered its content.
  */
+// Resize handler defined at module scope so it can be cleaned up
+const handleResize = () => {
+  updateTableHeight()
+}
+
 onMounted(() => {
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   if (scrollerEl) {
