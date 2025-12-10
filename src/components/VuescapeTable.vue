@@ -202,7 +202,7 @@ function getDisplayValue(row: TableRow, columnId: string): string {
 function getCellStyle(row: TableRow, columnId: string): Record<string, string> | undefined {
   const cell = row.cells[columnId]
   // Don't use the raw value even if there is no display value.
-  let result = cell?.cssStyles ?? undefined
+  const result = cell?.cssStyles ?? undefined
   return result
 }
 

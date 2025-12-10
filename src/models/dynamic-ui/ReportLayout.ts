@@ -1,5 +1,5 @@
 import type { ReportPaneKind } from '../feature/ReportPaneKind'
-import { ActionButtonComponent } from './pane-components'
+import type { ActionButtonComponent } from './pane-components'
 import type { PaneLayout } from './PaneLayout'
 
 /**
