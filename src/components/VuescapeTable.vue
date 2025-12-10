@@ -120,18 +120,13 @@ onMounted(() => {
   }, 0)
 
   // Only recalculate on window resize (not on every parent change)
-  const handleResize = () => {
-    updateTableHeight()
-  }
   window.addEventListener('resize', handleResize)
-
-  // Clean up on unmount
-  onBeforeUnmount(() => {
-    window.removeEventListener('resize', handleResize)
-  })
 })
 
 onBeforeUnmount(() => {
+  // Clean up resize listener
+  window.removeEventListener('resize', handleResize)
+  // Clean up scroll listener
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   scrollerEl?.removeEventListener('scroll', onScroll)
 })
