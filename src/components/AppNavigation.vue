@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 
 interface Props {
   /**
@@ -79,6 +80,14 @@ watch(
   }
 )
 
+// Close drawer when clicking outside (only in overlay mode, not when pinned)
+const navElement = ref<HTMLElement | null>(null)
+onClickOutside(navElement, () => {
+  if (!isPinned.value && drawerOpen.value) {
+    drawerOpen.value = false
+  }
+})
+
 // Resize functionality
 const isResizing = ref(false)
 const startX = ref(0)
@@ -134,6 +143,7 @@ if (typeof window !== 'undefined') {
   <!-- Custom drawer that behaves like Vuetify's navigation drawer -->
   <Transition name="slide-drawer">
     <aside
+      ref="navElement"
       v-show="isVisible"
       :class="[
         'app-navigation-custom',
