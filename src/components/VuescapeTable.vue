@@ -341,7 +341,7 @@ const enhancedRows = computed(() => {
 
     -->
 
-  <div ref="tableWrapperRef">
+  <div class="vuescape-table__container" ref="tableWrapperRef">
     <DataTable
       ref="dtRef"
       :value="enhancedRows"
@@ -371,6 +371,7 @@ const enhancedRows = computed(() => {
           :field="column.id"
           :header="column.headerText"
           :sortable="column.isSortable"
+          :frozen="column.isFrozen"
           :style="column.style"
           :sortField="columnIdToSortFieldMap.get(column.id)"
         >
@@ -378,7 +379,9 @@ const enhancedRows = computed(() => {
             <div v-if="slotProps.data.cells[column.id].component" class="cell-content">
               <PaneComponentRenderer :component="slotProps.data.cells[column.id].component" />
             </div>
-            <div v-else :style="getCellStyle(slotProps.data, column.id)" class="cell-content">{{ getDisplayValue(slotProps.data, column.id) }}</div>
+            <div v-else :style="getCellStyle(slotProps.data, column.id)" class="cell-content">
+              {{ getDisplayValue(slotProps.data, column.id) }}
+            </div>
           </template>
         </Column>
       </template>
@@ -387,18 +390,20 @@ const enhancedRows = computed(() => {
 </template>
 
 <style>
-  .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
-    padding: 0 !important;
-  }
-  .p-datatable-tbody > tr > td {
-    padding: 0 !important;
-  }
-
-  .cell-content {
-    padding: var(--p-datatable-body-cell-sm-padding);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-  }
+.p-datatable-scrollable td.p-datatable-frozen-column {
+  background: inherit;
+}
+.p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 0 !important;
+}
+.p-datatable-tbody > tr > td {
+  padding: 0 !important;
+}
+.cell-content {
+  padding: var(--p-datatable-body-cell-sm-padding);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
 </style>
