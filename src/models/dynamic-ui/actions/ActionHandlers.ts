@@ -167,13 +167,6 @@ function handleDirectDownloadAsync(url: string): void {
       flatFields[key] = values[0] // Take first value if multiple
     })
 
-    // Get auth token from auth store (this would need to be imported)
-    // For now, we'll assume it's available in the global scope
-    const token = (window as any).authenticationStore?.authState?.userProfile?.authorizationToken
-    if (token) {
-      flatFields['authorizationToken'] = token
-    }
-
     // Fire the form POST into the hidden iframe (download begins)
     postDownloadForm(endpoint, flatFields)
   } catch (error) {
