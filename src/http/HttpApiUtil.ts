@@ -98,6 +98,17 @@ export function constructUrl(
 }
 
 /**
+ * Gets the user's timezone and puts into an object suitable for using as an HTTP header.
+ *
+ * @returns An object with the name 'X-TimeZone' and the current Intl timeZone.
+ */
+export function getTimeZoneHeader() {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const result = { 'X-TimeZone': timeZone }
+  return result
+}
+
+/**
  * Prepares a RequestInit object for an HTTP request.
  *
  * @param method - The HTTP method to use for the request (e.g., GET, POST).
@@ -113,13 +124,12 @@ export function prepareRequest(
   init?: RequestInit
 ): RequestInit {
   const origin = window?.location?.origin
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const defaultHeaders = {
     'Access-Control-Allow-Origin': origin,
     Origin: origin,
     Accept: 'application/json, text/plain, */*',
-    'X-TimeZone': timeZone
+    ...getTimeZoneHeader()
   } as any
 
   if (method === HttpMethod.Post && data && !init?.body) {
