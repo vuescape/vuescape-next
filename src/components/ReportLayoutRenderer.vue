@@ -128,9 +128,6 @@ const pageTitle = computed(() => {
 
 onMounted(() => {
   const title = pageTitle.value
-  if (title) {
-    document.title = title
-  }
 })
 </script>
 
