@@ -80,6 +80,14 @@ watch(
   }
 )
 
+// Watch for pinned state changes - when unpinning, keep drawer open
+watch(isPinned, (newValue, oldValue) => {
+  // If we're going from pinned to unpinned, keep the drawer open
+  if (oldValue === true && newValue === false) {
+    drawerOpen.value = true
+  }
+})
+
 // Close drawer when clicking outside (only in overlay mode, not when pinned)
 const navElement = ref<HTMLElement | null>(null)
 onClickOutside(navElement, () => {
