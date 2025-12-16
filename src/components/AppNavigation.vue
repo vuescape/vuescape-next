@@ -82,11 +82,15 @@ watch(
 
 // Close drawer when clicking outside (only in overlay mode, not when pinned)
 const navElement = ref<HTMLElement | null>(null)
-onClickOutside(navElement, () => {
-  if (!isPinned.value && drawerOpen.value) {
-    drawerOpen.value = false
-  }
-})
+onClickOutside(
+  navElement,
+  () => {
+    if (!isPinned.value && drawerOpen.value) {
+      drawerOpen.value = false
+    }
+  },
+  { ignore: ['.app-navigation__ignore-click-outside'] }
+)
 
 // Resize functionality
 const isResizing = ref(false)
