@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import WizardMessage from '../WizardMessage.vue'
+import VuescapeButton from '../../VuescapeButton.vue'
 
 describe('WizardMessage.vue', () => {
   it('renders title when provided', () => {
@@ -23,23 +24,36 @@ describe('WizardMessage.vue', () => {
     expect(wrapper.html()).toContain(html)
   })
 
-  it('renders button when buttonText is provided', () => {
+  it('renders button when buttonText is provided', async () => {
     const wrapper = mount(WizardMessage, {
       props: {
         buttonText: 'Click Me',
         messageHtml: ''
+      },
+      global: {
+        stubs: {
+          VuescapeButton
+        }
       }
     })
-    expect(wrapper.findComponent({ name: 'VuescapeButton' }).exists()).toBe(true)
-    expect(wrapper.find('button').text()).toBe('Click Me')
+    await flushPromises()
+    const button = wrapper.findComponent({ name: 'VuescapeButton' })
+    expect(button.exists()).toBe(true)
+    expect(button.props('label')).toBe('Click Me')
   })
 
-  it('does not render button when buttonText is not provided', () => {
+  it('does not render button when buttonText is not provided', async () => {
     const wrapper = mount(WizardMessage, {
       props: {
         messageHtml: ''
+      },
+      global: {
+        stubs: {
+          VuescapeButton
+        }
       }
     })
+    await flushPromises()
     expect(wrapper.findComponent({ name: 'VuescapeButton' }).exists()).toBe(false)
   })
 
@@ -50,9 +64,15 @@ describe('WizardMessage.vue', () => {
         buttonText: 'Click',
         onclick: onClick,
         messageHtml: ''
+      },
+      global: {
+        stubs: {
+          VuescapeButton
+        }
       }
     })
-    await wrapper.find('button').trigger('click')
+    await flushPromises()
+    await wrapper.findComponent({ name: 'VuescapeButton' }).trigger('click')
     expect(onClick).toHaveBeenCalled()
   })
 })

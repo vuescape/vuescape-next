@@ -12,8 +12,10 @@ export default {}
 </script>
 
 <script lang="ts" setup>
+import { defineAsyncComponent } from 'vue'
 import type { WizardNavigationButtonsProps } from '../../models/componentProps/WizardNavigationButtonsProps'
-import VuescapeButton from '../VuescapeButton.vue'
+
+const VuescapeButton = defineAsyncComponent(() => import('../VuescapeButton.vue'))
 
 const props = defineProps<WizardNavigationButtonsProps>()
 

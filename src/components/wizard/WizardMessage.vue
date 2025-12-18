@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import VuescapeButton from '../VuescapeButton.vue'
-
+import { defineAsyncComponent } from 'vue'
 import type { WizardMessageProps } from '../../models/componentProps/WizardMessageProps'
+
+const VuescapeButton = defineAsyncComponent(() => import('../VuescapeButton.vue'))
 
 const props = defineProps<WizardMessageProps>()
 </script>

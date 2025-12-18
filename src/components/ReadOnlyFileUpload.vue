@@ -12,15 +12,15 @@ export default {}
 </script>
 
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
 import { usePrimeVue } from 'primevue/config'
 import { useActionStore } from '../stores/useActionStore'
 
 import type { ReadOnlyFileUploadProps } from '../models/componentProps/ReadOnlyFileUploadProps'
-
-import VuescapeButton from './VuescapeButton.vue'
 import { ReportPaneKind } from '../models'
-
 import { formatSize } from '../infrastructure/formatters'
+
+const VuescapeButton = defineAsyncComponent(() => import('./VuescapeButton.vue'))
 
 // props
 const props = defineProps<ReadOnlyFileUploadProps>()
