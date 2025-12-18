@@ -1,25 +1,29 @@
 export { default as NotFoundPage } from './404Page.vue'
-export { default as ActionButton } from './ActionButton.vue'
 export { default as App } from './App.vue'
 export { default as AppInfoHandler } from './AppInfoHandler.vue'
 export { default as AppNavigation } from './AppNavigation.vue'
 export { default as BreadcrumbComponent } from './BreadcrumbComponent.vue'
-export { default as ChicletButton } from './ChicletButton.vue'
-export { default as ChicletGrid } from './ChicletGrid.vue'
 export { default as CustomLoading } from './CustomLoading.vue'
-export { default as FileUpload } from './FileUpload.vue'
 export { default as NotificationMessages } from './NotificationMessages.vue'
 export { default as PaneItemRenderer } from './PaneItemRenderer.vue'
 export { default as PaneLayoutRenderer } from './PaneLayoutRenderer.vue'
 export { default as PaneSectionRenderer } from './PaneSectionRenderer.vue'
 export { default as ProgressToast } from './ProgressToast.vue'
-export { default as ReadOnlyFileUpload } from './ReadOnlyFileUpload.vue'
 export { default as ReportLayoutRenderer } from './ReportLayoutRenderer.vue'
-export { default as TableTabs } from './TableTabs.vue'
-export { default as TextLinkComponentRenderer } from './TextLinkComponentRenderer.vue'
-export { default as TextComponentRenderer } from './TextComponentRenderer.vue'
-export { default as VuescapeButton } from './VuescapeButton.vue'
 export { default as VuescapeDialog } from './VuescapeDialog.vue'
-export { default as VuescapeSelect } from './VuescapeSelect.vue'
-export { default as VuescapeTable } from './VuescapeTable.vue'
 export * from './wizard'
+
+// The following components are dynamically imported by other components
+// and are NOT statically exported to enable code splitting.
+// These are primarily used in PaneComponentRenderer's dynamic component system:
+// - ActionButton
+// - ChicletButton (only used by ChicletGrid internally)
+// - ChicletGrid
+// - FileUpload
+// - ReadOnlyFileUpload
+// - TableTabs
+// - TextComponentRenderer
+// - TextLinkComponentRenderer
+// - VuescapeButton
+// - VuescapeSelect
+// - VuescapeTable
