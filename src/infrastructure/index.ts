@@ -19,7 +19,6 @@ export {
 export { formatUtcDateTimeString } from './dateTimeUtility'
 export { selectElementContents } from './dom'
 export { fastHash } from './fastHash'
-export { downloadFile } from './fileDownloader'
 export { formatSize } from './formatters'
 export { registerGlobalVariable } from './globalState'
 export * from './presentationFormatter'
