@@ -2,7 +2,7 @@
 import { describe, it } from 'vitest'
 
 describe('ReportLayoutRenderer.vue', () => {
-  it.skip('renders the report title', () => {
+  it.todo('renders the report title', () => {
     // const wrapper = mount(ReportLayoutRenderer, {
     //   props: { reportLayouts: [reportLayouts.value[1]] }
     // })
@@ -10,14 +10,14 @@ describe('ReportLayoutRenderer.vue', () => {
     // expect(wrapper.find('h3').text()).toBe('Sample Report')
   })
 
-  it.skip('renders all panes when they have width', () => {
+  it.todo('renders all panes when they have width', () => {
     //   const wrapper = mount(ReportLayoutRenderer, {
     //     props: { reportLayouts: reportLayouts.value }
     //   })
     //   expect(wrapper.findAll('.pane-layout').length).toBe(3)
   })
 
-  it.skip('renders only center pane when left and right panes have 0 width', () => {
+  it.todo('renders only center pane when left and right panes have 0 width', () => {
     //   const modifiedLayout: Array<ReportLayout> = []
     //   reportLayouts.value.forEach((layout) => {
     //     if (layout.content.targetPane === ReportPaneKind.CenterPane) {

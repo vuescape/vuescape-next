@@ -15,8 +15,7 @@ describe('usePropertyWatch', () => {
       state.count = 1
       await nextTick()
 
-      expect(handler).toHaveBeenCalledOnce()
-      expect(handler).toHaveBeenCalledWith(1, 0)
+      expect(handler).toHaveBeenCalledExactlyOnceWith(1, 0)
     })
 
     it('should not call the handler for unrelated changes', async () => {
@@ -49,11 +48,9 @@ describe('usePropertyWatch', () => {
       state.name = 'Updated'
       await nextTick()
 
-      expect(countHandler).toHaveBeenCalledOnce()
-      expect(countHandler).toHaveBeenCalledWith(5, 0)
+      expect(countHandler).toHaveBeenCalledExactlyOnceWith(5, 0)
 
-      expect(nameHandler).toHaveBeenCalledOnce()
-      expect(nameHandler).toHaveBeenCalledWith('Updated', 'Test')
+      expect(nameHandler).toHaveBeenCalledExactlyOnceWith('Updated', 'Test')
     })
 
     it('should warn about invalid keys', () => {
@@ -103,8 +100,7 @@ describe('usePropertyWatch', () => {
       state.value.count = 10
       await nextTick()
 
-      expect(handler).toHaveBeenCalledOnce()
-      expect(handler).toHaveBeenCalledWith(10, 0)
+      expect(handler).toHaveBeenCalledExactlyOnceWith(10, 0)
     })
 
     it('should not call the handler for unrelated changes in a ref', async () => {
@@ -137,11 +133,9 @@ describe('usePropertyWatch', () => {
       state.value.name = 'Updated'
       await nextTick()
 
-      expect(countHandler).toHaveBeenCalledOnce()
-      expect(countHandler).toHaveBeenCalledWith(5, 0)
+      expect(countHandler).toHaveBeenCalledExactlyOnceWith(5, 0)
 
-      expect(nameHandler).toHaveBeenCalledOnce()
-      expect(nameHandler).toHaveBeenCalledWith('Updated', 'Test')
+      expect(nameHandler).toHaveBeenCalledExactlyOnceWith('Updated', 'Test')
     })
 
     it('should warn about invalid keys in a ref source', () => {

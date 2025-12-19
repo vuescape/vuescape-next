@@ -26,8 +26,7 @@ describe('watchRouteProps', () => {
     Object.assign(mockRoute.params, { productId: '456' })
     await nextTick()
 
-    expect(handler).toHaveBeenCalledOnce()
-    expect(handler).toHaveBeenCalledWith('456', '123')
+    expect(handler).toHaveBeenCalledExactlyOnceWith('456', '123')
   })
 
   it('should call the handler when a query parameter changes', async () => {
@@ -51,8 +50,7 @@ describe('watchRouteProps', () => {
     // Wait for reactivity to process
     await nextTick()
 
-    expect(handler).toHaveBeenCalledOnce()
-    expect(handler).toHaveBeenCalledWith('top-rated', 'all')
+    expect(handler).toHaveBeenCalledExactlyOnceWith('top-rated', 'all')
   })
 
   it('should normalize array values and call the handler with the first value', async () => {
@@ -76,8 +74,7 @@ describe('watchRouteProps', () => {
     // Wait for reactivity to process
     await nextTick()
 
-    expect(handler).toHaveBeenCalledOnce()
-    expect(handler).toHaveBeenCalledWith('new-value', 'first')
+    expect(handler).toHaveBeenCalledExactlyOnceWith('new-value', 'first')
   })
 
   it('should not call the handler for unrelated changes', async () => {

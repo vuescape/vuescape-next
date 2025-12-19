@@ -23,8 +23,7 @@ describe('useRouteProps', () => {
       filter: 'top-rated'
     })
 
-    expect(mockPush).toHaveBeenCalledOnce()
-    expect(mockPush).toHaveBeenCalledWith({
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith({
       params: { productId: '456' },
       query: { filter: 'top-rated' }
     })
@@ -47,8 +46,7 @@ describe('useRouteProps', () => {
       filter: 'new-filter'
     })
 
-    expect(mockPush).toHaveBeenCalledOnce()
-    expect(mockPush).toHaveBeenCalledWith({
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith({
       params: { productId: '789' },
       query: { filter: 'new-filter' }
     })
@@ -71,8 +69,7 @@ describe('useRouteProps', () => {
       sort: 'desc'
     })
 
-    expect(mockPush).toHaveBeenCalledOnce()
-    expect(mockPush).toHaveBeenCalledWith({
+    expect(mockPush).toHaveBeenCalledExactlyOnceWith({
       params: { productId: '789', entityId: '456' },
       query: { filter: 'all', sort: 'desc' }
     })

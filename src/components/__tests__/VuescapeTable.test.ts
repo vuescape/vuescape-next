@@ -71,7 +71,7 @@ describe('VuescapeTable.vue', () => {
   })
 
   // TODO: test virtual scroller implementation since table data is not in the body of the table.
-  it.skip('renders correct cell values', () => {
+  it.todo('renders correct cell values', () => {
     const wrapper = mount(VuescapeTable, {
       props: {
         id: 'test-table',
@@ -95,7 +95,7 @@ describe('VuescapeTable.vue', () => {
   })
 
   // TODO: test virtual scroller implementation since table data is not in the body of the table.
-  it.skip('sorts rows correctly when column header is clicked', async () => {
+  it.todo('sorts rows correctly when column header is clicked', async () => {
     const wrapper = mount(VuescapeTable, {
       props: {
         id: 'test-table',
@@ -268,10 +268,21 @@ describe('VuescapeTable.vue', () => {
     enhanced.forEach((row: any) => {
       Object.values(row.cells).forEach((cell: any) => {
         expect(cell.displayValue).not.toBe('\u0000')
-        if (cell.comparableValue?.stringValue) {
-          expect(cell.comparableValue.stringValue).not.toBe('\u0000')
+      })
+    })
+
+    // Check comparableValue.stringValue separately
+    const cellsWithComparableStringValue: any[] = []
+    enhanced.forEach((row: any) => {
+      Object.values(row.cells).forEach((cell: any) => {
+        if (cell.comparableValue?.stringValue !== undefined) {
+          cellsWithComparableStringValue.push(cell)
         }
       })
+    })
+
+    cellsWithComparableStringValue.forEach((cell: any) => {
+      expect(cell.comparableValue.stringValue).not.toBe('\u0000')
     })
   })
   })

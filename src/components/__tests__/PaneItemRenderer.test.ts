@@ -31,7 +31,7 @@ const props: PaneItemRendererProps = {
 
 describe('PaneItemRenderer', () => {
   // TODO: fix test -- Skipping for now due to failure
-  it.skip('renders the correct number of components', () => {
+  it.todo('renders the correct number of components', () => {
     const wrapper = mount(PaneItemRenderer, {
       global: {
         plugins: [router]

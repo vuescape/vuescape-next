@@ -11,7 +11,7 @@ import { PresentationFormatKind } from '../../infrastructure/PresentationFormatK
 
 describe('presentationFormatter', () => {
   // Decodes a base64 string to a Uint8Array.
-  it.skip('placeholder', () => {
+  it.todo('placeholder', () => {
     // arrange
   })
 })
