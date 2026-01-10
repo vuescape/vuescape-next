@@ -35,4 +35,10 @@ export interface StepWizardShellProps {
    * Can be overridden by individual step buttonConfig.
    */
   defaultButtonConfig?: ButtonConfig
+
+  /**
+   * Optional override for the next button label.
+   * When provided, takes precedence over step-level and default button config labels.
+   */
+  nextButtonLabel?: string
 }

@@ -124,6 +124,12 @@ const resolvedButtonConfig = computed<ButtonConfig>(() => {
   )
 
   // Apply dynamic overrides for disabled states and labels
+  // Priority for next label: prop override → step config → default config → isLastStep logic
+  const nextLabel = props.nextButtonLabel
+    ?? stepConfig?.next?.label
+    ?? defaultConfig?.next?.label
+    ?? (props.engine.isLastStep.value ? 'Finish' : DEFAULT_BUTTON_CONFIG.next!.label)
+
   return {
     previous: {
       ...previous,
@@ -131,8 +137,7 @@ const resolvedButtonConfig = computed<ButtonConfig>(() => {
     },
     next: {
       ...next,
-      label: stepConfig?.next?.label ?? defaultConfig?.next?.label ??
-        (props.engine.isLastStep.value ? 'Finish' : DEFAULT_BUTTON_CONFIG.next!.label),
+      label: nextLabel,
       disabled: stepConfig?.next?.disabled ?? defaultConfig?.next?.disabled ?? !canContinue.value
     },
     cancel
