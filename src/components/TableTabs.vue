@@ -69,20 +69,6 @@ function tableKey(tabId: string) {
   const result = `${props.id}::${tabId}::${selectedEntity.value ?? ''}`
   return result
 }
-
-// This removes all session storage by prefix.
-// This is necessary because PrimeVue uses session storage for some state
-// and we need to clear it when the component is created.
-function clearSessionStorageByPrefix(prefix: string) {
-  Object.keys(sessionStorage).forEach((key) => {
-    if (key.startsWith(prefix)) {
-      sessionStorage.removeItem(key)
-    }
-  })
-}
-
-// Usage: Remove all sessionStorage items starting with "/my-data/product"
-clearSessionStorageByPrefix('/my-data/product')
 </script>
 
 <template>
