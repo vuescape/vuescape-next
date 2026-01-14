@@ -1,29 +1,40 @@
 import type { Router } from 'vue-router'
-import { useRetainQueryStore } from '../stores/useRetainQueryStore'
+import { getRetainConfig, useRetainQueryStore } from '../stores/useRetainQueryStore'
 
 interface RetainOptions {
   blocklist?: string[]
-  includeRouteNames?: Array<string | number | symbol>
 }
 
 /**
  * Installs navigation guards on the provided Vue Router instance to retain and restore query parameters
- * for specific routes based on configurable options.
+ * for specific routes based on the `meta.retain` configuration.
  *
  * This function adds a `beforeEach` guard to restore saved query parameters when navigating to routes
- * marked with `meta.retainQuery`, and an `afterEach` guard to save query parameters after navigation.
- * It supports optional inclusion filtering by route names and allows blocking specific query keys from being saved.
+ * with `meta.retain` configured, and an `afterEach` guard to save query parameters after navigation.
  *
  * @param router - The Vue Router instance to install the guards on.
  * @param opts - Optional configuration for retaining queries.
- * @param opts.includeRouteNames - An array of route names for which query retention should be enabled. If omitted, all routes with `meta.retainQuery` are considered.
  * @param opts.blocklist - An array of query parameter keys to exclude from being saved/restored.
  *
  * @remarks
+ * - Routes opt in by defining `meta.retain.scope` function.
  * - If the route's query contains `retain=no`, query retention is skipped.
  * - To prevent restore loops, an in-memory flag is used during a synthetic `router.replace` triggered by the guard.
- *   This avoids leaking any internal marker into the URL.
  * - Uses a store (via `useRetainQueryStore`) to persist and retrieve query parameters.
+ *
+ * @example
+ * ```ts
+ * // Route definition
+ * {
+ *   path: '/product/:productId',
+ *   name: 'ProductView',
+ *   meta: {
+ *     retain: {
+ *       scope: (route) => route.params.productId as string
+ *     }
+ *   }
+ * }
+ * ```
  */
 export function installRetainQueryGuards(router: Router, opts: RetainOptions = {}) {
   // Module-scoped counter to suppress re-entrant restores from our own replace().
@@ -31,18 +42,14 @@ export function installRetainQueryGuards(router: Router, opts: RetainOptions = {
   let restoring = 0
 
   router.beforeEach((to) => {
-    // Route must opt in via meta
-    if (!to.meta?.retainQuery) {
+    // Route must opt in via meta.retain
+    const retainConfig = getRetainConfig(to)
+    if (!retainConfig) {
       return true
     }
 
     // Per-hop opt-out
     if (to.query.retain === 'no') {
-      return true
-    }
-
-    // Optional inclusion filter
-    if (opts.includeRouteNames && to.name && !opts.includeRouteNames.includes(to.name)) {
       return true
     }
 
@@ -79,17 +86,13 @@ export function installRetainQueryGuards(router: Router, opts: RetainOptions = {
     }
 
     // Only save for routes that opted in
-    if (!to.meta?.retainQuery) {
+    const retainConfig = getRetainConfig(to)
+    if (!retainConfig) {
       return
     }
 
     // Skip saving when either side explicitly opts out
     if (to.query.retain === 'no' || from.query.retain === 'no') {
-      return
-    }
-
-    // Optional inclusion filter
-    if (opts.includeRouteNames && to.name && !opts.includeRouteNames.includes(to.name)) {
       return
     }
 

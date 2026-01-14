@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useRetainQueryStore } from '../stores/useRetainQueryStore'
+import { getRetainConfig, useRetainQueryStore } from '../stores/useRetainQueryStore'
 
 export function useRetainedField<T>(
   queryKey: string,
@@ -16,7 +16,8 @@ export function useRetainedField<T>(
   const retained = useRetainQueryStore()
   const value = ref<T>(defaultValue)
 
-  const routeWantsRetention = !!route.meta?.retainQuery
+  const retainConfig = getRetainConfig(route)
+  const routeWantsRetention = !!retainConfig
   const syncUrl = forceUrlSync ?? routeWantsRetention
 
   onMounted(() => {

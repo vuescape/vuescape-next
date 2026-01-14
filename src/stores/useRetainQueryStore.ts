@@ -2,17 +2,23 @@
  * Pinia store for retaining and restoring query parameters across route navigations.
  *
  * This store allows you to save, restore, and clear query parameters for Vue Router routes,
- * using multiple keying strategies (exact match, group, route name, and path prefix).
- * It is useful for preserving user state (such as filters or search queries) when navigating
- * between pages or returning to a previous route.
+ * using a scope-based keying strategy defined in route meta.
  *
  * @remarks
- * - Uses a shallowRef-wrapped Map to store sanitized query objects keyed by route variants.
+ * - Uses a shallowRef-wrapped Map to store sanitized query objects keyed by scope.
  * - Query parameters can be selectively excluded from retention using a blocklist.
- * - Supports grouping and prefix-based retention via route meta and path heuristics.
+ * - Scope is defined via `route.meta.retain.scope(route)` function.
  *
  * @example
  * ```ts
+ * // In route definition:
+ * meta: {
+ *   retain: {
+ *     scope: (route) => route.params.productId as string
+ *   }
+ * }
+ *
+ * // In component:
  * const retainQueryStore = useRetainQueryStore()
  * retainQueryStore.save(route)
  * const restored = retainQueryStore.restore(route)
@@ -25,22 +31,25 @@ import { shallowRef } from 'vue'
 type Q = Record<string, any>
 
 /**
+ * Configuration object for query retention on a route.
+ */
+export interface RetainConfig {
+  /**
+   * Function that returns the scope key for this route.
+   * The scope determines how query params are keyed in the store.
+   * Can return a dynamic value (e.g., route.params.productId) or a constant for group-like behavior.
+   */
+  scope: (route: RouteLocationNormalized) => string | undefined
+}
+
+/**
  * The default list of query parameter keys to exclude (blocklist) when retaining query parameters.
- *
- * @remarks
- * This array contains the names of query parameters that should not be retained
- * across navigation or state changes. By default, it includes the `'retain'` key.
  */
 const DEFAULT_BLOCKLIST = ['retain']
 
 /**
  * Removes properties from the given query object (`q`) whose keys are present in the `blocklist`
  * or whose values are `undefined`. Returns a new object with the remaining key-value pairs.
- *
- * @template Q - The type of the query object.
- * @param q - The query object to sanitize.
- * @param blocklist - An array of keys to exclude from the result. Defaults to `DEFAULT_BLOCKLIST`.
- * @returns A new query object with excluded keys and undefined values removed.
  */
 function sanitizeQuery(q: Q, blocklist = DEFAULT_BLOCKLIST): Q {
   const out: Q = {}
@@ -54,76 +63,29 @@ function sanitizeQuery(q: Q, blocklist = DEFAULT_BLOCKLIST): Q {
 }
 
 /**
- * Generates a unique string key for a given route based on its name and sorted parameters.
- *
- * @param r - The route object of type `RouteLocationNormalized` to generate the key from.
- * @returns A string in the format `exact::<routeName>::<sortedParam1>:<value1>|<sortedParam2>:<value2>|...`
- *          where routeName is the route's name (or 'unknown' if not present), and parameters are sorted alphabetically.
+ * Gets the RetainConfig from route meta, if present.
  */
-function exactKey(r: RouteLocationNormalized) {
-  const name = String(r.name ?? 'unknown')
-  const params = Object.keys(r.params)
-    .sort()
-    .map((k) => `${k}:${String((r.params as any)[k])}`)
-    .join('|')
-  return `exact::${name}::${params}`
+export function getRetainConfig(route: RouteLocationNormalized): RetainConfig | undefined {
+  return route.meta?.retain as RetainConfig | undefined
 }
 
 /**
- * Generates a unique key string for a given route based on its name property.
- *
- * @param r - The route object of type `RouteLocationNormalized`.
- * @returns A string in the format `name::<routeName>`, where `<routeName>` is the route's name or 'unknown' if the name is not defined.
+ * Generates the storage key for a route based on its retain scope.
+ * Returns undefined if retention is not configured or scope returns undefined.
  */
-function nameKey(r: RouteLocationNormalized) {
-  return `name::${String(r.name ?? 'unknown')}`
-}
+function getRetainKey(route: RouteLocationNormalized): string | undefined {
+  const config = getRetainConfig(route)
+  if (!config) return undefined
 
-/**
- * Generates a group key string based on the `retainGroup` property in the route's meta object.
- *
- * @param r - The normalized route location object.
- * @returns A string in the format `group::<retainGroup>` if `retainGroup` is a non-empty string after trimming,
- *          otherwise returns `undefined`.
- */
-function groupKey(r: RouteLocationNormalized) {
-  const g = (r.meta?.retainGroup as string | undefined)?.trim()
-  return g ? `group::${g}` : undefined
-}
+  const scopeValue = config.scope(route)
+  if (scopeValue === undefined) return undefined
 
-/**
- * Generates a prefixed key based on the first static segment of the top-level route record.
- *
- * @param r - The normalized route location object.
- * @returns A string in the format `prefix::<segment>` if a segment exists, otherwise `undefined`.
- */
-function prefixKey(r: RouteLocationNormalized) {
-  // Heuristic fallback: first static segment of the top-level record
-  const top = r.matched[0]?.path ?? r.path
-  const seg = top.split('/').filter(Boolean)[0]
-  return seg ? `prefix::${seg}` : undefined
-}
-
-function keyVariants(r: RouteLocationNormalized) {
-  const keys = [exactKey(r)]
-  const gk = groupKey(r)
-  if (gk) {
-    keys.push(gk)
-  }
-
-  keys.push(nameKey(r))
-  const pk = prefixKey(r)
-  if (pk) {
-    keys.push(pk)
-  }
-  return keys
+  const routeName = String(route.name ?? 'unknown')
+  return `retain::${routeName}::${scopeValue}`
 }
 
 /**
  * Pinia store for retaining and restoring query parameters associated with Vue Router routes.
- *
- * This store allows you to save, restore, and clear query parameter objects keyed by route variants.
- * It uses a shallowRef-wrapped Map to efficiently manage and reactively update stored queries.
  *
  * @remarks
  * - Uses shallowRef to avoid deep reactivity issues with Map.
@@ -131,11 +93,11 @@ function keyVariants(r: RouteLocationNormalized) {
  *
  * @returns An object containing:
  * - `map`: The reactive Map of stored queries.
- * - `save(route, blocklist?)`: Saves the sanitized query for the given route, optionally omitting blocklisted keys.
+ * - `save(route, blocklist?)`: Saves the sanitized query for the given route.
  * - `restore(route)`: Restores the stored query for the given route, if any.
  * - `clear()`: Clears all stored queries.
  */
-export const useRetainQueryStore = defineStore('retainQuery', () => {
+export const useRetainQueryStore = defineStore('useRetainQuery', () => {
   // Use shallowRef to avoid deep proxying of Map; clone on writes to trigger reactivity.
   const map = shallowRef(new Map<string, Q>())
 
@@ -146,27 +108,23 @@ export const useRetainQueryStore = defineStore('retainQuery', () => {
   }
 
   function save(route: RouteLocationNormalized, blocklist?: string[]) {
+    const key = getRetainKey(route)
+    if (!key) return
+
     const cleaned = sanitizeQuery(route.query as Q, blocklist)
-    const keys = keyVariants(route)
 
     if (Object.keys(cleaned).length === 0) {
-      setMap((m) => {
-        keys.forEach((k) => m.delete(k))
-      })
+      setMap((m) => m.delete(key))
     } else {
-      setMap((m) => {
-        keys.forEach((k) => m.set(k, cleaned))
-      })
+      setMap((m) => m.set(key, cleaned))
     }
   }
 
   function restore(route: RouteLocationNormalized): Q | undefined {
-    const keys = keyVariants(route)
-    for (const k of keys) {
-      const hit = map.value.get(k)
-      if (hit) return hit
-    }
-    return undefined
+    const key = getRetainKey(route)
+    if (!key) return undefined
+
+    return map.value.get(key)
   }
 
   function clear() {
