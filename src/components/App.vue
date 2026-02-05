@@ -19,6 +19,7 @@ import type { AppComponentProps } from '../models/componentProps/AppComponentPro
 import { useNotificationStore } from '../stores/useNotificationStore'
 import NotificationMessages from './NotificationMessages.vue'
 import AppNavigation from './AppNavigation.vue'
+import Toast from 'primevue/toast'
 
 import { Guid, type AppInfo } from '../models'
 import type { NotificationMessage } from '../models/NotificationMessage'
@@ -115,6 +116,7 @@ const isFullWidth = computed(() => {
           >
             <!-- Main Content -->
             <main ref="main" class="flow-root flex-1">
+              <Toast v-if="props.shouldUseToastService" position="top-center" />
               <NotificationMessages
                 v-if="appInfoMessages.length && !route.meta.hideLayout"
                 :messages="appInfoMessages"

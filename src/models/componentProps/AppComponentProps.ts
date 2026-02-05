@@ -20,4 +20,5 @@ export interface AppComponentProps {
   trackingService?: TrackingService,
   globalClickHandler?: (event: MouseEvent) => void,
   additionalComponents?: Array<BootstrappedComponent>,
+  shouldUseToastService?: boolean,
 }

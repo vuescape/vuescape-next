@@ -19,7 +19,6 @@ import type { FileUploadProps } from '../models/componentProps/FileUploadProps'
 
 // Name PFileUpload to avoid naming conflict with this component
 import PFileUpload from 'primevue/fileupload'
-import Toast from 'primevue/toast'
 import Button from 'primevue/button'
 import { formatSize } from '../infrastructure/formatters'
 
@@ -130,7 +129,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <Toast />
   <div class="file-upload__container">
     <PFileUpload
       customUpload

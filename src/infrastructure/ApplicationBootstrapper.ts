@@ -236,7 +236,8 @@ export class ApplicationBootstrapper {
         footerBootstrappedComponent: this.bootstrappedFooterComponent,
         trackingService: this.trackingService,
         globalClickHandler: this.globalClickHandler,
-        additionalComponents: this.additionalAppComponents
+        additionalComponents: this.additionalAppComponents,
+        shouldUseToastService: this.shouldUseToastService
       }
 
       // Spread rootComponentProps to satisfy Vue typing
