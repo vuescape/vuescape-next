@@ -107,8 +107,11 @@ const isFullWidth = computed(() => {
         <transition mode="out-in" name="app__component--transition">
           <div
             v-if="true"
-            class="mt-2 flex pt-[36px]"
-            :class="{ 'pb-[36px]': props.footerBootstrappedComponent?.component }"
+            class="flex"
+            :class="{
+              'mt-2 pt-9': !route.meta.hideLayout,
+              'pb-9': props.footerBootstrappedComponent?.component && !route.meta.hideLayout
+            }"
           >
             <!-- Main Content -->
             <main ref="main" class="flow-root flex-1">
@@ -134,7 +137,7 @@ const isFullWidth = computed(() => {
       <Suspense>
         <component
           :is="props.footerBootstrappedComponent.component"
-          v-if="props.footerBootstrappedComponent?.component"
+          v-if="props.footerBootstrappedComponent?.component && !route.meta.hideLayout"
           ref="theFooter"
           class="fixed inset-x-0 bottom-0 z-50 h-9 bg-white"
           v-bind="props.footerBootstrappedComponent.props"
