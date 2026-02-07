@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
 
 const { MockDialog } = vi.hoisted(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { defineComponent: dc, h: hFn } = require('vue')
   return {
     MockDialog: dc({
@@ -26,6 +27,7 @@ const { MockDialog } = vi.hoisted(() => {
 
 vi.mock('primevue/button', () => ({
   default: defineComponent({
+    // eslint-disable-next-line vue/multi-word-component-names, vue/no-reserved-component-names
     name: 'Button',
     props: {
       label: String,
@@ -51,6 +53,7 @@ vi.mock('primevue/button', () => ({
 vi.mock('primevue/dialog', () => ({ default: MockDialog }))
 vi.mock('primevue/divider', () => ({
   default: defineComponent({
+    // eslint-disable-next-line vue/multi-word-component-names
     name: 'Divider',
     setup() {
       return () => h('hr', { class: 'mock-divider' })

@@ -58,7 +58,7 @@ describe('TextLinkComponent', () => {
     )
   })
 
-  it('prevents default navigation', async () => {
+  it('prevents default navigation', () => {
     const wrapper = createWrapper(props)
     const link = wrapper.find('a')
     const event = new Event('click')
