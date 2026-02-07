@@ -31,6 +31,18 @@ export interface VuescapeDialogProps {
   okButtonText?: string
 
   /**
+   * The text to display on the cancel button.
+   * When provided, a cancel button is shown alongside the OK button.
+   */
+  cancelButtonText?: string
+
+  /**
+   * Controls the layout density of the dialog header and footer.
+   * @default 'comfortable'
+   */
+  density?: 'comfortable' | 'compact'
+
+  /**
    * Indicates whether to show the footer.
    * @default true
    */

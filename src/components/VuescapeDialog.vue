@@ -15,6 +15,7 @@ export default {}
 </script>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import Divider from 'primevue/divider'
@@ -27,17 +28,29 @@ import type { VuescapeDialogProps } from '../models/componentProps/VuescapeDialo
  * wizard-specific variant (e.g., `WizardFileUpload.vue`) to keep the core
  * component agnostic of wizard behavior.
  */
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:modelValue', 'confirm'])
 
-withDefaults(defineProps<VuescapeDialogProps>(), {
-  closable: true,
+const props = withDefaults(defineProps<VuescapeDialogProps>(), {
+  closable: false,
   draggable: false,
   okButtonText: 'OK',
+  cancelButtonText: undefined,
+  density: 'comfortable',
   showFooter: true
 })
 
+const dialogClass = computed(() => [
+  'vuescape-dialog__pv-dialog-header--color',
+  { 'vuescape-dialog--compact': props.density === 'compact' }
+])
+
 const okClick = () => {
-  emit('update:visible', false)
+  emit('confirm')
+  emit('update:modelValue', false)
+}
+
+const cancelClick = () => {
+  emit('update:modelValue', false)
 }
 </script>
 
@@ -50,14 +63,25 @@ const okClick = () => {
       :header="headerText"
       :style="{ width: '25rem' }"
       :visible="modelValue"
-      class="vuescape-dialog__pv-dialog-header--color"
+      :class="dialogClass"
       modal
     >
       <slot />
-      <Divider v-if="showFooter" style="margin-bottom: 0" />
       <template v-if="showFooter" #footer>
         <slot name="footer">
-          <Button :label="okButtonText" type="button" @click="okClick"></Button>
+          <div class="w-full">
+            <Divider class="mb-4 mt-0" />
+            <div class="flex justify-end gap-2">
+              <Button
+                v-if="cancelButtonText"
+                :label="cancelButtonText"
+                type="button"
+                outlined
+                @click="cancelClick"
+              ></Button>
+              <Button :label="okButtonText" type="button" @click="okClick"></Button>
+            </div>
+          </div>
         </slot>
       </template>
     </Dialog>
@@ -69,5 +93,21 @@ const okClick = () => {
 .vuescape-dialog__pv-dialog-header--color .p-dialog-header {
   background-color: var(--p-primary-color);
   color: white;
+}
+
+.vuescape-dialog__pv-dialog-header--color .p-dialog-content {
+  padding-bottom: 0;
+}
+
+.vuescape-dialog__pv-dialog-header--color .p-dialog-footer {
+  padding-top: 0.25rem;
+}
+
+.vuescape-dialog--compact .p-dialog-header {
+  padding: 0.5rem 1rem;
+}
+
+.vuescape-dialog--compact .p-dialog-footer {
+  padding: 0.5rem 1rem;
 }
 </style>

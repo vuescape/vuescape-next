@@ -59,11 +59,11 @@ watch(
 
 <template>
   <VuescapeDialog
-    v-model:modelValue="isVisible"
+    v-model="isVisible"
     :closable="false"
     headerText="Updates Available"
     okButtonText="Refresh Now"
-    @update:visible="reload"
+    @confirm="reload"
   >
     <div>
       <p>We've been hard at work adding features and fixing issues!</p>
