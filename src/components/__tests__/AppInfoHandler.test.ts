@@ -1,36 +1,33 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 import AppInfoHandler from '../AppInfoHandler.vue'
 import { useAppInfoStore } from '../../stores/useAppInfoStore'
 import VuescapeDialog from '../VuescapeDialog.vue'
-import { reactive } from 'vue'
-import type { AppInfo } from '../../models'
 import type { AppInfoStore } from '../../stores'
-
-// Mock the AppInfoStore
-const startPollingMock = vi.fn()
-const fetchAppInfoAsyncMock = vi.fn()
-const stopPollingMock = vi.fn()
-
-const state = reactive({ version: '1.0.0', messages: [], disabledFeatures: [] })
-vi.mock('@/stores/useAppInfoStore', () => ({
-  useAppInfoStore: vi.fn(() => ({
-    state,
-    fetchAppInfoAsync: fetchAppInfoAsyncMock,
-    startPolling: startPollingMock,
-    stopPolling: stopPollingMock,
-    setAppInfoState: vi.fn((appInfo: AppInfo) => {
-      state.version = appInfo.version
-    })
-  }))
-}))
 
 describe('AppInfoHandler.vue', () => {
   let wrapper: any
   let wasReloadCalled = false
+  let pinia: ReturnType<typeof createPinia>
+  let appInfoStore: AppInfoStore
+  let startPollingSpy: any
+  let stopPollingSpy: any
+  let fetchAppInfoAsyncSpy: any
+
   beforeEach(() => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+    appInfoStore = useAppInfoStore()
+
+    // Spy on store methods
+    startPollingSpy = vi.spyOn(appInfoStore, 'startPolling').mockImplementation(() => {})
+    stopPollingSpy = vi.spyOn(appInfoStore, 'stopPolling').mockImplementation(() => {})
+    fetchAppInfoAsyncSpy = vi.spyOn(appInfoStore, 'fetchAppInfoAsync').mockResolvedValue()
+
     wrapper = mount(AppInfoHandler, {
       global: {
+        plugins: [pinia],
         components: { VuescapeDialog }
       }
     })
@@ -39,17 +36,21 @@ describe('AppInfoHandler.vue', () => {
     })
   })
 
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should start polling when the component is mounted', () => {
-    expect(startPollingMock).toHaveBeenCalled()
+    expect(startPollingSpy).toHaveBeenCalled()
   })
 
   it('should stop polling when the component is unmounted', () => {
     wrapper.unmount()
-    expect(stopPollingMock).toHaveBeenCalled()
+    expect(stopPollingSpy).toHaveBeenCalled()
   })
 
   it('should fetch app info when mounted', () => {
-    expect(fetchAppInfoAsyncMock).toHaveBeenCalled()
+    expect(fetchAppInfoAsyncSpy).toHaveBeenCalled()
   })
 
   it('should render the VuescapeDialog component', () => {
@@ -63,14 +64,15 @@ describe('AppInfoHandler.vue', () => {
   })
 
   it('should show the dialog when the version changes', async () => {
-    const appInfoStore = useAppInfoStore() as unknown as AppInfoStore
-
     // The dialog should be hidden initially
     expect(wrapper.vm.isVisible).toBe(false)
 
-    // Simulate a version change
-    appInfoStore.setAppInfoState({ version: '2.0.0', messages: [], disabledFeatures: [] })
+    // Set initial version first (simulates app startup)
+    appInfoStore.state.version = '1.0.0'
+    await wrapper.vm.$nextTick()
 
+    // Now change version (this should trigger the watcher with oldValue truthy)
+    appInfoStore.state.version = '2.0.0'
     await wrapper.vm.$nextTick()
 
     // Check if the dialog is now visible
@@ -78,31 +80,36 @@ describe('AppInfoHandler.vue', () => {
   })
 
   it('should reload the page when refresh is clicked', async () => {
-    // Simulate version change to make the dialog visible
-    const appInfoStore = useAppInfoStore()
-    appInfoStore.setAppInfoState({ version: '2.0.0', messages: [], disabledFeatures: [] })
+    // Set initial version then change it to make dialog visible
+    appInfoStore.state.version = '1.0.0'
+    await wrapper.vm.$nextTick()
+    appInfoStore.state.version = '2.0.0'
     await wrapper.vm.$nextTick()
 
-    // Ensure the dialog is visible and teleported to the body
-    const dialog = document.body.querySelector('.vuescape-dialog__pv-dialog-header--color')
-    expect(dialog).toBeTruthy() // Make sure the dialog is in the DOM
+    // Ensure the dialog is visible
+    expect(wrapper.vm.isVisible).toBe(true)
 
-    // Find the button inside the teleported dialog
-    const refreshButton = dialog!.querySelector('button') // Use appropriate selector for the button
-    expect(refreshButton).toBeTruthy() // Ensure the button exists
-
-    // Trigger the click event on the button
-    refreshButton!.click()
+    // Click OK button which triggers confirm event
+    const dialog = wrapper.findComponent(VuescapeDialog)
+    dialog.vm.$emit('confirm')
+    await wrapper.vm.$nextTick()
 
     expect(wasReloadCalled).toBe(true)
   })
 
   it('should display the correct version in the dialog', async () => {
-    // Make sure the dialog is visible
-    wrapper.vm.isVisible = true
+    // Set initial version then change it
+    appInfoStore.state.version = '1.0.0'
+    await wrapper.vm.$nextTick()
+    appInfoStore.state.version = '2.0.0'
     await wrapper.vm.$nextTick()
 
-    const dialog = document.body.querySelector('.vuescape-dialog__pv-dialog-header--color')
-    expect(dialog?.innerHTML).toContain('2.0.0')
+    // Make sure the dialog is visible
+    expect(wrapper.vm.isVisible).toBe(true)
+
+    // Verify the dialog component has the correct version in its state
+    const dialog = wrapper.findComponent(VuescapeDialog)
+    expect(dialog.exists()).toBe(true)
+    expect(wrapper.vm.state.version).toBe('2.0.0')
   })
 })

@@ -1,18 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createPinia, setActivePinia } from 'pinia'
 import TextLinkComponent from '../TextLinkComponentRenderer.vue'
-
-// Mock the action store
-vi.mock('../../stores/useActionStore', () => ({
-  useActionStore: () => ({
-    dispatch: vi.fn()
-  })
-}))
-
-// Mock the action handler
-vi.mock('../../models/dynamic-ui/actions/ActionHandlers', () => ({
-  handleActionEvent: vi.fn()
-}))
+import * as ActionHandlers from '../../models/dynamic-ui/actions/ActionHandlers'
 
 const navigationActionMock = {
   typeName: 'action.navigate',
@@ -29,8 +19,20 @@ const props = {
 }
 
 describe('TextLinkComponent', () => {
+  let pinia: ReturnType<typeof createPinia>
+
+  beforeEach(() => {
+    pinia = createPinia()
+    setActivePinia(pinia)
+  })
+
   const createWrapper = (props: any) => {
-    return mount(TextLinkComponent, { props })
+    return mount(TextLinkComponent, {
+      props,
+      global: {
+        plugins: [pinia]
+      }
+    })
   }
 
   it('renders link text', () => {
@@ -44,12 +46,12 @@ describe('TextLinkComponent', () => {
   })
 
   it('calls handleActionEvent on click', async () => {
-    const { handleActionEvent } = await import('../../models/dynamic-ui/actions/ActionHandlers')
+    const handleActionEventSpy = vi.spyOn(ActionHandlers, 'handleActionEvent').mockImplementation(() => {})
     const wrapper = createWrapper(props)
 
     await wrapper.find('a').trigger('click')
 
-    expect(handleActionEvent).toHaveBeenCalledWith(
+    expect(handleActionEventSpy).toHaveBeenCalledWith(
       expect.any(Object), // event
       props.action,
       expect.any(Object)  // actionStore
@@ -58,8 +60,12 @@ describe('TextLinkComponent', () => {
 
   it('prevents default navigation', async () => {
     const wrapper = createWrapper(props)
-    const preventDefault = vi.fn()
-    await wrapper.find('a').trigger('click', { preventDefault })
-    expect(preventDefault).toHaveBeenCalled()
+    const link = wrapper.find('a')
+    const event = new Event('click')
+    const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+
+    link.element.dispatchEvent(event)
+
+    expect(preventDefaultSpy).toHaveBeenCalled()
   })
 })
