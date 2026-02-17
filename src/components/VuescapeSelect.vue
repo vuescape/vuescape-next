@@ -10,8 +10,8 @@ export default {}
 </script>
 
 <script lang="ts" setup>
-import type { SelectChangeEvent } from 'primevue/Select'
-import Select from 'primevue/Select'
+import type { SelectChangeEvent } from 'primevue/select'
+import Select from 'primevue/select'
 import { onMounted, ref, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
 
