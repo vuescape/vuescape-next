@@ -110,8 +110,8 @@ const isFullWidth = computed(() => {
             v-if="true"
             class="flex"
             :class="{
-              'mt-2 pt-9': !route.meta.hideLayout,
-              'pb-9': props.footerBootstrappedComponent?.component && !route.meta.hideLayout
+              'mt-px pt-9': !route.meta.hideLayout,
+              'pb-10.75': props.footerBootstrappedComponent?.component && !route.meta.hideLayout
             }"
           >
             <!-- Main Content -->
