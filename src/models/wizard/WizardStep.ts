@@ -1,5 +1,4 @@
 import type { Component, Raw } from 'vue'
-import type { z } from 'zod'
 
 /**
  * Represents a step in a wizard.
@@ -28,13 +27,6 @@ export interface WizardStep {
    * The payload or any other data the step might need.
    */
   payload?: unknown;
-
-  /**
-   * A Zod schema the child component can use for local validation.
-   * For example, you can pass this to the child's props so it
-   * can call zodSchema.safeParse(formData).
-   */
-  validationSchema?: z.Schema<any>;
 
   /**
    * A function that the wizard can call (or the step can call)
