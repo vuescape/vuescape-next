@@ -30,6 +30,7 @@ describe('BreadcrumbComponent.vue', () => {
   let pinia: ReturnType<typeof createPinia>
 
   beforeEach(() => {
+    vi.restoreAllMocks()
     pinia = createPinia()
     setActivePinia(pinia)
   })

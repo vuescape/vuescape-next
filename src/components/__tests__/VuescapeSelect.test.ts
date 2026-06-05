@@ -1,5 +1,6 @@
 import { createTestingPinia } from '@pinia/testing'
 import { mount } from '@vue/test-utils'
+import { setActivePinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import PrimeVueSelect from 'primevue/select'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -25,14 +26,11 @@ const attrs = {
 }
 
 const createWrapper = (propsData: VuescapeSelectProps, attrsData: any) => {
+  const pinia = createTestingPinia({ createSpy: vi.fn })
+  setActivePinia(pinia)
   return mount(VuescapeSelect, {
     global: {
-      plugins: [
-        PrimeVue,
-        createTestingPinia({
-          createSpy: vi.fn
-        })
-      ],
+      plugins: [PrimeVue, pinia],
       components: {
         Select: PrimeVueSelect
       }

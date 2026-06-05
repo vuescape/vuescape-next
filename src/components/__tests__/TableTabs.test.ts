@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
+import { setActivePinia } from 'pinia'
 import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
 import TableTabsComponent from '../TableTabs.vue'
 
@@ -46,17 +47,12 @@ if (!(global as any).IntersectionObserver) {
 }
 
 const createWrapper = (props: TableTabsProps) => {
+  const pinia = createTestingPinia({ createSpy: vi.fn })
+  setActivePinia(pinia)
   return mount(TableTabsComponent, {
     props,
     global: {
-      plugins: [
-        primeVuePlugin, 
-        router, 
-        createTestingPinia({
-          createSpy: vi.fn
-        })
-      ],
-      // optional but nice: stub transitions to reduce flakiness
+      plugins: [primeVuePlugin, router, pinia],
       stubs: { transition: false, 'transition-group': false }
     }
   })
