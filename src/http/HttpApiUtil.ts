@@ -47,6 +47,9 @@ export async function usingRetryForFetchAsync(
         `Failed to fetch. Status: ${response?.status}, StatusText: ${response?.statusText}`
       )
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw err
+      }
       retryNumber++
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
       console.warn(`Retry ${retryNumber}/${MAX_NUMBER_RETRIES} for ${url} failed: ${errorMessage}`)
@@ -353,6 +356,8 @@ export async function withErrorHandlingAsync<T = unknown>(
 
       // Handle known ApiFetchError
       return { data: null, error }
+    } else if (error instanceof DOMException && error.name === 'AbortError') {
+      return { data: null, error: null }
     } else {
       // Handle unexpected errors
       console.error('Unexpected error occurred:', error)
