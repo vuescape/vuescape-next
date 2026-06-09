@@ -340,6 +340,9 @@ export async function withErrorHandlingAsync<T = unknown>(
         // For 401 errors, don't show a notification - the authentication store will handle sign-out
         // This prevents duplicate messages when the user is being signed out
         return { data: null, error }
+      } else if (error.response.status === 403) {
+        displayMessage = 'This action could not be completed. Please refresh and try again.'
+        severity = NotificationSeverity.Warning
       } else {
         // For other errors, use the generic network error message
         displayMessage =
