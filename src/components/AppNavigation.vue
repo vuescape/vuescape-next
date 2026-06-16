@@ -107,8 +107,9 @@ function handleResizeStart(e: MouseEvent) {
 }
 
 function handleResizeMove(e: MouseEvent) {
-  if (!isResizing.value) return
-
+  if (!isResizing.value) {
+    return
+  }
   const delta = e.clientX - startX.value
   const proposedWidth = startWidth.value + delta
 

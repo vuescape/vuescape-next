@@ -42,8 +42,9 @@ const nonCloseableMessages = computed(() => props.messages.filter((msg) => msg.c
  */
 const handleToastClose = (event: ToastEvent) => {
   const messageId = (event.message as { id: string })?.id
-  if (!messageId) return
-
+  if (!messageId) {
+    return
+  }
   // Remove from tracking
   displayedMessageIds.delete(messageId)
   emit('remove', messageId)

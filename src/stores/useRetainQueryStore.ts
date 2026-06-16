@@ -75,11 +75,13 @@ export function getRetainConfig(route: RouteLocationNormalized): RetainConfig | 
  */
 function getRetainKey(route: RouteLocationNormalized): string | undefined {
   const config = getRetainConfig(route)
-  if (!config) return undefined
-
+  if (!config) {
+    return undefined
+  }
   const scopeValue = config.scope(route)
-  if (scopeValue === undefined) return undefined
-
+  if (scopeValue === undefined) {
+    return undefined
+  }
   const routeName = String(route.name ?? 'unknown')
   return `retain::${routeName}::${scopeValue}`
 }
@@ -109,7 +111,9 @@ export const useRetainQueryStore = defineStore('useRetainQuery', () => {
 
   function save(route: RouteLocationNormalized, blocklist?: string[]) {
     const key = getRetainKey(route)
-    if (!key) return
+    if (!key) {
+      return
+    } 
 
     const cleaned = sanitizeQuery(route.query as Q, blocklist)
 
@@ -122,7 +126,9 @@ export const useRetainQueryStore = defineStore('useRetainQuery', () => {
 
   function restore(route: RouteLocationNormalized): Q | undefined {
     const key = getRetainKey(route)
-    if (!key) return undefined
+    if (!key) {
+      return undefined
+    }
 
     return map.value.get(key)
   }

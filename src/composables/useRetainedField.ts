@@ -21,8 +21,9 @@ export function useRetainedField<T>(
   const syncUrl = forceUrlSync ?? routeWantsRetention
 
   onMounted(() => {
-    if (!routeWantsRetention) return // behave like a normal uncontrolled field
-
+    if (!routeWantsRetention) {
+      return // behave like a normal uncontrolled field
+    }
     const fromQueryRaw = route.query[queryKey]
     const fromStoreRaw = retained.restore(route)?.[queryKey]
 
@@ -45,9 +46,12 @@ export function useRetainedField<T>(
   watch(
     value,
     (v, prev) => {
-      if (!routeWantsRetention) return
-      if (Object.is(v, prev)) return
-
+      if (!routeWantsRetention) {
+        return
+      }
+      if (Object.is(v, prev)) {
+        return
+      }
       const encoded = encode ? encode(v) : String(v)
       retained.save({ ...route, query: { ...route.query, [queryKey]: encoded } } as any)
       if (syncUrl && route.query[queryKey] !== encoded) {
