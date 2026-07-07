@@ -42,6 +42,15 @@ describe('HttpApiUtil', () => {
       expect(response.status).toBe(400)
       expect(mockFetch).toHaveBeenCalledTimes(1)
     })
+
+    it('retries 503 (Service Unavailable) responses by default', async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 503 }))
+      mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
+
+      const response = await usingRetryForFetchAsync('https://example.com')
+      expect(response.status).toBe(200)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe('constructUrl', () => {

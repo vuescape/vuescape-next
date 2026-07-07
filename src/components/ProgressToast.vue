@@ -21,6 +21,13 @@ export interface ProgressToastProps {
   closable?: boolean
   group?: string
   sticky?: boolean
+  /**
+   * CSS class(es) for the leading icon. Defaults to the PrimeIcons class for the
+   * given severity. Override to use a different icon set (e.g. Font Awesome) so this
+   * component stays icon-library agnostic. For full control over the icon markup,
+   * use the `icon` slot instead.
+   */
+  iconClass?: string
 }
 
 const props = withDefaults(defineProps<ProgressToastProps>(), {
@@ -45,6 +52,16 @@ const toastClasses = computed(() => {
   const severityClass = `p-toast-message-${props.severity}`
   return `${baseClasses} ${severityClass}`
 })
+
+// Default to the PrimeIcons class for the severity; consumers can override via the
+// `iconClass` prop to plug in a different icon set without this component depending on one.
+const severityIconClasses: Record<NonNullable<ProgressToastProps['severity']>, string> = {
+  success: 'pi pi-check',
+  info: 'pi pi-info-circle',
+  warn: 'pi pi-exclamation-triangle',
+  error: 'pi pi-times-circle'
+}
+const iconClasses = computed(() => props.iconClass ?? severityIconClasses[props.severity])
 
 const hideToast = () => {
   isVisible.value = false
@@ -87,23 +104,20 @@ defineExpose({
     <!-- Toast Content -->
     <div class="p-toast-message-content">
       <div class="p-toast-message-icon">
-        <i
-          :class="{
-            'pi pi-check': props.severity === 'success',
-            'pi pi-info-circle': props.severity === 'info',
-            'pi pi-exclamation-triangle': props.severity === 'warn',
-            'pi pi-times-circle': props.severity === 'error'
-          }"
-        ></i>
+        <!-- Default icon is PrimeIcons-based; override the class via `iconClass` or the
+             markup entirely via the `icon` slot to avoid depending on a specific set. -->
+        <slot name="icon" :severity="props.severity">
+          <i :class="iconClasses"></i>
+        </slot>
       </div>
       <div class="p-toast-message-text">
-        <div class="p-toast-summary">{{ props.summary }}</div>
+        <div v-if="props.summary" class="p-toast-summary">{{ props.summary }}</div>
         <div v-if="props.detail" class="p-toast-detail">
           {{ props.detail }}
         </div>
       </div>
       <button v-if="props.closable" class="p-toast-icon-close" @click="hideToast">
-        <i style="font-size: 10px; vertical-align: super" class="fas fa-times"></i>
+        <i style="font-size: 10px; vertical-align: super" class="pi pi-times"></i>
       </button>
     </div>
   </div>
@@ -192,13 +206,13 @@ defineExpose({
   z-index: 1;
   padding: 1rem;
   display: flex;
-  align-items: flex-start;
   gap: 0.75rem;
 }
 
 .p-toast-message-icon {
   flex-shrink: 0;
   font-size: 1.25rem;
+  line-height: 1;
   color: #e8e8e8 !important;
 }
 

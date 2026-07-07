@@ -17,13 +17,15 @@ const RETRY_DELAY_MS = 250
  *
  * @param url - The URL to fetch.
  * @param [init] - The options for the fetch operation.
- * @param retryStatusCodes - Status codes for which to retry (default: 500-599).
+ * @param retryStatusCodes - Status codes for which to retry (default: [500, 503]). 503
+ *   (Service Unavailable) is transient by definition — a temporarily overloaded or
+ *   redeploying service — so it is retried like a 500.
  * @returns The response from the fetch operation.
  */
 export async function usingRetryForFetchAsync(
   url: string,
   init?: RequestInit,
-  retryStatusCodes: number[] = [500]
+  retryStatusCodes: number[] = [500, 503]
 ) {
   let retryNumber = 0
   let response: Response = new Response(null, {
