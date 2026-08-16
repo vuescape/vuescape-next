@@ -5,7 +5,6 @@ import { type NotificationStore } from '../stores/NotificationStore'
 import { useNotificationStore } from '../stores/useNotificationStore'
 import { Guid } from '../models/Guid'
 import { NotificationSeverity } from '../models/NotificationSeverity'
-import { type NotificationMessage } from '../models/NotificationMessage'
 
 const MAX_NUMBER_RETRIES = 3
 const RETRY_DELAY_MS = 250
@@ -301,7 +300,6 @@ export async function withErrorHandlingAsync<T = unknown>(
   } catch (error) {
     if (error instanceof ApiFetchError) {
       const notificationStore = useNotificationStore() as NotificationStore
-      const messages = notificationStore.messages as Array<NotificationMessage>
 
       let displayMessage: string
       let severity: NotificationSeverity
@@ -353,7 +351,7 @@ export async function withErrorHandlingAsync<T = unknown>(
         severity = NotificationSeverity.Error
       }
 
-      messages.push({
+      notificationStore.addMessage({
         id: Guid.newGuid(),
         text: displayMessage,
         severity: severity
