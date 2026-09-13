@@ -10,23 +10,102 @@ const MAX_NUMBER_RETRIES = 3
 const RETRY_DELAY_MS = 250
 
 /**
+ * Message shown for failures that carry no usable detail of their own -- anything other than
+ * a 400, 401 or 403. Exported so callers that supply their own wording can still fall back to
+ * or build on the standard text.
+ */
+export const DEFAULT_NETWORK_ERROR_MESSAGE =
+  'Sorry, there was temporary problem connecting over the network. ' +
+  'Please verify you are connected to the internet and try again.'
+
+/**
+ * Supplies the headers to send on a single fetch attempt. Invoked immediately before
+ * every attempt -- including the first -- so a retry sends freshly-read credentials
+ * rather than replaying the ones captured when the request was first built.
+ *
+ * @param attemptNumber - Zero-based attempt index; 0 is the initial attempt.
+ * @returns Headers to merge over the request's existing headers.
+ */
+export type RequestHeadersProvider = (
+  attemptNumber: number
+) => Record<string, string> | Promise<Record<string, string>>
+
+/**
+ * Produces the message shown for a failure that carries no detail of its own. Given as a
+ * function rather than a string when deciding the wording needs work -- probing what is
+ * actually reachable, say -- that should happen only once a request has already failed,
+ * and only for the callers that ask for it.
+ *
+ * @returns The message to show. Invoked only in the fallback branch, never for 400/401/403.
+ */
+export type NetworkErrorMessageProvider = () => string | Promise<string>
+
+/**
+ * Cross-cutting options for an API call.
+ *
+ * Collected into one object deliberately: these concerns have to travel from the service
+ * layer down to `fetch`, and as positional parameters every new one meant widening every
+ * function in between and writing `undefined, undefined, value` at the call sites. Adding a
+ * concern -- an idempotency key, a telemetry hook, a different backoff -- is now a field
+ * here, and the layers that do not care about it simply pass the object along.
+ */
+export interface ApiRequestOptions {
+  /** Standard fetch options: method, body, signal, headers. */
+  init?: RequestInit
+  /**
+   * Supplies headers per attempt so a retry sends freshly-read credentials rather than
+   * replaying the ones captured when the request was first built.
+   */
+  headersProvider?: RequestHeadersProvider
+  /**
+   * Replaces DEFAULT_NETWORK_ERROR_MESSAGE for failures other than 400, 401 and 403 --
+   * the cases that carry no detail of their own. Lets a caller say what the user actually
+   * lost instead of the generic wording. A function is awaited, so the wording can be
+   * decided after the failure; it delays the notification, so keep it quick.
+   */
+  networkErrorMessage?: string | NetworkErrorMessageProvider
+  /** Status codes to retry. Defaults to [500, 503]. */
+  retryStatusCodes?: Array<number>
+}
+
+/**
+ * Normalizes any of the HeadersInit shapes into a plain record so headers can be merged.
+ *
+ * @param headers - The headers to normalize.
+ * @returns The headers as a plain object.
+ */
+function toHeaderRecord(headers?: HeadersInit): Record<string, string> {
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries())
+  }
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(headers)
+  }
+  return { ...((headers as Record<string, string> | undefined) ?? {}) }
+}
+
+/**
  * Performs a fetch operation with retries for specified status codes.
  * If the fetch operation fails, it will retry up to MAX_NUMBER_RETRIES times
  * with an exponential backoff delay.
  *
  * @param url - The URL to fetch.
  * @param [init] - The options for the fetch operation.
- * @param retryStatusCodes - Status codes for which to retry (default: [500, 503]). 503
- *   (Service Unavailable) is transient by definition — a temporarily overloaded or
- *   redeploying service — so it is retried like a 500.
+ * @param options - Retry and credential policy. `retryStatusCodes` defaults to [500, 503];
+ *   503 (Service Unavailable) is transient by definition — a temporarily overloaded or
+ *   redeploying service — so it is retried like a 500. `headersProvider`, when given, is
+ *   read per attempt; without it every attempt replays the headers baked into `init`, so a
+ *   request that failed because a credential rotated fails identically on every retry.
  * @returns The response from the fetch operation.
  */
 export async function usingRetryForFetchAsync(
   url: string,
   init?: RequestInit,
-  retryStatusCodes: number[] = [500, 503]
+  options?: Pick<ApiRequestOptions, 'headersProvider' | 'retryStatusCodes'>
 ) {
+  const { headersProvider, retryStatusCodes = [500, 503] } = options ?? {}
   let retryNumber = 0
+  let attemptNumber = 0
   let response: Response = new Response(null, {
     status: 418,
     statusText: 'Default response value'
@@ -34,7 +113,20 @@ export async function usingRetryForFetchAsync(
 
   while (retryNumber <= MAX_NUMBER_RETRIES) {
     try {
-      response = await fetch(url, init)
+      // Re-read the headers for every attempt rather than reusing the ones captured when
+      // the request was built: credentials can rotate mid-flight (a refresh on a timer, or
+      // another tab), and replaying a stale one would fail every attempt the same way.
+      const attemptInit = headersProvider
+        ? {
+            ...init,
+            headers: {
+              ...toHeaderRecord(init?.headers),
+              ...(await headersProvider(attemptNumber++))
+            }
+          }
+        : init
+
+      response = await fetch(url, attemptInit)
 
       if (response.ok || response.status === 400 || response.status === 401) {
         return response
@@ -140,14 +232,8 @@ export function prepareRequest(
     defaultHeaders['Content-Type'] = 'application/json'
   }
 
-  // Convert init.headers to an object if it's a Headers instance
-  const initHeaders =
-    init?.headers instanceof Headers
-      ? Object.fromEntries(init.headers.entries()) // Convert Headers to a plain object
-      : init?.headers || {}
-
-  // Merge defaultHeaders and initHeaders
-  const mergedHeaders = { ...defaultHeaders, ...initHeaders }
+  // Merge defaultHeaders and the caller's headers
+  const mergedHeaders = { ...defaultHeaders, ...toHeaderRecord(init?.headers) }
 
   // Create the final RequestInit object
   const requestInit: RequestInit = {
@@ -232,17 +318,19 @@ export function createPostRequest(
  * @template T - The expected response type.
  * @param {string} baseUrl - The base URL for the API request.
  * @param {Record<string, unknown>} [argsOrData] - The query parameters for GET requests or the body data for POST requests.
- * @param {RequestInit} [init] - Additional request options, including the HTTP method.
+ * @param {ApiRequestOptions} [options] - Fetch options plus retry and credential policy.
  * @returns {Promise<T | null>} - A promise that resolves to the response data of type T or null if the response body is empty.
  * @throws {ApiFetchError} - Throws an error if the response is not ok.
  */
 export async function apiFetchAsync<T = unknown>(
   baseUrl: string,
   argsOrData?: Record<string, unknown>,
-  init?: RequestInit
+  options?: ApiRequestOptions
 ): Promise<T | null> {
+  const { init, headersProvider, retryStatusCodes } = options ?? {}
+
   // Generate the request based on the HTTP method
-  const { url, options } =
+  const { url, options: requestInit } =
     (init?.method || HttpMethod.Get) === HttpMethod.Get
       ? createGetRequest(
           baseUrl,
@@ -251,7 +339,10 @@ export async function apiFetchAsync<T = unknown>(
         )
       : createPostRequest(baseUrl, argsOrData || {}, init)
 
-  const response = await usingRetryForFetchAsync(url, options)
+  const response = await usingRetryForFetchAsync(url, requestInit, {
+    headersProvider,
+    retryStatusCodes
+  })
 
   if (!response?.ok) {
     throw new ApiFetchError(response)
@@ -266,11 +357,19 @@ export async function apiFetchAsync<T = unknown>(
 /**
  * Executes an API fetch function with error handling.
  *
+ * @deprecated Prefer `apiFetchWithErrorHandling`, which does the same thing without the
+ *   injected fetch function and accepts `ApiRequestOptions`. Retained because this is a
+ *   published entry point of this package and may have callers outside this repo.
+ *
  * @template T - The type of the data expected from the API fetch function.
  * @param apiFetchFn - The API fetch function to be executed. It should return a promise that resolves to the expected data or null.
  * @param baseUrl - The base URL for the API request.
  * @param argsOrData - Optional arguments or data to be sent with the API request.
  * @param init - Optional request initialization options.
+ * @param networkErrorMessage - Replaces DEFAULT_NETWORK_ERROR_MESSAGE for failures other than
+ *   400, 401 and 403, letting a caller say what the user actually lost ("Your message was not
+ *   sent...") instead of the generic wording. Does not affect the 400 path, which surfaces the
+ *   server's own message, nor 401, which shows nothing because sign-out handles it.
  * @returns A promise that resolves to an object containing either the fetched data or an error.
  *
  * @example
@@ -291,83 +390,123 @@ export async function withErrorHandlingAsync<T = unknown>(
   ) => Promise<T | null>,
   baseUrl: string,
   argsOrData?: Record<string, unknown>,
-  init?: RequestInit
+  init?: RequestInit,
+  networkErrorMessage?: string | NetworkErrorMessageProvider
 ): Promise<{ data: T | null; error: ApiFetchError | null }> {
   try {
     // Call the provided apiFetch function
     const data = await apiFetchFn(baseUrl, argsOrData, init)
     return { data, error: null } // Return the result with no error
   } catch (error) {
-    if (error instanceof ApiFetchError) {
-      const notificationStore = useNotificationStore() as NotificationStore
+    return await toErrorResultAsync<T>(error, networkErrorMessage)
+  }
+}
 
-      let displayMessage: string
-      let severity: NotificationSeverity
+/**
+ * Resolves the caller's fallback wording, awaiting a provider if one was given.
+ *
+ * A provider that throws must not cost the user their notification, so any failure there
+ * falls back to the standard message.
+ *
+ * @param networkErrorMessage - The caller's message or provider, if any.
+ * @returns The message to display.
+ */
+async function resolveNetworkErrorMessageAsync(
+  networkErrorMessage?: string | NetworkErrorMessageProvider
+): Promise<string> {
+  if (typeof networkErrorMessage !== 'function') {
+    return networkErrorMessage ?? DEFAULT_NETWORK_ERROR_MESSAGE
+  }
+  try {
+    return (await networkErrorMessage()) || DEFAULT_NETWORK_ERROR_MESSAGE
+  } catch (error) {
+    console.warn('Network error message provider failed; using the default message.', error)
+    return DEFAULT_NETWORK_ERROR_MESSAGE
+  }
+}
 
-      if (error.response.status === 400) {
-        // For 400 errors, try to extract the actual error message from the response
-        try {
-          // Check if the response body is still readable
-          if (error.response.bodyUsed) {
-            // If body was already consumed, use status text
-            displayMessage = error.response.statusText || 'Invalid request'
-          } else {
-            // Clone the response to avoid consuming the body stream
-            const responseClone = error.response.clone()
-            const body = await responseClone.json()
+/**
+ * Turns a thrown error into the { data, error } result shape, notifying the user when the
+ * failure is one they can act on.
+ *
+ * @template T - The type the caller expected; only ever returned as null here.
+ * @param error - The thrown error.
+ * @param networkErrorMessage - Replaces DEFAULT_NETWORK_ERROR_MESSAGE for failures other
+ *   than 400, 401 and 403.
+ * @returns The result to hand back to the caller.
+ */
+async function toErrorResultAsync<T = unknown>(
+  error: unknown,
+  networkErrorMessage?: string | NetworkErrorMessageProvider
+): Promise<{ data: T | null; error: ApiFetchError | null }> {
+  if (error instanceof ApiFetchError) {
+    const notificationStore = useNotificationStore() as NotificationStore
 
-            // Try to extract error message from common response formats
-            displayMessage =
-              body.message ||
-              body.error ||
-              body.detail ||
-              body.title ||
-              body.description ||
-              body.errorMessage ||
-              body.Message || // Try capitalized versions (for .NET Framework)
-              body.Error ||
-              body.Detail ||
-              error.response.statusText ||
-              'We could not process your request. Please try again.'
-          }
-        } catch {
-          // If JSON parsing fails then display a generic message
-          displayMessage = 'We could not process your request. Please try again.'
+    let displayMessage: string
+    let severity: NotificationSeverity
+
+    if (error.response.status === 400) {
+      // For 400 errors, try to extract the actual error message from the response
+      try {
+        // Check if the response body is still readable
+        if (error.response.bodyUsed) {
+          // If body was already consumed, use status text
+          displayMessage = error.response.statusText || 'Invalid request'
+        } else {
+          // Clone the response to avoid consuming the body stream
+          const responseClone = error.response.clone()
+          const body = await responseClone.json()
+
+          // Try to extract error message from common response formats
+          displayMessage =
+            body.message ||
+            body.error ||
+            body.detail ||
+            body.title ||
+            body.description ||
+            body.errorMessage ||
+            body.Message || // Try capitalized versions (for .NET Framework)
+            body.Error ||
+            body.Detail ||
+            error.response.statusText ||
+            'We could not process your request. Please try again.'
         }
-
-        severity = NotificationSeverity.Warning
-      } else if (error.response.status === 401) {
-        // For 401 errors, don't show a notification - the authentication store will handle sign-out
-        // This prevents duplicate messages when the user is being signed out
-        return { data: null, error }
-      } else if (error.response.status === 403) {
-        displayMessage = 'This action could not be completed. Please refresh and try again.'
-        severity = NotificationSeverity.Warning
-      } else {
-        // For other errors, use the generic network error message
-        displayMessage =
-          'Sorry, there was temporary problem connecting over the network. ' +
-          'Please verify you are connected to the internet and try again.'
-        severity = NotificationSeverity.Error
+      } catch {
+        // If JSON parsing fails then display a generic message
+        displayMessage = 'We could not process your request. Please try again.'
       }
 
-      notificationStore.addMessage({
-        id: Guid.newGuid(),
-        text: displayMessage,
-        severity: severity
-      })
-
-      // Handle known ApiFetchError
+      severity = NotificationSeverity.Warning
+    } else if (error.response.status === 401) {
+      // For 401 errors, don't show a notification - the authentication store will handle sign-out
+      // This prevents duplicate messages when the user is being signed out
       return { data: null, error }
-    } else if (error instanceof DOMException && error.name === 'AbortError') {
-      return { data: null, error: null }
+    } else if (error.response.status === 403) {
+      displayMessage = 'This action could not be completed. Please refresh and try again.'
+      severity = NotificationSeverity.Warning
     } else {
-      // Handle unexpected errors
-      console.error('Unexpected error occurred:', error)
-      return {
-        data: null,
-        error: new ApiFetchError(new Response(null, { status: 500, statusText: 'Unknown Error' }))
-      }
+      // For other errors there is no detail worth surfacing, so use the caller's wording
+      // when it gave any and the generic network message otherwise.
+      displayMessage = await resolveNetworkErrorMessageAsync(networkErrorMessage)
+      severity = NotificationSeverity.Error
+    }
+
+    notificationStore.addMessage({
+      id: Guid.newGuid(),
+      text: displayMessage,
+      severity: severity
+    })
+
+    // Handle known ApiFetchError
+    return { data: null, error }
+  } else if (error instanceof DOMException && error.name === 'AbortError') {
+    return { data: null, error: null }
+  } else {
+    // Handle unexpected errors
+    console.error('Unexpected error occurred:', error)
+    return {
+      data: null,
+      error: new ApiFetchError(new Response(null, { status: 500, statusText: 'Unknown Error' }))
     }
   }
 }
@@ -378,19 +517,23 @@ export async function withErrorHandlingAsync<T = unknown>(
  * @template T - The type of the data expected from the API response.
  * @param {string} baseUrl - The base URL of the API endpoint.
  * @param {Record<string, unknown>} [argsOrData] - Optional arguments or data to be sent with the request.
- * @param {RequestInit} [init] - Optional custom settings to apply to the request.
+ * @param {ApiRequestOptions} [options] - Fetch options plus retry, credential and messaging policy.
  * @returns {Promise<{ data: T | null; error: ApiFetchError | null }>} A promise that resolves to an object containing either the fetched data or an error.
  */
-export function apiFetchWithErrorHandling<T = unknown>(
+export async function apiFetchWithErrorHandling<T = unknown>(
   baseUrl: string,
   argsOrData?: Record<string, unknown>,
-  init?: RequestInit
+  options?: ApiRequestOptions
 ): Promise<{
   data: T | null
   error: ApiFetchError | null
 }> {
-  const result = withErrorHandlingAsync(apiFetchAsync<T>, baseUrl, argsOrData, init)
-  return result
+  try {
+    const data = await apiFetchAsync<T>(baseUrl, argsOrData, options)
+    return { data, error: null }
+  } catch (error) {
+    return await toErrorResultAsync<T>(error, options?.networkErrorMessage)
+  }
 }
 
 /**
@@ -402,8 +545,11 @@ export function apiFetchWithErrorHandling<T = unknown>(
  */
 export async function safeJsonAsync<T>(response: Response): Promise<T | null> {
   try {
-    return await response.json()
+    const result = await response.json()
+    return result
   } catch {
-    return null // Return null if JSON parsing fails
+    console.warn('Could not parse json...returning null.')
+    // Return null if JSON parsing fails
+    return null
   }
 }

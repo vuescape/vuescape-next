@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { HttpMethod } from '../HttpMethod'
 import {
+  DEFAULT_NETWORK_ERROR_MESSAGE,
   usingRetryForFetchAsync,
   constructUrl,
   prepareRequest,
@@ -12,6 +13,7 @@ import {
   safeJsonAsync
 } from '../HttpApiUtil'
 import { ApiFetchError } from '../../models/ApiFetchError'
+import { useNotificationStore } from '../../stores/useNotificationStore'
 import { createPinia, setActivePinia } from 'pinia'
 
 setActivePinia(createPinia())
@@ -30,7 +32,13 @@ describe('HttpApiUtil', () => {
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
       mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
 
-      const response = await usingRetryForFetchAsync('https://example.com', {}, [500])
+      const response = await usingRetryForFetchAsync(
+        'https://example.com',
+        {},
+        {
+          retryStatusCodes: [500]
+        }
+      )
       expect(response.status).toBe(200)
       expect(mockFetch).toHaveBeenCalledTimes(3)
     })
@@ -50,6 +58,58 @@ describe('HttpApiUtil', () => {
       const response = await usingRetryForFetchAsync('https://example.com')
       expect(response.status).toBe(200)
       expect(mockFetch).toHaveBeenCalledTimes(2)
+    })
+
+    describe('headersProvider', () => {
+      it('sends the headers the provider returns for the attempt, not the ones in init', async () => {
+        // Arrange: a credential that rotates between the failing attempt and the next one.
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 500 }))
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
+        const tokens = ['stale-token', 'rotated-token']
+
+        // Act
+        await usingRetryForFetchAsync(
+          'https://example.com',
+          { headers: { authZ: 'stale-token', Accept: 'application/json' } },
+          {
+            retryStatusCodes: [500],
+            headersProvider: (attemptNumber) => ({ authZ: tokens[attemptNumber] })
+          }
+        )
+
+        // Assert: the retry carries the rotated token, and untouched headers survive.
+        expect(mockFetch.mock.calls[0][1].headers).toEqual({
+          authZ: 'stale-token',
+          Accept: 'application/json'
+        })
+        expect(mockFetch.mock.calls[1][1].headers).toEqual({
+          authZ: 'rotated-token',
+          Accept: 'application/json'
+        })
+      })
+
+      it('awaits an async provider', async () => {
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
+
+        await usingRetryForFetchAsync(
+          'https://example.com',
+          {},
+          {
+            headersProvider: () => Promise.resolve({ authZ: 'resolved-token' })
+          }
+        )
+
+        expect(mockFetch.mock.calls[0][1].headers).toEqual({ authZ: 'resolved-token' })
+      })
+
+      it('leaves init untouched when no provider is given', async () => {
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 200 }))
+        const init = { headers: { authZ: 'only-token' } }
+
+        await usingRetryForFetchAsync('https://example.com', init)
+
+        expect(mockFetch.mock.calls[0][1]).toBe(init)
+      })
     })
   })
 
@@ -137,16 +197,109 @@ describe('HttpApiUtil', () => {
         formData: () => Promise.resolve(new FormData()),
         text: () => Promise.resolve('')
       } as Response
-      
+
       // Mock multiple responses for retries
       mockFetch.mockResolvedValueOnce(mockResponse)
       mockFetch.mockResolvedValueOnce(mockResponse)
       mockFetch.mockResolvedValueOnce(mockResponse)
       mockFetch.mockResolvedValueOnce(mockResponse)
-      
+
       const result = await withErrorHandlingAsync(apiFetchAsync, 'https://example.com')
       expect(result.data).toBeNull()
       expect(result.error).toBeInstanceOf(ApiFetchError)
+    })
+
+    describe('networkErrorMessage', () => {
+      // 502 is not retried, so a single mocked response drives the whole call.
+      const respondWith = (status: number) =>
+        mockFetch.mockResolvedValueOnce(new Response(null, { status }))
+
+      it('notifies with the default message when no override is given', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        respondWith(502)
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com')
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe(DEFAULT_NETWORK_ERROR_MESSAGE)
+      })
+
+      it('notifies with the override when one is given', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        respondWith(502)
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          networkErrorMessage: 'Your message was not sent.'
+        })
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe('Your message was not sent.')
+      })
+
+      it('resolves a provider function, so wording can be decided after the failure', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        respondWith(502)
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          networkErrorMessage: () => Promise.resolve('We could not reach the service.')
+        })
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe('We could not reach the service.')
+      })
+
+      it('falls back to the default when the provider throws', async () => {
+        // Arrange: a broken provider must not cost the user their notification.
+        setActivePinia(createPinia())
+        respondWith(502)
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          networkErrorMessage: () => {
+            throw new Error('probe blew up')
+          }
+        })
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe(DEFAULT_NETWORK_ERROR_MESSAGE)
+      })
+
+      it('does not invoke the provider for a 403, which has its own message', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        respondWith(403)
+        const provider = vi.fn(() => 'should not be used')
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          networkErrorMessage: provider
+        })
+
+        // Assert
+        expect(provider).not.toHaveBeenCalled()
+      })
+
+      it('does not override the 403 message', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        respondWith(403)
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          networkErrorMessage: 'Your message was not sent.'
+        })
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe(
+          'This action could not be completed. Please refresh and try again.'
+        )
+      })
     })
   })
 
