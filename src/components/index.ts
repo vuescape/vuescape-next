@@ -10,6 +10,7 @@ export { default as PaneLayoutRenderer } from './PaneLayoutRenderer.vue'
 export { default as PaneSectionRenderer } from './PaneSectionRenderer.vue'
 export { default as ProgressToast } from './ProgressToast.vue'
 export { default as ReportLayoutRenderer } from './ReportLayoutRenderer.vue'
+export { default as VuescapeCard } from './VuescapeCard.vue'
 export { default as VuescapeDialog } from './VuescapeDialog.vue'
 export * from './wizard'
 

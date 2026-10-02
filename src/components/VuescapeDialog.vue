@@ -36,7 +36,8 @@ const props = withDefaults(defineProps<VuescapeDialogProps>(), {
   okButtonText: 'OK',
   cancelButtonText: undefined,
   density: 'comfortable',
-  showFooter: true
+  showFooter: true,
+  width: '25rem'
 })
 
 const dialogClass = computed(() => [
@@ -52,6 +53,13 @@ const okClick = () => {
 const cancelClick = () => {
   emit('update:modelValue', false)
 }
+
+// Escape and the close icon only dismiss the dialog when it is closable
+const onVisibleUpdate = (visible: boolean) => {
+  if (props.closable) {
+    emit('update:modelValue', visible)
+  }
+}
 </script>
 
 <template>
@@ -61,10 +69,11 @@ const cancelClick = () => {
       :dismissable-mask="closable"
       :draggable="draggable"
       :header="headerText"
-      :style="{ width: '25rem' }"
+      :style="{ width: props.width }"
       :visible="modelValue"
       :class="dialogClass"
       modal
+      @update:visible="onVisibleUpdate"
     >
       <slot />
       <template v-if="showFooter" #footer>
@@ -93,6 +102,18 @@ const cancelClick = () => {
 .vuescape-dialog__pv-dialog-header--color .p-dialog-header {
   background-color: var(--p-primary-color);
   color: white;
+}
+
+/*
+ * The default close button is a muted grey, barely visible on the primary color. Set through the button's
+ * own tokens rather than `color`, which ties PrimeVue's rules on specificity and loses to its later
+ * injected style.
+ */
+.vuescape-dialog__pv-dialog-header--color .p-dialog-close-button {
+  --p-button-text-secondary-color: white;
+  --p-button-text-secondary-hover-background: rgb(255 255 255 / 0.15);
+  --p-button-text-secondary-active-background: rgb(255 255 255 / 0.25);
+  --p-button-secondary-focus-ring-color: white;
 }
 
 .vuescape-dialog__pv-dialog-header--color .p-dialog-content {

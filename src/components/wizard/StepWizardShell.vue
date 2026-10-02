@@ -6,6 +6,7 @@
  *
  * @prop {StepWizardShellProps} - the StepWizardProps
  *
+ * @slot statusBar - optional content rendered between the title and the current step
  */
 export default {}
 </script>
@@ -236,6 +237,8 @@ function handleCancel() {
         </a>
       </div>
     </div>
+    <!-- Optional content shown above every step, e.g. the health of something the steps depend on -->
+    <slot name="statusBar" />
     <KeepAlive>
       <component
         v-if="stepComponent"

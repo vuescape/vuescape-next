@@ -47,4 +47,10 @@ export interface VuescapeDialogProps {
    * @default true
    */
   showFooter?: boolean
+
+  /**
+   * The CSS width of the dialog.
+   * @default '25rem'
+   */
+  width?: string
 }
