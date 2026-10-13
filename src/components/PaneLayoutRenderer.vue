@@ -30,8 +30,8 @@ defineProps<PaneLayoutRendererProps>()
 <style scoped>
 .pane-layout {
   padding-top: 0 !important;
-  /* padding-bottom: 1rem; */
-  padding-bottom: 14px;
+  /* Tables measure the space below them (utils/tableLayout), so this no longer has to be trimmed to fit them. */
+  padding-bottom: 1rem;
   /*   
   padding-left: 1rem;
   padding-right: 1rem;

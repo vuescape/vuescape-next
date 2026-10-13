@@ -17,6 +17,7 @@ import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableP
 import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
+import { getSpaceBelow } from '../utils/tableLayout'
 
 import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject } from 'vue'
 
@@ -65,17 +66,18 @@ function onScroll(e: Event) {
 }
 
 /**
- * Calculates the available height for the table based on viewport and wrapper position.
- * Uses getBoundingClientRect to determine how much vertical space is available.
+ * Calculates the available height for the table based on viewport and wrapper position, so the page fills the
+ * screen without scrolling. Uses getBoundingClientRect to determine how much vertical space is available.
  */
 function updateTableHeight() {
   if (tableWrapperRef.value) {
     const rect = tableWrapperRef.value.getBoundingClientRect()
-    // Calculate available height: viewport height - current top position - buffer for footer
+    // Available height: viewport height - current top position - whatever the layout adds below the table (measured,
+    // not a fixed buffer, which drifted out of date and showed as a scrollbar).
     const viewportHeight = window.innerHeight
     const topPosition = rect.top
-    const footerBuffer = 84 // Space for footer and padding
-    const availableHeight = viewportHeight - topPosition - footerBuffer
+    const spaceBelow = getSpaceBelow(tableWrapperRef.value)
+    const availableHeight = viewportHeight - topPosition - spaceBelow
 
     // Use available height with minimum of 276px
     const tableHeight = Math.max(276, availableHeight)
