@@ -31,6 +31,7 @@ function createEngineMock({ isLastStep = false, historyLength = 2, buttonConfig 
     },
     goNext: vi.fn(),
     goBack: vi.fn(),
+    goTo: vi.fn(),
     updateStepState: vi.fn()
   }
 }

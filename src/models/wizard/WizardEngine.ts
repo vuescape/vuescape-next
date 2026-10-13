@@ -35,6 +35,15 @@ export interface WizardEngine {
    * Moves the wizard back to the previous step.
    */
   goBack: () => void
+
+  /**
+   * Moves the wizard to a step out of its normal order, e.g. back to a step whose precondition no longer holds.
+   *
+   * @param stepId - The step to go to. Ignored when it is not in the graph.
+   * @param precedingHistory - The steps Back returns through from it. Defaults to the history before the step's last
+   * visit, or the whole current history when it has not been visited.
+   */
+  goTo: (stepId: string, precedingHistory?: string[]) => void
   
   /**
    * Updates the state of a specific step in the wizard.

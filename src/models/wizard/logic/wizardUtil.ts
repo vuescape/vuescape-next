@@ -24,6 +24,7 @@ import type { SurveyStepState } from '../survey-components/SurveyStepState'
  * - `isLastStep`: A computed boolean indicating whether the current step is the last step in the wizard.
  * - `goNext`: A function to transition to the next step, if available.
  * - `goBack`: A function to return to the previous step, if possible.
+ * - `goTo`: A function to move to a step out of the normal order.
  * - `updateStepState`: A function to update the state of a specific step.
  * - `context`: The wizard context, including state, current step ID, history, and the `updateState` function.
  */
@@ -69,6 +70,20 @@ export function createWizardEngine(
     }
   }
 
+  function goTo(stepId: string, precedingHistory?: string[]) {
+    if (!graph[stepId]) {
+      return
+    }
+
+    const lastVisit = history.value.lastIndexOf(stepId)
+    const preceding =
+      precedingHistory ?? (lastVisit === -1 ? history.value : history.value.slice(0, lastVisit))
+
+    // In place: the context holds this same array.
+    history.value.splice(0, history.value.length, ...preceding, stepId)
+    currentStepId.value = stepId
+  }
+
   function updateStepState(stepId: string, payload: any) {
     updateState(stepId, payload)
   }
@@ -80,6 +95,7 @@ export function createWizardEngine(
     isLastStep,
     goNext,
     goBack,
+    goTo,
     updateStepState,
     context
   }
