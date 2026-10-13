@@ -77,7 +77,13 @@ const toggleMenu = (e: Event) => menuRef.value.toggle(e)
 /* TODO: Add this to the theme */
 .action-button {
   font-size: 14px;
-  line-height: 0;
+  line-height: 1;
   height: 26px;
+}
+
+/* Flex centering centers the font's ascent/descent box, and Segoe UI's tall ascent leaves the
+   glyphs ~2px low. Trimming the label to cap-height/baseline centers the visible text instead. */
+.action-button :deep(.p-button-label) {
+  text-box: trim-both cap alphabetic;
 }
 </style>
