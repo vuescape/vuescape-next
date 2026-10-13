@@ -156,14 +156,15 @@ const buttonsByPosition = computed(() => {
     right: []
   }
 
+  // Order within a shared position runs backward → forward, so Next is the rightmost button of its group.
   if (config.previous?.visible) {
     groups[config.previous.position!].push({ type: 'previous', config: config.previous })
   }
-  if (config.next?.visible) {
-    groups[config.next.position!].push({ type: 'next', config: config.next })
-  }
   if (config.cancel?.visible) {
     groups[config.cancel.position!].push({ type: 'cancel', config: config.cancel })
+  }
+  if (config.next?.visible) {
+    groups[config.next.position!].push({ type: 'next', config: config.next })
   }
 
   return groups

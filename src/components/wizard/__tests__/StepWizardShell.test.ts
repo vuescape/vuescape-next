@@ -246,4 +246,26 @@ describe('StepWizardShell', () => {
     // Step-level config should override for next button
     expect(btns.at(2)!.text()).toBe('Continue')
   })
+
+  it('places Next after Cancel when they share a position', async () => {
+    const engine = createEngineMock({
+      buttonConfig: {
+        previous: { visible: false },
+        next: { label: 'Continue', position: 'center', visible: true },
+        cancel: { label: 'Back to Product', position: 'center', visible: true }
+      }
+    })
+    const wrapper = mount(StepWizardShell, {
+      props: { engine: engine as any },
+      global: {
+        stubs: {
+          VuescapeButton
+        }
+      }
+    })
+    await flushPromises()
+
+    const btns = wrapper.findAllComponents({ name: 'VuescapeButton' })
+    expect(btns.map((btn) => btn.text())).toEqual(['Back to Product', 'Continue'])
+  })
 })
