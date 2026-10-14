@@ -310,6 +310,38 @@ describe('HttpApiUtil', () => {
       expect(result.data).toEqual({ foo: 'bar' })
       expect(result.error).toBeNull()
     })
+
+    describe('expectedStatusCodes', () => {
+      it('does not notify for an expected status but still returns the error', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 404 }))
+
+        // Act
+        const actual = await apiFetchWithErrorHandling('https://example.com', undefined, {
+          expectedStatusCodes: [404]
+        })
+
+        // Assert
+        expect(actual.data).toBeNull()
+        expect(actual.error?.response.status).toBe(404)
+        expect(useNotificationStore().messages).toHaveLength(0)
+      })
+
+      it('still notifies for a status that is not expected', async () => {
+        // Arrange
+        setActivePinia(createPinia())
+        mockFetch.mockResolvedValueOnce(new Response(null, { status: 502 }))
+
+        // Act
+        await apiFetchWithErrorHandling('https://example.com', undefined, {
+          expectedStatusCodes: [404]
+        })
+
+        // Assert
+        expect(useNotificationStore().messages[0].text).toBe(DEFAULT_NETWORK_ERROR_MESSAGE)
+      })
+    })
   })
 
   describe('safeJson', () => {

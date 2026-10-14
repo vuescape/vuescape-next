@@ -64,6 +64,12 @@ export interface ApiRequestOptions {
    * decided after the failure; it delays the notification, so keep it quick.
    */
   networkErrorMessage?: string | NetworkErrorMessageProvider
+  /**
+   * Failure statuses the caller handles itself, so no notification is shown for them -- a 404
+   * for a resource that may have been removed, say. The call still fails as usual (null data,
+   * the error set), so the caller can tell the user in place.
+   */
+  expectedStatusCodes?: ReadonlyArray<number>
   /** Status codes to retry. Defaults to [500, 503]. */
   retryStatusCodes?: Array<number>
 }
@@ -433,13 +439,20 @@ async function resolveNetworkErrorMessageAsync(
  * @param error - The thrown error.
  * @param networkErrorMessage - Replaces DEFAULT_NETWORK_ERROR_MESSAGE for failures other
  *   than 400, 401 and 403.
+ * @param expectedStatusCodes - Failure statuses the caller handles itself, so they are not
+ *   notified.
  * @returns The result to hand back to the caller.
  */
 async function toErrorResultAsync<T = unknown>(
   error: unknown,
-  networkErrorMessage?: string | NetworkErrorMessageProvider
+  networkErrorMessage?: string | NetworkErrorMessageProvider,
+  expectedStatusCodes?: ReadonlyArray<number>
 ): Promise<{ data: T | null; error: ApiFetchError | null }> {
   if (error instanceof ApiFetchError) {
+    if (expectedStatusCodes?.includes(error.response.status)) {
+      return { data: null, error }
+    }
+
     const notificationStore = useNotificationStore() as NotificationStore
 
     let displayMessage: string
@@ -532,7 +545,11 @@ export async function apiFetchWithErrorHandling<T = unknown>(
     const data = await apiFetchAsync<T>(baseUrl, argsOrData, options)
     return { data, error: null }
   } catch (error) {
-    return await toErrorResultAsync<T>(error, options?.networkErrorMessage)
+    return await toErrorResultAsync<T>(
+      error,
+      options?.networkErrorMessage,
+      options?.expectedStatusCodes
+    )
   }
 }
 
