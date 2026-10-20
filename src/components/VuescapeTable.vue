@@ -17,7 +17,7 @@ import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableP
 import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
-import { getSpaceBelow } from '../utils/tableLayout'
+import { APPEND_ONLY_MAX_CELLS, getSpaceBelow } from '../utils/tableLayout'
 
 import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject } from 'vue'
 
@@ -60,6 +60,11 @@ watch(
   },
   { deep: shouldDeepWatch } // Deep watch can be disabled for large datasets via prop or inject
 )
+
+const virtualScrollerOptions = computed(() => ({
+  itemSize: 46,
+  appendOnly: localState.rows.length * localState.columns.length <= APPEND_ONLY_MAX_CELLS,
+}))
 
 function onScroll(e: Event) {
   emit('update:scrollPosition', (e.target as HTMLElement).scrollTop)
@@ -352,7 +357,7 @@ const enhancedRows = computed(() => {
       :stripedRows="true"
       :showGridlines="true"
       tableStyle="min-width: 100%;"
-      :virtualScrollerOptions="{ itemSize: 46 }"
+      :virtualScrollerOptions="virtualScrollerOptions"
       stateStorage="session"
       :stateKey="localState.id"
       :resizable-columns="false"

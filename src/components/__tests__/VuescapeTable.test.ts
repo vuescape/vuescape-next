@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { ref } from 'vue'
 import type { TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
+import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
 import VuescapeTable from '../VuescapeTable.vue'
 
 const columns = ref<Array<TableColumn>>([
@@ -68,6 +69,48 @@ describe('VuescapeTable.vue', () => {
 
     const tableColumns = wrapper.findAllComponents({ name: 'Column' })
     expect(tableColumns.length).toBe(columns.value.length)
+  })
+
+  describe('virtual scroller', () => {
+    const columnCount = 10
+
+    function mountWithRowCount(rowCount: number) {
+      const wideColumns: Array<TableColumn> = Array.from({ length: columnCount }, (_, index) => ({
+        id: `column${index}`,
+        headerText: `Column ${index}`,
+      }))
+      const manyRows: Array<TableRow> = Array.from({ length: rowCount }, (_, rowIndex) => ({
+        id: `${rowIndex}`,
+        cells: Object.fromEntries(
+          wideColumns.map((column) => [column.id, { displayValue: `${rowIndex}` }]),
+        ),
+      }))
+
+      return mount(VuescapeTable, {
+        props: {
+          id: 'test-table-virtual-scroller',
+          columns: wideColumns,
+          rows: manyRows,
+          initialScrollPosition: 0,
+        },
+      })
+    }
+
+    it('should only append rows up to the cell threshold, so wrapped rows do not drift', () => {
+      // Act
+      const wrapper = mountWithRowCount(APPEND_ONLY_MAX_CELLS / columnCount)
+
+      // Assert
+      expect(wrapper.findComponent({ name: 'VirtualScroller' }).props('appendOnly')).toBe(true)
+    })
+
+    it('should recycle rows above the cell threshold, to keep the page small', () => {
+      // Act
+      const wrapper = mountWithRowCount(APPEND_ONLY_MAX_CELLS / columnCount + 1)
+
+      // Assert
+      expect(wrapper.findComponent({ name: 'VirtualScroller' }).props('appendOnly')).toBe(false)
+    })
   })
 
   // TODO: test virtual scroller implementation since table data is not in the body of the table.

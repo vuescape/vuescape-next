@@ -10,6 +10,14 @@ export const APP_SHELL_CONTENT_CLASS = 'app__container--scroll'
 export const FALLBACK_SPACE_BELOW_TABLE = 84
 
 /**
+ * The most cells (rows × columns) a table can have and still have its virtual scroller only append rows. Appending
+ * never removes rows or positions them by the fixed `itemSize`, so rows can wrap to any height without the scroll
+ * position drifting. Bigger tables recycle rows to keep the page small, which needs every row to be exactly
+ * `itemSize` tall. Counted in cells, not rows, since cells are what the page has to render.
+ */
+export const APPEND_ONLY_MAX_CELLS = 10_000
+
+/**
  * How much the layout adds below an element, down to the bottom of the app shell's content: the padding of whatever
  * contains it (tab panels, panes) and the shell's room for the fixed footer. Measured rather than assumed, since
  * each of those has changed before and any drift shows as a page scrollbar.
