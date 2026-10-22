@@ -50,7 +50,7 @@ onUnmounted(() => {
  */
 const componentMap: Record<PaneComponent['typeName'], () => Promise<{ default: Component }>> = {
   'component.text': () => import('./TextComponentRenderer.vue'),
-  'component.button': () => import('./VuescapeButton.vue'),
+  'component.button': () => import('./ButtonComponentRenderer.vue'),
   'component.chicletGrid': () => import('./ChicletGrid.vue'),
   'component.fileUpload': () => import('./FileUpload.vue'),
   'component.readOnlyFileUpload': () => import('./ReadOnlyFileUpload.vue'),

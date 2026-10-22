@@ -23,4 +23,14 @@ export interface ButtonComponentPayload {
    * Optional array of icon names to display on the button.
    */
   icons?: Array<string>
+
+  /**
+   * Optional value indicating whether the button is disabled. Default is false.
+   */
+  isDisabled?: boolean
+
+  /**
+   * Optional tooltip.
+   */
+  tooltip?: string
 }

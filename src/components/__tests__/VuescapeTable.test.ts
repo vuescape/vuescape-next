@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import type { TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
 import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
@@ -69,6 +69,38 @@ describe('VuescapeTable.vue', () => {
 
     const tableColumns = wrapper.findAllComponents({ name: 'Column' })
     expect(tableColumns.length).toBe(columns.value.length)
+  })
+
+  describe('scroll height', () => {
+    it('should use a height provided by an ancestor, e.g. a dialog, instead of filling the page', async () => {
+      // Arrange
+      const wrapper = mount(VuescapeTable, {
+        props: { id: 'test-table', columns: columns.value, rows: rows.value, initialScrollPosition: 0 },
+        global: { provide: { tableScrollHeight: 'min(320px, 50vh)' } }
+      })
+
+      // Act: let the deferred measurement run, which must not override the provided height
+      await new Promise((resolve) => setTimeout(resolve, 0))
+
+      // Assert
+      expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe('min(320px, 50vh)')
+    })
+
+    it('should follow a provided height that changes, e.g. as a dialog it fills resizes', async () => {
+      // Arrange
+      const tableScrollHeight = ref('200px')
+      const wrapper = mount(VuescapeTable, {
+        props: { id: 'test-table', columns: columns.value, rows: rows.value, initialScrollPosition: 0 },
+        global: { provide: { tableScrollHeight } }
+      })
+
+      // Act
+      tableScrollHeight.value = '300px'
+      await nextTick()
+
+      // Assert
+      expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe('300px')
+    })
   })
 
   describe('virtual scroller', () => {

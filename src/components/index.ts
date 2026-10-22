@@ -18,6 +18,7 @@ export * from './wizard'
 // and are NOT statically exported to enable code splitting.
 // These are primarily used in PaneComponentRenderer's dynamic component system:
 // - ActionButton
+// - ButtonComponentRenderer
 // - ChicletButton (only used by ChicletGrid internally)
 // - ChicletGrid
 // - FileUpload
