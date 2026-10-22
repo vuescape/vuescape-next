@@ -16,6 +16,7 @@ import { ref, watch, computed, onMounted, provide } from 'vue'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import PaneLayoutRenderer from './PaneLayoutRenderer.vue'
+import { VuescapeTableDeepWatchKey } from './injectionKeys'
 
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
@@ -27,7 +28,7 @@ import type { ReportLayout } from '../models'
 const props = defineProps<ReportLayoutRendererProps>()
 
 // Provide deepWatch setting to all child components (including dynamically loaded ones like VuescapeTable)
-provide('deepWatch', props.deepWatch ?? true)
+provide(VuescapeTableDeepWatchKey, props.deepWatch ?? true)
 
 // Set up reactive reportLayout that initializes from props and updates reactively
 const reportLayouts = ref<ReportLayout[]>(

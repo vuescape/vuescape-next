@@ -4,6 +4,7 @@ import { nextTick, ref } from 'vue'
 import type { TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
 import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
+import { VuescapeTableScrollHeightKey } from '../injectionKeys'
 import VuescapeTable from '../VuescapeTable.vue'
 
 const columns = ref<Array<TableColumn>>([
@@ -76,7 +77,7 @@ describe('VuescapeTable.vue', () => {
       // Arrange
       const wrapper = mount(VuescapeTable, {
         props: { id: 'test-table', columns: columns.value, rows: rows.value, initialScrollPosition: 0 },
-        global: { provide: { tableScrollHeight: 'min(320px, 50vh)' } }
+        global: { provide: { [VuescapeTableScrollHeightKey as symbol]: 'min(320px, 50vh)' } }
       })
 
       // Act: let the deferred measurement run, which must not override the provided height
@@ -91,7 +92,7 @@ describe('VuescapeTable.vue', () => {
       const tableScrollHeight = ref('200px')
       const wrapper = mount(VuescapeTable, {
         props: { id: 'test-table', columns: columns.value, rows: rows.value, initialScrollPosition: 0 },
-        global: { provide: { tableScrollHeight } }
+        global: { provide: { [VuescapeTableScrollHeightKey as symbol]: tableScrollHeight } }
       })
 
       // Act

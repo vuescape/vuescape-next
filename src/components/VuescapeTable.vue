@@ -18,16 +18,24 @@ import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import { APPEND_ONLY_MAX_CELLS, getSpaceBelow } from '../utils/tableLayout'
+import { VuescapeTableDeepWatchKey, VuescapeTableScrollHeightKey } from './injectionKeys'
 
-import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject, unref } from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
 
 // Inject deepWatch from parent (ReportLayoutRenderer provides it)
 // Prefer prop value if explicitly set, otherwise use injected value, fallback to true
-const injectedDeepWatch = inject<boolean>('deepWatch', true)
+const injectedDeepWatch = inject(VuescapeTableDeepWatchKey, true)
 const shouldDeepWatch = props.deepWatch ?? injectedDeepWatch
+
+// A height (any CSS length) from an ancestor that cannot give the table the rest of the page, e.g. a dialog, where
+// filling the screen would make the dialog scroll as well as the table. It may be a ref the ancestor updates, e.g. to
+// fill the dialog as it resizes. Without it the table fills the page.
+// Providing it at all (even as a ref that later holds '') turns off the self-measured dynamicScrollHeight for good:
+// the check is whether the inject resolved, not what it holds.
+const injectedScrollHeight = inject(VuescapeTableScrollHeightKey, undefined)
 
 /**
  * This component currently uses a typed event model (e.g. `@change`, `@update`).
@@ -40,7 +48,13 @@ const emit = defineEmits<{ (e: 'update:scrollPosition', val: number): void }>()
 
 const dtRef = ref<any>(null)
 const tableWrapperRef = ref<HTMLElement | null>(null)
+// The table's own "fill the rest of the page" height in px, measured by updateTableHeight on mount and window resize.
+// Unused (left at this default) when an ancestor provides tableScrollHeight.
 const dynamicScrollHeight = ref('576px')
+// What the DataTable actually gets: the ancestor's height when one is provided, otherwise the measured one.
+const scrollHeight = computed(() =>
+  injectedScrollHeight === undefined ? dynamicScrollHeight.value : unref(injectedScrollHeight)
+)
 
 const localState = reactive({
   id: props.id,
@@ -75,6 +89,10 @@ function onScroll(e: Event) {
  * screen without scrolling. Uses getBoundingClientRect to determine how much vertical space is available.
  */
 function updateTableHeight() {
+  if (injectedScrollHeight !== undefined) {
+    return
+  }
+
   if (tableWrapperRef.value) {
     const rect = tableWrapperRef.value.getBoundingClientRect()
     // Available height: viewport height - current top position - whatever the layout adds below the table (measured,
@@ -353,7 +371,7 @@ const enhancedRows = computed(() => {
       ref="dtRef"
       :value="enhancedRows"
       :scrollable="true"
-      :scrollHeight="dynamicScrollHeight"
+      :scrollHeight="scrollHeight"
       :stripedRows="true"
       :showGridlines="true"
       tableStyle="min-width: 100%;"

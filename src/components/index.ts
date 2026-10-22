@@ -12,6 +12,7 @@ export { default as ProgressToast } from './ProgressToast.vue'
 export { default as ReportLayoutRenderer } from './ReportLayoutRenderer.vue'
 export { default as VuescapeCard } from './VuescapeCard.vue'
 export { default as VuescapeDialog } from './VuescapeDialog.vue'
+export * from './injectionKeys'
 export * from './wizard'
 
 // The following components are dynamically imported by other components
