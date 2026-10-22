@@ -7,7 +7,7 @@ interface RetainOptions {
 
 /**
  * Installs navigation guards on the provided Vue Router instance to retain and restore query parameters
- * for specific routes based on the `meta.retain` configuration.
+ * (and optionally path params) for specific routes based on the `meta.retain` configuration.
  *
  * This function adds a `beforeEach` guard to restore saved query parameters when navigating to routes
  * with `meta.retain` configured, and an `afterEach` guard to save query parameters after navigation.
@@ -18,7 +18,9 @@ interface RetainOptions {
  *
  * @remarks
  * - Routes opt in by defining `meta.retain.scope` function.
- * - If the route's query contains `retain=no`, query retention is skipped.
+ * - Routes can also list path params in `meta.retain.params`; a navigation that leaves one out gets the last value
+ *   seen in the same scope, whether or not it has a query of its own.
+ * - If the route's query contains `retain=no`, query and param retention are skipped.
  * - To prevent restore loops, an in-memory flag is used during a synthetic `router.replace` triggered by the guard.
  * - Uses a store (via `useRetainQueryStore`) to persist and retrieve query parameters.
  *
@@ -53,28 +55,27 @@ export function installRetainQueryGuards(router: Router, opts: RetainOptions = {
       return true
     }
 
-    // Respect explicit query provided by the navigation
-    if (Object.keys(to.query).length > 0) {
-      return true
-    }
-
     // If we're already in the middle of a restore-triggered replace, skip
     if (restoring > 0) {
       return true
     }
 
     const store = useRetainQueryStore()
-    const saved = store.restore(to)
-    if (!saved) {
+
+    // Respect explicit query provided by the navigation
+    const savedQuery = Object.keys(to.query).length > 0 ? undefined : store.restore(to)
+    // Params the navigation left out (one it includes always wins)
+    const savedParams = store.restoreParams(to)
+    if (!savedQuery && !savedParams) {
       return true
     }
 
-    // Inject retained query via replace to keep history clean
+    // Inject retained query and params via replace to keep history clean
     restoring++
     return router.replace({
       name: to.name ?? undefined,
-      params: to.params,
-      query: { ...saved },
+      params: { ...to.params, ...savedParams },
+      query: savedQuery ? { ...savedQuery } : to.query,
       hash: to.hash
     })
   })
