@@ -32,3 +32,4 @@ test-results.xml
 *.sw?
 
 *.tsbuildinfo
+test-results.xml
