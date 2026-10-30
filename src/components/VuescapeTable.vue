@@ -13,11 +13,21 @@ export default {}
 <script setup lang="ts">
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
+import type { DataTableSortEvent, DataTableStateEvent } from 'primevue/datatable'
 import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableProps'
 import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import { APPEND_ONLY_MAX_CELLS, getSpaceBelow } from '../utils/tableLayout'
+import {
+  flattenVisibleRows,
+  getAllRows,
+  getInitiallyExpandedRowIds,
+  isTree,
+  resolveFieldPath,
+  sortTree,
+} from '../utils/tableTree'
+import type { VisibleTableRow } from '../utils/tableTree'
 import { VuescapeTableDeepWatchKey, VuescapeTableScrollHeightKey } from './injectionKeys'
 
 import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject, unref } from 'vue'
@@ -53,14 +63,22 @@ const tableWrapperRef = ref<HTMLElement | null>(null)
 const dynamicScrollHeight = ref('576px')
 // What the DataTable actually gets: the ancestor's height when one is provided, otherwise the measured one.
 const scrollHeight = computed(() =>
-  injectedScrollHeight === undefined ? dynamicScrollHeight.value : unref(injectedScrollHeight)
+  injectedScrollHeight === undefined ? dynamicScrollHeight.value : unref(injectedScrollHeight),
 )
 
 const localState = reactive({
   id: props.id,
   rows: [...props.rows],
-  columns: [...props.columns]
+  columns: [...props.columns],
 })
+
+// A table whose rows have child rows is shown as a tree. Child rows are ordinary rows placed under their parent, with
+// a toggle and indent in the first column, so they share the table's columns.
+const isTreeTable = computed(() => isTree(localState.rows))
+const expandedRowIds = ref(getInitiallyExpandedRowIds(localState.rows))
+// DataTable's own sort would separate child rows from their parents, so a tree table sorts itself (see tableRows)
+// with the column and order DataTable reports
+const treeSort = ref<{ field: string; order: number } | null>(null)
 
 // Watch for changes in props and update local refs reactively
 watch(
@@ -69,16 +87,34 @@ watch(
     localState.rows = [...newRows]
     localState.columns = [...newColumns]
     localState.id = id
+    expandedRowIds.value = getInitiallyExpandedRowIds(newRows)
 
     initializeColumnIdToSortFieldMap()
   },
-  { deep: shouldDeepWatch } // Deep watch can be disabled for large datasets via prop or inject
+  { deep: shouldDeepWatch }, // Deep watch can be disabled for large datasets via prop or inject
 )
 
+// Counts every row of a tree, not just the visible ones, so expanding rows can't switch the scroller's mode
 const virtualScrollerOptions = computed(() => ({
   itemSize: 46,
-  appendOnly: localState.rows.length * localState.columns.length <= APPEND_ONLY_MAX_CELLS,
+  appendOnly:
+    getAllRows(localState.rows).length * localState.columns.length <= APPEND_ONLY_MAX_CELLS,
 }))
+
+function toggleRow(rowId: string) {
+  const ids = new Set(expandedRowIds.value)
+  if (!ids.delete(rowId)) {
+    ids.add(rowId)
+  }
+  expandedRowIds.value = ids
+}
+
+function setTreeSort(event: DataTableSortEvent | DataTableStateEvent) {
+  treeSort.value =
+    typeof event.sortField === 'string' && event.sortOrder
+      ? { field: event.sortField, order: event.sortOrder }
+      : null
+}
 
 function onScroll(e: Event) {
   emit('update:scrollPosition', (e.target as HTMLElement).scrollTop)
@@ -126,7 +162,16 @@ const handleResize = () => {
   updateTableHeight()
 }
 
+// Realigns the frozen cells when the table's size changes the column widths. Runs after layout and before paint, so
+// the misaligned cells are never shown.
+const tableResizeObserver = new ResizeObserver(updateFrozenCellOffsets)
+
 onMounted(() => {
+  const tableEl: HTMLElement | undefined = dtRef.value?.$el?.querySelector('table')
+  if (tableEl) {
+    tableResizeObserver.observe(tableEl)
+  }
+
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   if (scrollerEl) {
     scrollerEl.addEventListener('scroll', onScroll)
@@ -149,8 +194,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  // Clean up resize listener
+  // Clean up resize listeners
   window.removeEventListener('resize', handleResize)
+  tableResizeObserver.disconnect()
   // Clean up scroll listener
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   scrollerEl?.removeEventListener('scroll', onScroll)
@@ -258,7 +304,7 @@ function initializeColumnIdToSortFieldMap() {
   })
 
   // Iterate through rows once and evaluate all columns
-  for (const row of localState.rows) {
+  for (const row of getAllRows(localState.rows)) {
     for (const columnId of columnIds) {
       const cell = row.cells[columnId]
       const columnState = columnSortCandidates[columnId]
@@ -298,7 +344,7 @@ function initializeColumnIdToSortFieldMap() {
     const columnState = columnSortCandidates[id]
     columnIdToSortFieldMap.set(
       id,
-      `cells.${id}.${columnState.isValid && columnState.commonKey ? columnState.commonKey : 'displayValue'}`
+      `cells.${id}.${columnState.isValid && columnState.commonKey ? columnState.commonKey : 'displayValue'}`,
     )
   })
 }
@@ -310,49 +356,103 @@ initializeColumnIdToSortFieldMap()
  * Replaces empty displayValue and comparableValue.stringValue with null character (\u0000)
  * which sorts before any other character, ensuring empty strings appear first.
  * Optimized to only create new objects when necessary to reduce memory pressure.
+ * Child rows are enhanced too, since a tree table sorts them.
  */
-const enhancedRows = computed(() => {
-  return localState.rows.map((row) => {
-    // Check if any cells need modification first
-    let needsEnhancement = false
-    const cellsToEnhance: Record<string, any> = {}
+function enhanceRow(row: TableRow): TableRow {
+  // Check if any cells need modification first
+  let needsEnhancement = false
+  const cellsToEnhance: Record<string, any> = {}
 
-    for (const columnId in row.cells) {
-      const cell = row.cells[columnId]
-      if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
-        needsEnhancement = true
-        const enhancedCell = { ...cell }
+  for (const columnId in row.cells) {
+    const cell = row.cells[columnId]
+    if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
+      needsEnhancement = true
+      const enhancedCell = { ...cell }
 
-        if (cell.displayValue === '') {
-          enhancedCell.displayValue = '\u0000' // Null character sorts first
-        }
-
-        if (cell.comparableValue?.stringValue === '') {
-          enhancedCell.comparableValue = {
-            ...cell.comparableValue,
-            stringValue: '\u0000'
-          }
-        }
-
-        cellsToEnhance[columnId] = enhancedCell
+      if (cell.displayValue === '') {
+        enhancedCell.displayValue = '\u0000' // Null character sorts first
       }
-    }
 
-    // Only create new row/cells objects if modifications are needed
-    if (needsEnhancement) {
-      return {
-        ...row,
-        cells: {
-          ...row.cells,
-          ...cellsToEnhance
+      if (cell.comparableValue?.stringValue === '') {
+        enhancedCell.comparableValue = {
+          ...cell.comparableValue,
+          stringValue: '\u0000',
         }
       }
-    }
 
-    // Return original row if no enhancement needed
-    return row
-  })
+      cellsToEnhance[columnId] = enhancedCell
+    }
+  }
+
+  const childRows = row.childRows?.length ? row.childRows.map(enhanceRow) : row.childRows
+
+  // Only create new row/cells objects if modifications are needed
+  if (needsEnhancement || childRows !== row.childRows) {
+    return {
+      ...row,
+      cells: needsEnhancement ? { ...row.cells, ...cellsToEnhance } : row.cells,
+      childRows,
+    }
+  }
+
+  // Return original row if no enhancement needed
+  return row
+}
+
+const enhancedRows = computed(() => localState.rows.map(enhanceRow))
+
+/**
+ * The rows the DataTable shows: a flat table's as they are (DataTable sorts them), a tree table's sorted within
+ * each level and with the child rows of collapsed rows left out.
+ */
+const tableRows = computed((): Array<TableRow | VisibleTableRow> => {
+  if (!isTreeTable.value) {
+    return enhancedRows.value
+  }
+
+  const sort = treeSort.value
+  const sortedRows = sort
+    ? sortTree(enhancedRows.value, (row) => resolveFieldPath(row, sort.field), sort.order)
+    : enhancedRows.value
+  return flattenVisibleRows(sortedRows, expandedRowIds.value)
 })
+
+/**
+ * Lines the frozen cells up with their columns again. PrimeVue offsets each frozen cell by the widths of the frozen
+ * cells before it, but works out a cell's offset only when the cell renders. Column widths can change without that:
+ * showing other rows (e.g. collapsing a tree row whose child rows were the widest in a column) or resizing the table
+ * (e.g. the window narrowing until it scrolls horizontally), so frozen cells would keep their old offsets and overlap
+ * or leave gaps. Matches PrimeVue's own calculation for columns frozen on the left, the only kind this table makes.
+ */
+function updateFrozenCellOffsets() {
+  const tableEl: HTMLElement | undefined = dtRef.value?.$el?.querySelector('table')
+  const headerRow = tableEl?.querySelector<HTMLElement>('thead > tr')
+  if (!tableEl || !headerRow) {
+    return
+  }
+
+  // A column's cells share its width, so the header row's widths give the offsets for every row
+  const offsets: Array<string> = []
+  let offset = 0
+  headerRow
+    .querySelectorAll<HTMLElement>(':scope > th.p-datatable-frozen-column')
+    .forEach((cell) => {
+      offsets.push(`${offset}px`)
+      offset += cell.offsetWidth
+    })
+
+  tableEl
+    .querySelectorAll<HTMLElement>(':scope > thead > tr, :scope > tbody > tr')
+    .forEach((row) => {
+      row
+        .querySelectorAll<HTMLElement>(':scope > .p-datatable-frozen-column')
+        .forEach((cell, index) => {
+          cell.style.insetInlineStart = offsets[index] ?? cell.style.insetInlineStart
+        })
+    })
+}
+
+watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
 </script>
 
 <template>
@@ -369,7 +469,8 @@ const enhancedRows = computed(() => {
   <div class="vuescape-table__container" ref="tableWrapperRef">
     <DataTable
       ref="dtRef"
-      :value="enhancedRows"
+      :value="tableRows"
+      :lazy="isTreeTable"
       :scrollable="true"
       :scrollHeight="scrollHeight"
       :stripedRows="true"
@@ -380,6 +481,8 @@ const enhancedRows = computed(() => {
       :stateKey="localState.id"
       :resizable-columns="false"
       size="small"
+      @sort="setTreeSort"
+      @state-restore="setTreeSort"
     >
       <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
@@ -391,7 +494,7 @@ const enhancedRows = computed(() => {
         </div>
       </template>
 
-      <template v-for="column in localState.columns" :key="column.id">
+      <template v-for="(column, columnIndex) in localState.columns" :key="column.id">
         <Column
           :field="column.id"
           :header="column.headerText"
@@ -401,11 +504,41 @@ const enhancedRows = computed(() => {
           :sortField="columnIdToSortFieldMap.get(column.id)"
         >
           <template #body="slotProps">
-            <div v-if="slotProps.data.cells[column.id].component" class="cell-content">
-              <PaneComponentRenderer :component="slotProps.data.cells[column.id].component" />
-            </div>
-            <div v-else :style="getCellStyle(slotProps.data, column.id)" class="cell-content">
-              {{ getDisplayValue(slotProps.data, column.id) }}
+            <div
+              :style="
+                slotProps.data.cells[column.id].component
+                  ? undefined
+                  : getCellStyle(slotProps.data, column.id)
+              "
+              class="cell-content"
+            >
+              <!-- A tree table's first column: the row's toggle, or room for one, indented by its depth -->
+              <span
+                v-if="isTreeTable && columnIndex === 0"
+                class="vuescape-table__row-toggle"
+                :style="{ '--vuescape-table-tree-depth': slotProps.data.depth }"
+              >
+                <button
+                  v-if="slotProps.data.hasChildRows"
+                  type="button"
+                  :aria-expanded="slotProps.data.isExpanded"
+                  :aria-label="slotProps.data.isExpanded ? 'Collapse row' : 'Expand row'"
+                  @click="toggleRow(slotProps.data.id)"
+                >
+                  <i
+                    :class="[
+                      'fa-light',
+                      slotProps.data.isExpanded ? 'fa-chevron-down' : 'fa-chevron-right',
+                    ]"
+                    aria-hidden="true"
+                  />
+                </button>
+              </span>
+              <PaneComponentRenderer
+                v-if="slotProps.data.cells[column.id].component"
+                :component="slotProps.data.cells[column.id].component"
+              />
+              <template v-else>{{ getDisplayValue(slotProps.data, column.id) }}</template>
             </div>
           </template>
         </Column>
@@ -430,5 +563,61 @@ const enhancedRows = computed(() => {
   height: 100%;
   display: flex;
   align-items: center;
+}
+/*
+ * Each level is indented by the toggle's width plus its gap, so a child's toggle sits under its parent's text. The
+ * chevron is at the toggle's left edge, so the down chevron lines up with the parent's first letter.
+ */
+.vuescape-table__row-toggle {
+  --vuescape-table-tree-toggle-width: 1rem;
+  --vuescape-table-tree-toggle-gap: 0.25rem;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: var(--vuescape-table-tree-toggle-width);
+  margin-right: var(--vuescape-table-tree-toggle-gap);
+  margin-left: calc(
+    var(--vuescape-table-tree-depth, 0) *
+      (var(--vuescape-table-tree-toggle-width) + var(--vuescape-table-tree-toggle-gap))
+  );
+}
+.vuescape-table__row-toggle > button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--vuescape-table-tree-toggle-width);
+  height: var(--vuescape-table-tree-toggle-width);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  cursor: pointer;
+}
+/*
+ * Both chevrons take the down chevron's width (1em), with the narrower right chevron (0.625em) centered in it, so a
+ * chevron turns in place and keeps the same gap to the text
+ */
+.vuescape-table__row-toggle > button > i {
+  width: 1em;
+  text-align: center;
+}
+/* Widens the click target to 24px without taking up layout space */
+.vuescape-table__row-toggle > button::after {
+  content: '';
+  position: absolute;
+  inset: -0.25rem;
+}
+/* Only the chevron darkens on hover: a filled background would crowd the table's colored cells */
+.vuescape-table__row-toggle > button:hover {
+  color: var(--p-text-color);
+}
+/* The focus ring goes around the chevron rather than the button, whose chevron is at its left edge */
+.vuescape-table__row-toggle > button:focus-visible {
+  outline: none;
+}
+.vuescape-table__row-toggle > button:focus-visible > i {
+  border-radius: var(--p-border-radius-sm);
+  outline: var(--p-focus-ring-width) var(--p-focus-ring-style) var(--p-focus-ring-color);
+  outline-offset: var(--p-focus-ring-offset);
 }
 </style>
