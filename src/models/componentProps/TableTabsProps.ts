@@ -19,4 +19,10 @@ export interface TableTabsProps {
    * The select component that will be displayed above the table tabs.
    */
   selectComponent?: SelectComponent
+
+  /**
+   * The id of the tab to show first. When it is not set, or matches no tab, the first tab with a table is shown, or
+   * the first tab when none has one.
+   */
+  activeTabId?: string | null
 }

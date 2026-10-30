@@ -5,9 +5,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
 import { setActivePinia } from 'pinia'
 import type { TableTabsProps } from '../../models/componentProps/TableTabsProps'
+import type { TableComponent } from '../../models/dynamic-ui/pane-components/TableComponent'
+import { LinkTarget } from '../../reporting-domain/Link/LinkTarget'
 import TableTabsComponent from '../TableTabs.vue'
 
 import PrimeVue from 'primevue/config'
+
+// __esModule lets defineAsyncComponent unwrap the default export of the mocked module.
+vi.mock('../VuescapeTable.vue', () => ({
+  __esModule: true,
+  default: { template: '<div class="vuescape-table-stub" />' }
+}))
+
+const table = { typeName: 'component.table', payload: {} } as unknown as TableComponent
 
 // Mock router setup
 const router = createRouter({
@@ -274,5 +284,101 @@ describe('TableTabsComponent', () => {
     // Verify the second tab is now active
     expect(tabButtons[0].attributes('aria-selected')).toBe('false')
     expect(tabButtons[1].attributes('aria-selected')).toBe('true')
+  })
+
+  describe('active tab', () => {
+    const tableTab = (id: string) => ({ id, label: `Tab ${id}`, table })
+
+    it('initially selects the tab named by activeTabId', async () => {
+      // Arrange
+      const props: TableTabsProps = {
+        id: 'testTabSet',
+        tabs: [tableTab('tab1'), tableTab('tab2'), tableTab('tab3')],
+        activeTabId: 'tab3'
+      }
+
+      // Act
+      wrapper = createWrapper(props)
+      await flushPromises()
+      await nextTick()
+
+      // Assert
+      const selected = wrapper
+        .findAll('button.p-tab')
+        .map((button: any) => button.attributes('aria-selected'))
+      expect(selected).toEqual(['false', 'false', 'true'])
+    })
+
+    it('falls back to the first tab with a table when activeTabId matches no tab', async () => {
+      // Arrange
+      const props: TableTabsProps = {
+        id: 'testTabSet',
+        tabs: [tableTab('tab1'), tableTab('tab2')],
+        activeTabId: 'missing'
+      }
+
+      // Act
+      wrapper = createWrapper(props)
+      await flushPromises()
+      await nextTick()
+
+      // Assert
+      const selected = wrapper
+        .findAll('button.p-tab')
+        .map((button: any) => button.attributes('aria-selected'))
+      expect(selected).toEqual(['true', 'false'])
+    })
+  })
+
+  describe('deferred tabs', () => {
+    const deferredTab = (id: string) => ({
+      id,
+      label: `Deferred ${id}`,
+      onSelectAction: {
+        typeName: 'action.navigate' as const,
+        payload: { url: `/report/${id}`, target: LinkTarget.CurrentWindow }
+      }
+    })
+
+    it('initially selects the first tab that has a table', async () => {
+      // Arrange
+      const props: TableTabsProps = {
+        id: 'testTabSet',
+        tabs: [deferredTab('tab1'), { id: 'tab2', label: 'Loaded', table }]
+      }
+
+      // Act
+      wrapper = createWrapper(props)
+      await flushPromises()
+      await nextTick()
+
+      // Assert
+      const tabButtons = wrapper.findAll('button.p-tab')
+      expect(tabButtons[0].attributes('aria-selected')).toBe('false')
+      expect(tabButtons[1].attributes('aria-selected')).toBe('true')
+      expect(wrapper.find('.vuescape-table-stub').exists()).toBe(true)
+    })
+
+    it('performs the onSelectAction of a deferred tab when it is selected', async () => {
+      // Arrange
+      const pushSpy = vi.spyOn(router, 'push')
+      const props: TableTabsProps = {
+        id: 'testTabSet',
+        tabs: [{ id: 'tab1', label: 'Loaded', table }, deferredTab('tab2')]
+      }
+      wrapper = createWrapper(props)
+      await flushPromises()
+      await nextTick()
+      expect(pushSpy).not.toHaveBeenCalled()
+
+      // Act
+      await wrapper.findAll('button.p-tab')[1].trigger('click')
+      await flushPromises()
+
+      // Assert
+      expect(pushSpy).toHaveBeenCalledWith('/report/tab2')
+      expect(wrapper.text()).not.toContain('No Results Found')
+      pushSpy.mockRestore()
+    })
   })
 })

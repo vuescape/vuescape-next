@@ -9,6 +9,10 @@
  * loading is that the table is created and destroyed each time the tab is selected so
  * we need to reset the table state (in this case scroll position) each time the tab is selected.
  *
+ * A tab may be deferred: it has no table, only an onSelectAction that loads its content (e.g. navigates
+ * to the route that renders the report with that tab's table). The tab named by activeTabId is shown
+ * initially, or else the first tab with a table.
+ *
  * @prop {TableTabsProps} - the TableTabs props
  *
  */
@@ -24,16 +28,29 @@ import Tabs from 'primevue/tabs'
 import { defineAsyncComponent } from 'vue'
 
 import type { SelectChangeEvent } from 'primevue/select'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useRetainedField } from '../composables/useRetainedField'
 import type { TableTabsProps } from '../models/componentProps/TableTabsProps'
+import type { Action } from '../models/dynamic-ui/actions/Action'
+import { handleNavigationActionAsync } from '../models/dynamic-ui/actions/ActionHandlers'
+import { ReportPaneKind } from '../models/feature/ReportPaneKind'
+import { useActionStore } from '../stores/useActionStore'
 
 const VuescapeSelect = defineAsyncComponent(() => import('./VuescapeSelect.vue'))
 const VuescapeTable = defineAsyncComponent(() => import('./VuescapeTable.vue'))
 
 const props = defineProps<TableTabsProps>()
 
-const initialTabId = props.tabs[0]?.id ?? 'default'
+const actionStore = useActionStore()
+const router = useRouter()
+
+const initialTabId =
+  (
+    props.tabs.find((tab) => tab.id === props.activeTabId) ??
+    props.tabs.find((tab) => tab.table) ??
+    props.tabs[0]
+  )?.id ?? 'default'
 const queryKey = 'tab'
 
 // Auto: if route.meta.retainQuery is true, this will sync to URL+store.
@@ -69,6 +86,22 @@ function tableKey(tabId: string) {
   const result = `${props.id}::${tabId}::${selectedEntity.value ?? ''}`
   return result
 }
+
+async function performActionAsync(action: Action) {
+  if (action.typeName === 'action.navigate') {
+    // This component does not load reports into panes; navigation targets render via the router.
+    await handleNavigationActionAsync(action, ReportPaneKind.None, router, () => Promise.resolve())
+  } else {
+    actionStore.dispatch(action)
+  }
+}
+
+watch(activeTab, async (tabId) => {
+  const action = props.tabs.find((tab) => tab.id === tabId)?.onSelectAction
+  if (action) {
+    await performActionAsync(action)
+  }
+})
 </script>
 
 <template>
@@ -94,7 +127,7 @@ function tableKey(tabId: string) {
           :initialScrollPosition="getInitialScrollPosition(tab.id)"
           @update:scrollPosition="updateInitialScrollPosition(tab.id, $event)"
         ></VuescapeTable>
-        <div v-else>No Results Found</div>
+        <div v-else-if="!tab.onSelectAction">No Results Found</div>
       </TabPanel>
     </TabPanels>
   </Tabs>
