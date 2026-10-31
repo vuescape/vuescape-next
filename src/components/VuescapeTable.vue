@@ -277,6 +277,15 @@ function getCellStyle(row: TableRow, columnId: string): Record<string, string> |
   return result
 }
 
+/**
+ * Shows a cell's full text as its tooltip when the cell cuts it off with an ellipsis. Checked on hover rather than
+ * set on every cell, so text that fits gets no tooltip.
+ */
+function setTitleIfTruncated(event: MouseEvent) {
+  const textEl = event.currentTarget as HTMLElement
+  textEl.title = textEl.scrollWidth > textEl.clientWidth ? (textEl.textContent?.trim() ?? '') : ''
+}
+
 // function getDisplayHtml(row: TableRow, columnId: string): string {
 //   const text = getDisplayValue(row, columnId)
 //   return `<a href="https://www.cometrics.com">${text}</a>`
@@ -538,6 +547,15 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
                 v-if="slotProps.data.cells[column.id].component"
                 :component="slotProps.data.cells[column.id].component"
               />
+              <!-- Kept to one line, so long text can't make a row taller than the virtual scroller's fixed row
+                   height. Frozen columns (e.g. names) wrap instead of cutting off what identifies the row. -->
+              <span
+                v-else-if="!column.isFrozen"
+                class="vuescape-table__cell-text"
+                @mouseenter="setTitleIfTruncated"
+              >
+                {{ getDisplayValue(slotProps.data, column.id) }}
+              </span>
               <template v-else>{{ getDisplayValue(slotProps.data, column.id) }}</template>
             </div>
           </template>
@@ -563,6 +581,18 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
   height: 100%;
   display: flex;
   align-items: center;
+}
+/*
+ * A non-frozen column grows with its text up to the max width, then cuts the text off with an ellipsis. The
+ * max-content width keeps the column from being squeezed narrower than its text (or the max width) when the table is
+ * wider than its container: overflow: hidden alone would let it shrink to nothing instead of scrolling horizontally.
+ */
+.vuescape-table__cell-text {
+  width: max-content;
+  max-width: var(--vuescape-table-cell-max-width, 20rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /*
  * Each level is indented by the toggle's width plus its gap, so a child's toggle sits under its parent's text. The

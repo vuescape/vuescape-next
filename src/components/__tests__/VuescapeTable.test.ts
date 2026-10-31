@@ -547,6 +547,60 @@ describe('VuescapeTable.vue as a tree', () => {
     ])
   })
 
+  describe('long text', () => {
+    function mountWithNotes(notes: Array<string>) {
+      return mount(VuescapeTable, {
+        props: {
+          id: 'notes-table',
+          columns: [
+            { id: 'name', headerText: 'Name', isFrozen: true },
+            { id: 'notes', headerText: 'Notes' },
+          ],
+          rows: notes.map((note, index) => ({
+            id: `${index}`,
+            cells: { name: { displayValue: `Name ${index}` }, notes: { displayValue: note } },
+          })),
+          initialScrollPosition: 0,
+        },
+      })
+    }
+
+    // jsdom lays nothing out, so give the text the widths a browser would
+    function setTextWidths(textEl: Element, scrollWidth: number, clientWidth: number) {
+      Object.defineProperty(textEl, 'scrollWidth', { configurable: true, value: scrollWidth })
+      Object.defineProperty(textEl, 'clientWidth', { configurable: true, value: clientWidth })
+    }
+
+    it('should keep the text of non-frozen columns to one line, so rows keep the fixed row height', async () => {
+      // Act
+      const wrapper = mountWithNotes(['A long note'])
+      await nextTick()
+
+      // Assert
+      const [nameCell, notesCell] = wrapper.findAll('tbody td')
+      expect(notesCell.find('.vuescape-table__cell-text').text()).toBe('A long note')
+      expect(nameCell.find('.vuescape-table__cell-text').exists()).toBe(false)
+      expect(nameCell.text()).toBe('Name 0')
+    })
+
+    it('should show the full text as a tooltip only when it is cut off', async () => {
+      // Arrange
+      const wrapper = mountWithNotes(['A note cut off', 'A note that fits'])
+      await nextTick()
+      const [cutOffText, fittingText] = wrapper.findAll('.vuescape-table__cell-text')
+      setTextWidths(cutOffText.element, 400, 320)
+      setTextWidths(fittingText.element, 200, 200)
+
+      // Act
+      await cutOffText.trigger('mouseenter')
+      await fittingText.trigger('mouseenter')
+
+      // Assert
+      expect(cutOffText.attributes('title')).toBe('A note cut off')
+      expect(fittingText.attributes('title')).toBe('')
+    })
+  })
+
   it('should not be lazy or show toggles when no row has child rows', async () => {
     // Act
     const wrapper = mountTree([treeRow('a'), treeRow('b')])
