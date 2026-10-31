@@ -31,4 +31,16 @@ describe('CustomLoading.vue', () => {
     await wrapper.setProps({ isVisible: false })
     expect(wrapper.html()).not.toContain('class="custom-loading-wrapper"')
   })
+
+  it('should stay beneath dialogs unless asked to cover them', async () => {
+    // Arrange
+    const wrapper = createWrapper(true)
+    expect(wrapper.find('.custom-loading-wrapper--cover-dialogs').exists()).toBe(false)
+
+    // Act
+    await wrapper.setProps({ shouldCoverDialogs: true })
+
+    // Assert
+    expect(wrapper.find('.custom-loading-wrapper--cover-dialogs').exists()).toBe(true)
+  })
 })
