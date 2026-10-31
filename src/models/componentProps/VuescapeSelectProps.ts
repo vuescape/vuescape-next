@@ -63,4 +63,12 @@ export interface VuescapeSelectProps {
    * @default 'default'
    */
   size?: 'default' | 'small'
+
+  /**
+   * Shows the select even when there is only one option, rather than the option as text. Use it when the select's
+   * label alone doesn't say what the value is, e.g. "Aligned To:" followed by "For Fiscal Time" would read oddly.
+   * @optional
+   * @default false
+   */
+  shouldShowSelectForSingleOption?: boolean
 }

@@ -85,4 +85,29 @@ describe('VuescapeSelect.vue', () => {
     wrapper = createWrapper({ ...props, selectedValue: undefined }, attrs)
     expect(wrapper.find('span.p-placeholder').attributes('aria-label')).toBe(props.placeholder)
   })
+
+  describe('with a single option', () => {
+    const singleOption = { displayName: 'Option 1', id: '1' }
+
+    it('should show the option as text instead of the select', () => {
+      // Act
+      wrapper = createWrapper({ ...props, options: [singleOption] }, attrs)
+
+      // Assert
+      expect(wrapper.find('.single-option-text').text()).toBe('For Option 1')
+      expect(wrapper.findComponent({ name: 'select' }).isVisible()).toBe(false)
+    })
+
+    it('should show the select when asked to', () => {
+      // Act
+      wrapper = createWrapper(
+        { ...props, options: [singleOption], shouldShowSelectForSingleOption: true },
+        attrs
+      )
+
+      // Assert
+      expect(wrapper.find('.single-option-text').exists()).toBe(false)
+      expect(wrapper.findComponent({ name: 'select' }).isVisible()).toBe(true)
+    })
+  })
 })

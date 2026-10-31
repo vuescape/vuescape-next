@@ -12,7 +12,7 @@ export default {}
 <script lang="ts" setup>
 import type { SelectChangeEvent } from 'primevue/select'
 import Select from 'primevue/select'
-import { onMounted, ref, useAttrs } from 'vue'
+import { computed, onMounted, ref, useAttrs } from 'vue'
 import { useRouter } from 'vue-router'
 
 import type { VuescapeSelectProps } from '../models/componentProps/VuescapeSelectProps'
@@ -39,8 +39,16 @@ const initializedProps = ref<VuescapeSelectProps>({
   placeholder: props.placeholder ?? 'Select an Item',
   disabled: props.disabled ?? false,
   cssClass: props.cssClass ?? '',
-  size: props.size ?? 'default'
+  size: props.size ?? 'default',
+  shouldShowSelectForSingleOption: props.shouldShowSelectForSingleOption ?? false
 })
+
+// A single option is shown as text, since there is nothing to choose, unless the caller asks for the select
+const shouldShowSingleOptionText = computed(
+  () =>
+    initializedProps.value.options.length === 1 &&
+    !initializedProps.value.shouldShowSelectForSingleOption
+)
 
 const mySelect = ref(null)
 
@@ -153,7 +161,7 @@ onMounted(async () => {
   <!-- do we need card flex here or should it just be the bare component? -->
   <div class="card flex">
     <Select
-      v-show="initializedProps.options.length !== 1"
+      v-show="!shouldShowSingleOptionText"
       ref="mySelect"
       :name="initializedProps.name"
       :model-value="initializedProps.selectedValue"
@@ -168,7 +176,7 @@ onMounted(async () => {
       @change="handleChangeAsync"
     >
     </Select>
-    <div v-if="initializedProps.options.length === 1" class="single-option-text">
+    <div v-if="shouldShowSingleOptionText" class="single-option-text">
       For
       {{ initializedProps.selectedValue?.displayName ?? initializedProps.options[0].displayName }}
     </div>
