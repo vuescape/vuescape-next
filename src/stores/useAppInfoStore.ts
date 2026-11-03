@@ -24,12 +24,13 @@ export const useAppInfoStore = defineStore('useAppInfoStore', () => {
   let poller: any = null
 
   /**
-   * Fetches the application information asynchronously from the '/appInfo.json' endpoint.
+   * Fetches the application information asynchronously from the app's appInfo.json, beside its index.html (under the
+   * app's Vite base, which is not the site root when the app shares a site with another).
    * If the fetched app info differs from the current state, updates the state with the new app info.
    * @returns {Promise<void>} A promise that resolves when the fetch operation is complete.
    */
   async function fetchAppInfoAsync() {
-    const response = await usingRetryForFetchAsync('/appInfo.json')
+    const response = await usingRetryForFetchAsync(`${import.meta.env.BASE_URL}appInfo.json`)
     if (response.ok) {
       const appInfo = await response.json()
       if (JSON.stringify(appInfo) !== JSON.stringify(state.value)) {
