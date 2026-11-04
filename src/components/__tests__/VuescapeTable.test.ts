@@ -73,6 +73,36 @@ describe('VuescapeTable.vue', () => {
     expect(tableColumns.length).toBe(columns.value.length)
   })
 
+  it('should show footer rows below the rows, with a cell for each column', () => {
+    // Arrange
+    const footerRows: Array<TableRow> = [
+      {
+        id: 'total',
+        cells: {
+          name: { displayValue: 'Total' },
+          age: { displayValue: '90', cssStyles: { backgroundColor: 'rgb(144, 238, 144)' } },
+          address: {},
+        },
+      },
+    ]
+
+    // Act
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'footer-table',
+        columns: columns.value,
+        rows: rows.value,
+        footerRows,
+        initialScrollPosition: 0,
+      },
+    })
+
+    // Assert
+    const footerCells = wrapper.findAll('tfoot td')
+    expect(footerCells.map((cell) => cell.text())).toEqual(['Total', '90', ''])
+    expect(footerCells[1].attributes('style')).toContain('background-color: rgb(144, 238, 144)')
+  })
+
   describe('scroll height', () => {
     it('should use a height provided by an ancestor, e.g. a dialog, instead of filling the page', async () => {
       // Arrange

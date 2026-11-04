@@ -24,6 +24,12 @@ export interface VuescapeTableProps {
   rows: Array<TableRow>
 
   /**
+   * Rows shown below the table's rows, e.g. totals, which stay in place when the rows scroll or are sorted.
+   * Their cells are keyed by column id, like a row's. Child rows are not shown.
+   */
+  footerRows?: Array<TableRow>
+
+  /**
    * The initial scroll position of the table.
    * @default 0
    */

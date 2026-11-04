@@ -12,7 +12,9 @@ export default {}
 
 <script setup lang="ts">
 import Column from 'primevue/column'
+import ColumnGroup from 'primevue/columngroup'
 import DataTable from 'primevue/datatable'
+import Row from 'primevue/row'
 import type { DataTableSortEvent, DataTableStateEvent } from 'primevue/datatable'
 import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableProps'
 import type { TableRow } from '../models/dynamic-ui/TableRow'
@@ -451,7 +453,7 @@ function updateFrozenCellOffsets() {
     })
 
   tableEl
-    .querySelectorAll<HTMLElement>(':scope > thead > tr, :scope > tbody > tr')
+    .querySelectorAll<HTMLElement>(':scope > thead > tr, :scope > tbody > tr, :scope > tfoot > tr')
     .forEach((row) => {
       row
         .querySelectorAll<HTMLElement>(':scope > .p-datatable-frozen-column')
@@ -561,13 +563,33 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
           </template>
         </Column>
       </template>
+
+      <ColumnGroup v-if="props.footerRows?.length" type="footer">
+        <Row v-for="footerRow in props.footerRows" :key="footerRow.id">
+          <Column
+            v-for="column in localState.columns"
+            :key="column.id"
+            :frozen="column.isFrozen"
+            :footer="footerRow.cells[column.id]?.displayValue ?? ''"
+            :footerStyle="footerRow.cells[column.id]?.cssStyles"
+          />
+        </Row>
+      </ColumnGroup>
     </DataTable>
   </div>
 </template>
 
 <style>
-.p-datatable-scrollable td.p-datatable-frozen-column {
+.p-datatable-scrollable .p-datatable-tbody > tr > td.p-datatable-frozen-column {
   background: inherit;
+}
+/*
+ * PrimeVue leaves footer cells without a background, so the cells scrolling under a frozen footer cell would show
+ * through it. A cell's own style (e.g. a colored total) still wins.
+ */
+.p-datatable-scrollable .p-datatable-tfoot > tr > td.p-datatable-frozen-column {
+  z-index: 1;
+  background: var(--p-datatable-footer-cell-background);
 }
 .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
   padding: 0 !important;
