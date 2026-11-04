@@ -1,0 +1,357 @@
+import { describe, expect, it } from 'vitest'
+
+import type { PaneComponent } from '../../models/dynamic-ui/pane-components/PaneComponent'
+import type { TableComponent } from '../../models/dynamic-ui/pane-components/TableComponent'
+import type { ReportLayout } from '../../models/dynamic-ui/ReportLayout'
+import { ReportPaneKind } from '../../models/feature/ReportPaneKind'
+import type {
+  LegacyCell,
+  LegacyHeaderCell,
+  LegacyReport,
+  LegacyRow,
+  LegacySection,
+} from '../LegacyReport'
+import { toReportLayout } from '../toReportLayout'
+
+function cell(displayValue?: string, extra: Partial<LegacyCell> = {}): LegacyCell {
+  return { displayValue, colspan: 1, isVisible: true, links: {}, ...extra }
+}
+
+function valueCell(value: string | number, uiObjectType: string): LegacyCell {
+  return cell(String(value), {
+    slots: {
+      slotNameToUiObjectMap: { '__vs-value': { value, uiObjectType } },
+      defaultSlotName: '__vs-value',
+    },
+  })
+}
+
+/** A cell covered by an earlier cell's span, as vuescape-dotnet makes it: visible, without a colspan */
+const covered: LegacyCell = { isVisible: true }
+
+function headerCell(displayValue: string | undefined, isSortable = false): LegacyHeaderCell {
+  return {
+    displayValue,
+    colspan: 1,
+    isVisible: true,
+    ...(isSortable ? { columnSorter: { sortDirection: 'none' } } : {}),
+  }
+}
+
+function row(cells: Array<LegacyCell>, children?: Array<LegacyRow>, isExpanded = false): LegacyRow {
+  return { cells, children, isExpanded }
+}
+
+function section(
+  id: string,
+  content: LegacySection['treeTable']['content'],
+  extra: Partial<LegacySection> = {},
+): LegacySection {
+  return {
+    id,
+    treeTable: {
+      columnDefinitions: [{ isFrozen: true }, { isFrozen: false }],
+      content,
+    },
+    ...extra,
+  }
+}
+
+function report(sections: Array<LegacySection>, extra: Partial<LegacyReport> = {}): LegacyReport {
+  return { id: 'report', title: 'Report Title', sections, ...extra }
+}
+
+const columnHeaders = { cells: [headerCell('Name', true), headerCell('Count')] }
+
+function getComponents(layout: ReportLayout): Array<PaneComponent> {
+  return layout.content!.sections.flatMap((paneSection) =>
+    paneSection.items.flatMap((item) => item.components),
+  )
+}
+
+function getTable(layout: ReportLayout): TableComponent {
+  return getComponents(layout).find(
+    (component): component is TableComponent => component.typeName === 'component.table',
+  )!
+}
+
+describe('toReportLayout', () => {
+  it(`should put a section's table in the pane, under the section's title`, () => {
+    // Arrange
+    const legacyReport = report([
+      section(
+        'running',
+        {
+          headers: [columnHeaders],
+          rows: [row([valueCell('Org A', 'string'), valueCell(3, 'int')])],
+        },
+        { title: 'Running' },
+      ),
+    ])
+
+    // Act
+    const actual = toReportLayout(legacyReport, ReportPaneKind.LeftPane, 20)
+
+    // Assert
+    expect(actual).toMatchObject({
+      id: 'report',
+      title: 'Report Title',
+      targetPane: ReportPaneKind.LeftPane,
+      paneWidthPercent: 20,
+    })
+    expect(getComponents(actual).map((component) => component.typeName)).toEqual([
+      'component.text',
+      'component.table',
+    ])
+    expect(getComponents(actual)[0].payload).toMatchObject({
+      text: 'Running',
+      renderTextAs: 'subheading',
+    })
+    expect(getTable(actual).payload).toEqual({
+      id: 'report-running',
+      columns: [
+        { id: 'c0', headerText: 'Name', isSortable: true, isFrozen: true },
+        { id: 'c1', headerText: 'Count', isSortable: false, isFrozen: false },
+      ],
+      rows: [
+        {
+          id: 'report-running-row-0',
+          cells: {
+            c0: { displayValue: 'Org A', comparableValue: { stringValue: 'Org A' } },
+            c1: { displayValue: '3', comparableValue: { numericValue: 3 } },
+          },
+        },
+      ],
+    })
+  })
+
+  it('should leave the header text out when the table has no header rows', () => {
+    // Act
+    const actual = toReportLayout(
+      report([section('navigation', { rows: [row([cell('Org A'), cell()])] })]),
+      ReportPaneKind.LeftPane,
+    )
+
+    // Assert
+    expect(getTable(actual).payload.columns).toEqual([
+      { id: 'c0', headerText: undefined, isSortable: false, isFrozen: true },
+      { id: 'c1', headerText: undefined, isSortable: false, isFrozen: false },
+    ])
+  })
+
+  it(`should style a cell as its format says`, () => {
+    // Arrange
+    const formatted = cell('in', {
+      cellFormat: {
+        backgroundHexColor: '#90EE90',
+        fontHexColor: '#000000',
+        fontSizeInPixels: '12px',
+        horizontalAlignment: 'right',
+      },
+    })
+
+    // Act
+    const actual = toReportLayout(
+      report([
+        section('section', { headers: [columnHeaders], rows: [row([cell('Org A'), formatted])] }),
+      ]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    expect(getTable(actual).payload.rows[0].cells.c1.cssStyles).toEqual({
+      backgroundColor: '#90EE90',
+      color: '#000000',
+      fontSize: '12px',
+      justifyContent: 'flex-end',
+    })
+  })
+
+  it('should show the children of a row that only groups them in its place', () => {
+    // Arrange
+    const groupingRow = row(
+      [cell(), cell()],
+      [row([cell('Org A'), cell()]), row([cell('Org B'), cell()])],
+    )
+    const parentRow = row([cell('Org C'), cell()], [row([cell('Org C1'), cell()])], true)
+
+    // Act
+    const actual = toReportLayout(
+      report([section('section', { headers: [columnHeaders], rows: [groupingRow, parentRow] })]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    const rows = getTable(actual).payload.rows
+    expect(rows.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual([
+      'Org A',
+      'Org B',
+      'Org C',
+    ])
+    expect(rows[2].isExpanded).toBe(true)
+    expect(rows[2].childRows?.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual(['Org C1'])
+  })
+
+  it('should show header rows above the column headers as text, totals as footer rows and a footnote as text', () => {
+    // Arrange
+    const legacyReport = report([
+      section('section', {
+        headers: [
+          { cells: [headerCell('Total Active Organizations: 2'), headerCell(undefined)] },
+          columnHeaders,
+        ],
+        rows: [row([cell('Org A'), cell('in')])],
+        footers: [
+          row([cell('Total In'), cell('1')]),
+          row([cell(undefined, { colspan: 2 }), covered]),
+          row([cell('* A footnote', { colspan: 2 }), covered]),
+        ],
+      }),
+    ])
+
+    // Act
+    const actual = toReportLayout(legacyReport, ReportPaneKind.CenterPane)
+
+    // Assert
+    const components = getComponents(actual)
+    expect(components.map((component) => component.typeName)).toEqual([
+      'component.text',
+      'component.table',
+      'component.text',
+    ])
+    expect(components[0].payload).toMatchObject({ text: 'Total Active Organizations: 2' })
+    expect(components[2].payload).toMatchObject({ text: '* A footnote' })
+    expect(getTable(actual).payload.footerRows).toEqual([
+      {
+        id: 'report-section-footer-0',
+        cells: { c0: { displayValue: 'Total In' }, c1: { displayValue: '1' } },
+      },
+    ])
+  })
+
+  it(`should give a column covered by another cell's span an empty cell`, () => {
+    // Act
+    const actual = toReportLayout(
+      report([
+        section('section', {
+          headers: [columnHeaders],
+          rows: [row([cell('Org A', { colspan: 2 }), covered])],
+        }),
+      ]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    expect(getTable(actual).payload.rows[0].cells).toEqual({
+      c0: { displayValue: 'Org A' },
+      c1: {},
+    })
+  })
+
+  it(`should make a cell's link load the linked report into the pane it names, or download it`, () => {
+    // Arrange
+    const reportLink = cell('Org A', {
+      links: {
+        '__vs-self': {
+          source: 'https://api/report-a',
+          linkTarget: 'centerPane',
+          resourceKind: 'report',
+        },
+      },
+    })
+    const downloadLink = cell('Export', {
+      links: {
+        '__vs-self': {
+          source: 'https://api/export',
+          linkTarget: 'download',
+          resourceKind: 'excel',
+        },
+      },
+    })
+
+    // Act
+    const actual = toReportLayout(
+      report([section('section', { rows: [row([reportLink, downloadLink])] })]),
+      ReportPaneKind.LeftPane,
+    )
+
+    // Assert
+    const cells = getTable(actual).payload.rows[0].cells
+    expect(cells.c0.component).toEqual({
+      typeName: 'component.textLink',
+      payload: {
+        id: 'report-section-row-0-0',
+        text: 'Org A',
+        action: {
+          typeName: 'action.navigate',
+          payload: { url: 'https://api/report-a', target: 'centerPane' },
+        },
+      },
+    })
+    expect(cells.c1.component?.payload).toMatchObject({
+      action: { typeName: 'action.download', payload: { url: 'https://api/export' } },
+    })
+  })
+
+  it('should show several sections as tabs', () => {
+    // Arrange
+    const legacyReport = report([
+      section('running', { headers: [columnHeaders], rows: [] }, { title: 'Running' }),
+      section(
+        'completed',
+        { headers: [columnHeaders], rows: [row([cell('Job'), cell('1')])] },
+        { name: 'Completed' },
+      ),
+    ])
+
+    // Act
+    const actual = toReportLayout(legacyReport, ReportPaneKind.CenterPane)
+
+    // Assert
+    const components = getComponents(actual)
+    expect(components).toHaveLength(1)
+    expect(components[0].typeName).toBe('component.tableTabs')
+    expect(
+      (
+        components[0].payload as {
+          tabs: Array<{ id: string; label: string; table?: TableComponent }>
+        }
+      ).tabs.map((tab) => [tab.id, tab.label, tab.table?.payload.id]),
+    ).toEqual([
+      ['running', 'Running', 'report-running'],
+      ['completed', 'Completed', 'report-completed'],
+    ])
+  })
+
+  it(`should offer the report's downloads from a button and show its additional info`, () => {
+    // Arrange
+    const legacyReport = report([section('section', { rows: [] })], {
+      additionalReportInfo: 'As Of: Wednesday, November, 4, 2026',
+      downloadLinks: [
+        {
+          source: 'https://api/report?ResourceKind=Excel',
+          linkTarget: 'download',
+          resourceKind: 'excel',
+        },
+      ],
+    })
+
+    // Act
+    const actual = toReportLayout(legacyReport, ReportPaneKind.CenterPane)
+
+    // Assert
+    expect(actual.reportDetail).toBe('As Of: Wednesday, November, 4, 2026')
+    expect(actual.actionButton?.payload.label).toBe('Download')
+    expect(actual.actionButton?.payload.menuItems).toEqual([
+      {
+        label: 'Excel',
+        action: {
+          typeName: 'action.download',
+          payload: { url: 'https://api/report?ResourceKind=Excel' },
+        },
+        iconPosition: 'left',
+        isDisabled: false,
+      },
+    ])
+  })
+})
