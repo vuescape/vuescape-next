@@ -12,3 +12,9 @@ export const VuescapeTableDeepWatchKey: InjectionKey<boolean> = Symbol('Vuescape
 export const VuescapeTableScrollHeightKey: InjectionKey<MaybeRef<string>> = Symbol(
   'VuescapeTable.scrollHeight',
 )
+
+// Whether VuescapeTable starts scrolled all the way to the right, e.g. a report whose latest periods are its last
+// columns, as the original Vuescape showed its reports. Defaults to the left.
+export const VuescapeTableStartsAtRightKey: InjectionKey<boolean> = Symbol(
+  'VuescapeTable.startsAtRight',
+)

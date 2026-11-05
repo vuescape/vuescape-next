@@ -28,14 +28,21 @@ const SELF_LINK_NAME = '__vs-self'
 const NUMERIC_UI_OBJECT_TYPES = new Set(['int', 'short', 'long', 'decimal'])
 
 const RESOURCE_KIND_LABELS: Record<string, string> = { excel: 'Excel', csv: 'CSV', pdf: 'PDF' }
+// The file icons the sites use for these kinds (e.g. Customer.Web's ConversationFileChip)
+const RESOURCE_KIND_ICONS: Record<string, Array<string>> = {
+  excel: ['fa-duotone', 'fa-file-excel'],
+  csv: ['fa-duotone', 'fa-file-csv'],
+  pdf: ['fa-duotone', 'fa-file-pdf'],
+}
 
 /**
  * Converts a report in the original Vuescape format into a ReportLayout for the given pane.
  *
- * A section becomes a table, or a tab of one when the report has several sections. Header rows above the column
- * headers and footer rows spanning every column (e.g. a footnote) become text above and below a single section's table;
- * other footer rows become the table's footer rows. A row with nothing to show that only groups child rows is replaced
- * by them. A cell's own link becomes a link that dispatches its action: a download, or a navigation whose target names
+ * A section becomes a table, or a tab of one when the report has several sections. A single section's title joins the
+ * report's title, after a " | ", rather than heading its table. Header rows become the table's header rows, and footer
+ * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each span every column
+ * are footnotes, shown as text below a single section's table. A row with nothing to show that only groups child rows
+ * is replaced by them. A cell's own link becomes a link that dispatches its action: a download, or a navigation whose target names
  * the pane to load the linked report into.
  */
 export function toReportLayout(
@@ -47,10 +54,14 @@ export function toReportLayout(
     report.sections.length > 1
       ? [toTabbedSection(report)]
       : report.sections.map((section) => toPaneSection(report, section))
+  const onlySection = report.sections.length === 1 ? report.sections[0] : undefined
+  const title = [report.title, onlySection && getSectionTitle(onlySection)]
+    .filter(Boolean)
+    .join(' | ')
 
   return {
     id: report.id,
-    title: report.title ?? undefined,
+    title: title || undefined,
     targetPane,
     paneWidthPercent,
     reportDetail: report.additionalReportInfo ?? undefined,
@@ -59,20 +70,22 @@ export function toReportLayout(
   }
 }
 
+function getSectionTitle(section: LegacySection): string | undefined {
+  return section.title || section.name || undefined
+}
+
+/** A report's only section. Its title is in the report's title (see toReportLayout). */
 function toPaneSection(report: LegacyReport, section: LegacySection): PaneSection {
-  const { table, textAbove, textBelow } = toTable(report, section)
+  const { table, textBelow } = toTable(report, section)
   const id = `${report.id}-${section.id}`
-  const title = section.title || section.name
   const components: Array<PaneComponent> = [
-    ...(title ? [toText(`${id}-title`, title, 'subheading')] : []),
-    ...textAbove.map((text, index) => toText(`${id}-above-${index}`, text)),
     table,
     ...textBelow.map((text, index) => toText(`${id}-below-${index}`, text)),
   ]
   return { id, items: [{ components }] }
 }
 
-/** A tab holds only a table, so a tabbed section's text above and below its table isn't shown. */
+/** A tab holds only a table, so a tabbed section's footnotes aren't shown. */
 function toTabbedSection(report: LegacyReport): PaneSection {
   const id = `${report.id}-sections`
   return {
@@ -86,7 +99,7 @@ function toTabbedSection(report: LegacyReport): PaneSection {
               id,
               tabs: report.sections.map((section) => ({
                 id: section.id,
-                label: section.title || section.name || section.id,
+                label: getSectionTitle(section) || section.id,
                 table: toTable(report, section).table,
               })),
             },
@@ -100,35 +113,51 @@ function toTabbedSection(report: LegacyReport): PaneSection {
 function toTable(
   report: LegacyReport,
   section: LegacySection,
-): { table: TableComponent; textAbove: Array<string>; textBelow: Array<string> } {
+): { table: TableComponent; textBelow: Array<string> } {
   const { columnDefinitions, content } = section.treeTable
   const headers = content.headers ?? []
   const columnHeaderRow: LegacyHeaderRow | undefined = headers[headers.length - 1]
+  const footers = content.footers ?? []
   const id = `${report.id}-${section.id}`
 
-  const columns = columnDefinitions.map((definition, index): TableColumn => {
-    const headerCell = columnHeaderRow?.cells[index]
-    return {
-      id: toColumnId(index),
-      headerText: headerCell?.displayValue ?? undefined,
-      isSortable: headerCell?.columnSorter != null,
-      isFrozen: definition.isFrozen,
-    }
-  })
+  const columns = columnDefinitions.map((definition, index): TableColumn => ({
+    id: toColumnId(index),
+    isSortable: columnHeaderRow?.cells[index]?.columnSorter != null,
+    isFrozen: definition.isFrozen,
+  }))
+  const columnCount = columns.length
 
-  const textBelow: Array<string> = []
-  const footerRows: Array<TableRow> = []
-  ;(content.footers ?? []).forEach((footer, index) => {
-    const shownCells = footer.cells.filter(isShown)
-    if (shownCells.length === 1 && shownCells[0].colspan! >= columns.length) {
-      // Spans every column, e.g. a footnote, or a blank row spacing one out
-      if (shownCells[0].displayValue) {
-        textBelow.push(shownCells[0].displayValue)
-      }
-    } else if (!isBlank(footer)) {
-      footerRows.push(toTableRow(footer, `${id}-footer-${index}`, columns.length))
-    }
+  // A header row with nothing to show is left out, e.g. a list of links' empty column headings
+  const headerRows = headers.flatMap((header, index) =>
+    isBlank(header)
+      ? []
+      : [
+          toSpanningRow(header.cells, `${id}-header-${index}`, columnCount, (cell) => ({
+            displayValue: cell.displayValue ?? undefined,
+          })),
+        ],
+  )
+
+  // The footers' last rows that each span every column are footnotes, shown below the table; a blank one only spaces
+  // them out. The rows before them stay in the table, e.g. totals, leaving out blank ones.
+  let footnoteStart = footers.length
+  while (footnoteStart > 0 && isFullWidth(footers[footnoteStart - 1], columnCount)) {
+    footnoteStart--
+  }
+  const footerRows = footers.slice(0, footnoteStart).flatMap((footer, index) => {
+    const rowId = `${id}-footer-${index}`
+    return isBlank(footer)
+      ? []
+      : [
+          toSpanningRow(footer.cells, rowId, columnCount, (cell, cellIndex) =>
+            toTableCell(cell, `${rowId}-${cellIndex}`),
+          ),
+        ]
   })
+  const textBelow = footers
+    .slice(footnoteStart)
+    .flatMap((footer) => footer.cells.filter((cell) => isShown(cell) && cell.displayValue))
+    .map((cell) => cell.displayValue!)
 
   return {
     table: {
@@ -136,21 +165,35 @@ function toTable(
       payload: {
         id,
         columns,
-        rows: toTableRows(content.rows ?? [], `${id}-row`, columns.length),
+        headerRows,
+        rows: toTableRows(content.rows ?? [], `${id}-row`, columnCount),
         ...(footerRows.length ? { footerRows } : {}),
       },
     },
-    textAbove: headers
-      .slice(0, -1)
-      .map((header) =>
-        header.cells
-          .filter((cell) => isShown(cell) && cell.displayValue)
-          .map((cell) => cell.displayValue)
-          .join(' '),
-      )
-      .filter((text) => text),
     textBelow,
   }
+}
+
+/** A header or footer row: a cell spans its columns, and the row leaves out the cells it covers */
+function toSpanningRow<T extends LegacyCell | LegacyHeaderCell>(
+  cells: Array<T>,
+  id: string,
+  columnCount: number,
+  toCell: (cell: T, index: number) => TableCell,
+): TableRow {
+  const result: Record<string, TableCell> = {}
+  cells.slice(0, columnCount).forEach((cell, index) => {
+    if (isShown(cell)) {
+      const colspan = cell.colspan!
+      result[toColumnId(index)] = { ...toCell(cell, index), ...(colspan > 1 ? { colspan } : {}) }
+    }
+  })
+  return { id, cells: result }
+}
+
+function isFullWidth(row: LegacyRow, columnCount: number): boolean {
+  const shownCells = row.cells.filter(isShown)
+  return shownCells.length === 1 && shownCells[0].colspan! >= columnCount
 }
 
 function toTableRows(
@@ -174,7 +217,7 @@ function toTableRows(
   })
 }
 
-/** Gives every column a cell, as the table expects; a column covered by another cell's span gets an empty one */
+/** A body row, whose cells don't span: a column covered by another cell's span gets an empty cell */
 function toTableRow(row: LegacyRow, id: string, columnCount: number): TableRow {
   const cells: Record<string, TableCell> = {}
   for (let index = 0; index < columnCount; index++) {
@@ -265,10 +308,13 @@ function toDownloadButton(report: LegacyReport): ActionButtonComponent | undefin
       id: `${report.id}-download`,
       label: 'Download',
       isDisabled: false,
-      iconPosition: 'left',
+      // The caret says the button opens a menu
+      icons: ['fa-solid', 'fa-caret-down'],
+      iconPosition: 'right',
       menuItems: links.map((link) => ({
         label: link.title || RESOURCE_KIND_LABELS[link.resourceKind] || link.resourceKind,
         action: { typeName: 'action.download', payload: { url: link.source } },
+        icons: RESOURCE_KIND_ICONS[link.resourceKind],
         iconPosition: 'left',
         isDisabled: false,
       })),
@@ -288,7 +334,7 @@ function isShown(cell: LegacyCell | LegacyHeaderCell): boolean {
   return cell.isVisible && cell.colspan != null
 }
 
-function isBlank(row: LegacyRow): boolean {
+function isBlank(row: LegacyRow | LegacyHeaderRow): boolean {
   return row.cells.every((cell) => !isShown(cell) || !cell.displayValue)
 }
 

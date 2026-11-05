@@ -20,7 +20,10 @@ import type { VuescapeTableProps } from '../models/componentProps/VuescapeTableP
 import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
-import { APPEND_ONLY_MAX_CELLS, getSpaceBelow } from '../utils/tableLayout'
+import { APPEND_ONLY_MAX_CELLS, getSpaceBelow, SPLIT_PANE_CLASS } from '../utils/tableLayout'
+import { getHeaderRows, getSpannedCells } from '../utils/tableHeaderRows'
+import type { TableCell } from '../models/dynamic-ui/TableCell'
+import type { TableColumn } from '../models/dynamic-ui/TableColumn'
 import {
   flattenVisibleRows,
   getAllRows,
@@ -30,7 +33,11 @@ import {
   sortTree,
 } from '../utils/tableTree'
 import type { VisibleTableRow } from '../utils/tableTree'
-import { VuescapeTableDeepWatchKey, VuescapeTableScrollHeightKey } from './injectionKeys'
+import {
+  VuescapeTableDeepWatchKey,
+  VuescapeTableScrollHeightKey,
+  VuescapeTableStartsAtRightKey,
+} from './injectionKeys'
 
 import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject, unref } from 'vue'
 
@@ -48,6 +55,9 @@ const shouldDeepWatch = props.deepWatch ?? injectedDeepWatch
 // Providing it at all (even as a ref that later holds '') turns off the self-measured dynamicScrollHeight for good:
 // the check is whether the inject resolved, not what it holds.
 const injectedScrollHeight = inject(VuescapeTableScrollHeightKey, undefined)
+
+// Whether the table starts scrolled all the way to the right; an ancestor decides (see VuescapeTableStartsAtRightKey)
+const startsAtRight = inject(VuescapeTableStartsAtRightKey, false)
 
 /**
  * This component currently uses a typed event model (e.g. `@change`, `@update`).
@@ -73,6 +83,22 @@ const localState = reactive({
   rows: [...props.rows],
   columns: [...props.columns],
 })
+
+// The header's rows, top to bottom: the table's own, or one of the columns' (deprecated) header text
+const headerRows = computed(() => getHeaderRows(props.headerRows, localState.columns))
+// A table without header rows (e.g. a list of links) shows no header
+const isHeadless = computed(() => !headerRows.value.length)
+
+// The bottom header row's cell over a single column holds that column's sort control
+function getSortProps(column: TableColumn, rowIndex: number, colspan: number) {
+  return rowIndex === headerRows.value.length - 1 && colspan === 1
+    ? {
+        field: column.id,
+        sortable: column.isSortable,
+        sortField: columnIdToSortFieldMap.get(column.id),
+      }
+    : {}
+}
 
 // A table whose rows have child rows is shown as a tree. Child rows are ordinary rows placed under their parent, with
 // a toggle and indent in the first column, so they share the table's columns.
@@ -168,10 +194,20 @@ const handleResize = () => {
 // the misaligned cells are never shown.
 const tableResizeObserver = new ResizeObserver(updateFrozenCellOffsets)
 
+// In a pane beside other panes (ReportLayoutRenderer), what's above the table can still change size after it has
+// measured its height, e.g. a report's Download button loading in, so it measures again when its pane resizes. Its
+// own new height resizes the pane once more, and that measure changes nothing.
+const paneResizeObserver = new ResizeObserver(updateTableHeight)
+
 onMounted(() => {
   const tableEl: HTMLElement | undefined = dtRef.value?.$el?.querySelector('table')
   if (tableEl) {
     tableResizeObserver.observe(tableEl)
+  }
+
+  const pane = tableWrapperRef.value?.closest(`.${SPLIT_PANE_CLASS}`)
+  if (pane) {
+    paneResizeObserver.observe(pane)
   }
 
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
@@ -181,6 +217,12 @@ onMounted(() => {
     if (props.initialScrollPosition ?? 0 > 0) {
       setTimeout(() => {
         scrollerEl.scrollTo({ top: props.initialScrollPosition })
+      }, 0)
+    }
+    // After the columns have their widths. Past the end is clamped to the end.
+    if (startsAtRight) {
+      setTimeout(() => {
+        scrollerEl.scrollLeft = scrollerEl.scrollWidth
       }, 0)
     }
   }
@@ -199,6 +241,7 @@ onBeforeUnmount(() => {
   // Clean up resize listeners
   window.removeEventListener('resize', handleResize)
   tableResizeObserver.disconnect()
+  paneResizeObserver.disconnect()
   // Clean up scroll listener
   const scrollerEl = dtRef.value?.getVirtualScrollerRef?.()?.$el
   scrollerEl?.removeEventListener('scroll', onScroll)
@@ -364,8 +407,10 @@ initializeColumnIdToSortFieldMap()
 
 /**
  * Enhanced rows with null character preprocessing for empty string sorting.
- * Replaces empty displayValue and comparableValue.stringValue with null character (\u0000)
- * which sorts before any other character, ensuring empty strings appear first.
+ * Replaces a blank displayValue (empty, or none at all, including a column the row has no cell for) and an empty
+ * comparableValue.stringValue with null character (\u0000), which sorts before any other character, ensuring blanks
+ * appear first in ascending order and last in descending. DataTable would otherwise put a missing value last either
+ * way, so a column of one value and blanks wouldn't change order when sorted the other way.
  * Optimized to only create new objects when necessary to reduce memory pressure.
  * Child rows are enhanced too, since a tree table sorts them.
  */
@@ -374,17 +419,18 @@ function enhanceRow(row: TableRow): TableRow {
   let needsEnhancement = false
   const cellsToEnhance: Record<string, any> = {}
 
-  for (const columnId in row.cells) {
+  for (const { id: columnId } of localState.columns) {
     const cell = row.cells[columnId]
-    if (cell && (cell.displayValue === '' || cell.comparableValue?.stringValue === '')) {
+    const isBlank = cell?.displayValue == null || cell.displayValue === ''
+    if (isBlank || cell?.comparableValue?.stringValue === '') {
       needsEnhancement = true
-      const enhancedCell = { ...cell }
+      const enhancedCell: TableCell = { ...cell }
 
-      if (cell.displayValue === '') {
+      if (isBlank) {
         enhancedCell.displayValue = '\u0000' // Null character sorts first
       }
 
-      if (cell.comparableValue?.stringValue === '') {
+      if (cell?.comparableValue?.stringValue === '') {
         enhancedCell.comparableValue = {
           ...cell.comparableValue,
           stringValue: '\u0000',
@@ -437,12 +483,13 @@ const tableRows = computed((): Array<TableRow | VisibleTableRow> => {
  */
 function updateFrozenCellOffsets() {
   const tableEl: HTMLElement | undefined = dtRef.value?.$el?.querySelector('table')
-  const headerRow = tableEl?.querySelector<HTMLElement>('thead > tr')
+  const headerRow = tableEl?.querySelector<HTMLElement>('thead > tr:last-child')
   if (!tableEl || !headerRow) {
     return
   }
 
-  // A column's cells share its width, so the header row's widths give the offsets for every row
+  // A column's cells share its width, so the bottom header row's widths (a cell per column) give the offsets for
+  // every row
   const offsets: Array<string> = []
   let offset = 0
   headerRow
@@ -480,6 +527,7 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
   <div class="vuescape-table__container" ref="tableWrapperRef">
     <DataTable
       ref="dtRef"
+      :class="{ 'vuescape-table--headless': isHeadless }"
       :value="tableRows"
       :lazy="isTreeTable"
       :scrollable="true"
@@ -508,7 +556,6 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
       <template v-for="(column, columnIndex) in localState.columns" :key="column.id">
         <Column
           :field="column.id"
-          :header="column.headerText"
           :sortable="column.isSortable"
           :frozen="column.isFrozen"
           :style="column.style"
@@ -558,20 +605,41 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
               >
                 {{ getDisplayValue(slotProps.data, column.id) }}
               </span>
-              <template v-else>{{ getDisplayValue(slotProps.data, column.id) }}</template>
+              <span v-else class="vuescape-table__frozen-cell-text">
+                {{ getDisplayValue(slotProps.data, column.id) }}
+              </span>
             </div>
           </template>
         </Column>
       </template>
 
-      <ColumnGroup v-if="props.footerRows?.length" type="footer">
-        <Row v-for="footerRow in props.footerRows" :key="footerRow.id">
+      <!-- The header's rows, in place of the columns' own headers.
+           The column groups' keys are their own: DataTable takes a keyed child of its slot to hold every column with
+           an ancestor of the same key, so v-if's automatic keys (0, 1, ...) could match one far up the page and show
+           every column twice. -->
+      <ColumnGroup v-if="headerRows.length" key="vuescape-table-header-rows" type="header">
+        <Row v-for="(headerRow, rowIndex) in headerRows" :key="headerRow.id">
           <Column
-            v-for="column in localState.columns"
+            v-for="{ column, cell, colspan } in getSpannedCells(headerRow, localState.columns)"
             :key="column.id"
             :frozen="column.isFrozen"
-            :footer="footerRow.cells[column.id]?.displayValue ?? ''"
-            :footerStyle="footerRow.cells[column.id]?.cssStyles"
+            :colspan="colspan"
+            :header="cell.displayValue ?? ''"
+            :headerStyle="cell.cssStyles"
+            v-bind="getSortProps(column, rowIndex, colspan)"
+          />
+        </Row>
+      </ColumnGroup>
+
+      <ColumnGroup v-if="props.footerRows?.length" key="vuescape-table-footer-rows" type="footer">
+        <Row v-for="footerRow in props.footerRows" :key="footerRow.id">
+          <Column
+            v-for="{ column, cell, colspan } in getSpannedCells(footerRow, localState.columns)"
+            :key="column.id"
+            :frozen="column.isFrozen"
+            :colspan="colspan"
+            :footer="cell.displayValue ?? ''"
+            :footerStyle="cell.cssStyles"
           />
         </Row>
       </ColumnGroup>
@@ -590,6 +658,17 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
 .p-datatable-scrollable .p-datatable-tfoot > tr > td.p-datatable-frozen-column {
   z-index: 1;
   background: var(--p-datatable-footer-cell-background);
+}
+/*
+ * Collapses the header row rather than removing it: its cells still size the columns, and give the frozen cells their
+ * offsets (updateFrozenCellOffsets). Through PrimeVue's variables, since its own header cell rules come later and
+ * would win a tie.
+ */
+.vuescape-table--headless {
+  --p-datatable-header-cell-padding: 0;
+  --p-datatable-header-cell-sm-padding: 0;
+  --p-datatable-header-cell-background: transparent;
+  --p-datatable-header-cell-border-color: transparent;
 }
 .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
   padding: 0 !important;
@@ -615,6 +694,14 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/*
+ * A frozen column (e.g. names) also grows with its text up to the max width, so a table wider than its container
+ * doesn't squeeze it to its longest word. Past the max width it wraps rather than cutting off what identifies the row.
+ */
+.vuescape-table__frozen-cell-text {
+  width: max-content;
+  max-width: var(--vuescape-table-cell-max-width, 20rem);
 }
 /*
  * Each level is indented by the toggle's width plus its gap, so a child's toggle sits under its parent's text. The

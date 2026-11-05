@@ -193,6 +193,16 @@ body {
   margin-bottom: 36px; /* Same height as footer */
 }
 
+/*
+ * The gaps the content leaves below the fixed header (mt-px) and above the fixed footer (its bottom padding, pb-10.75,
+ * is the footer's height, h-9, and a gap). Content that should reach the header and footer (e.g. side-by-side report
+ * panes) takes them back with negative margins.
+ */
+.app__container--scroll {
+  --app-header-gap: 1px;
+  --app-footer-gap: calc(var(--spacing) * (10.75 - 9));
+}
+
 .footer-component {
   height: 36px;
   bottom: 0;

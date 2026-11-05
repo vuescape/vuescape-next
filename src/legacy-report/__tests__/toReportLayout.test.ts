@@ -76,7 +76,7 @@ function getTable(layout: ReportLayout): TableComponent {
 }
 
 describe('toReportLayout', () => {
-  it(`should put a section's table in the pane, under the section's title`, () => {
+  it(`should put a section's table in the pane, with the section's title after the report's`, () => {
     // Arrange
     const legacyReport = report([
       section(
@@ -95,23 +95,24 @@ describe('toReportLayout', () => {
     // Assert
     expect(actual).toMatchObject({
       id: 'report',
-      title: 'Report Title',
+      title: 'Report Title | Running',
       targetPane: ReportPaneKind.LeftPane,
       paneWidthPercent: 20,
     })
     expect(getComponents(actual).map((component) => component.typeName)).toEqual([
-      'component.text',
       'component.table',
     ])
-    expect(getComponents(actual)[0].payload).toMatchObject({
-      text: 'Running',
-      renderTextAs: 'subheading',
-    })
     expect(getTable(actual).payload).toEqual({
       id: 'report-running',
       columns: [
-        { id: 'c0', headerText: 'Name', isSortable: true, isFrozen: true },
-        { id: 'c1', headerText: 'Count', isSortable: false, isFrozen: false },
+        { id: 'c0', isSortable: true, isFrozen: true },
+        { id: 'c1', isSortable: false, isFrozen: false },
+      ],
+      headerRows: [
+        {
+          id: 'report-running-header-0',
+          cells: { c0: { displayValue: 'Name' }, c1: { displayValue: 'Count' } },
+        },
       ],
       rows: [
         {
@@ -192,7 +193,7 @@ describe('toReportLayout', () => {
     expect(rows[2].childRows?.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual(['Org C1'])
   })
 
-  it('should show header rows above the column headers as text, totals as footer rows and a footnote as text', () => {
+  it('should keep header rows and totals in the table, and show the last full-width footer rows as footnotes', () => {
     // Arrange
     const legacyReport = report([
       section('section', {
@@ -215,18 +216,68 @@ describe('toReportLayout', () => {
     // Assert
     const components = getComponents(actual)
     expect(components.map((component) => component.typeName)).toEqual([
-      'component.text',
       'component.table',
       'component.text',
     ])
-    expect(components[0].payload).toMatchObject({ text: 'Total Active Organizations: 2' })
-    expect(components[2].payload).toMatchObject({ text: '* A footnote' })
+    expect(components[1].payload).toMatchObject({ text: '* A footnote' })
+    expect(getTable(actual).payload.headerRows).toEqual([
+      {
+        id: 'report-section-header-0',
+        cells: { c0: { displayValue: 'Total Active Organizations: 2' }, c1: {} },
+      },
+      {
+        id: 'report-section-header-1',
+        cells: { c0: { displayValue: 'Name' }, c1: { displayValue: 'Count' } },
+      },
+    ])
     expect(getTable(actual).payload.footerRows).toEqual([
       {
         id: 'report-section-footer-0',
         cells: { c0: { displayValue: 'Total In' }, c1: { displayValue: '1' } },
       },
     ])
+  })
+
+  it('should keep a full-width footer row followed by other footer rows in the table, spanning its columns', () => {
+    // Act
+    const actual = toReportLayout(
+      report([
+        section('section', {
+          headers: [columnHeaders],
+          rows: [],
+          footers: [
+            row([cell('Totals', { colspan: 2 }), covered]),
+            row([cell('Total In'), cell('1')]),
+          ],
+        }),
+      ]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    expect(getComponents(actual).map((component) => component.typeName)).toEqual([
+      'component.table',
+    ])
+    expect(getTable(actual).payload.footerRows?.map((footerRow) => footerRow.cells)).toEqual([
+      { c0: { displayValue: 'Totals', colspan: 2 } },
+      { c0: { displayValue: 'Total In' }, c1: { displayValue: '1' } },
+    ])
+  })
+
+  it('should leave out a header row with nothing to show, e.g. a list of links', () => {
+    // Act
+    const actual = toReportLayout(
+      report([
+        section('section', {
+          headers: [{ cells: [headerCell(''), headerCell(undefined)] }],
+          rows: [row([cell('Org A'), cell('in')])],
+        }),
+      ]),
+      ReportPaneKind.LeftPane,
+    )
+
+    // Assert
+    expect(getTable(actual).payload.headerRows).toEqual([])
   })
 
   it(`should give a column covered by another cell's span an empty cell`, () => {
@@ -341,7 +392,11 @@ describe('toReportLayout', () => {
 
     // Assert
     expect(actual.reportDetail).toBe('As Of: Wednesday, November, 4, 2026')
-    expect(actual.actionButton?.payload.label).toBe('Download')
+    expect(actual.actionButton?.payload).toMatchObject({
+      label: 'Download',
+      icons: ['fa-solid', 'fa-caret-down'],
+      iconPosition: 'right',
+    })
     expect(actual.actionButton?.payload.menuItems).toEqual([
       {
         label: 'Excel',
@@ -349,6 +404,7 @@ describe('toReportLayout', () => {
           typeName: 'action.download',
           payload: { url: 'https://api/report?ResourceKind=Excel' },
         },
+        icons: ['fa-duotone', 'fa-file-excel'],
         iconPosition: 'left',
         isDisabled: false,
       },

@@ -24,8 +24,17 @@ export interface VuescapeTableProps {
   rows: Array<TableRow>
 
   /**
+   * The rows of the table's header, top to bottom, e.g. a row of group headings above the columns' headings. Their
+   * cells are keyed by column id, like a row's, and can span columns. The bottom row's cells hold the columns' sort
+   * controls. Child rows are not shown.
+   * Undefined or null: one row of the columns' (deprecated) headerText, or none when no column has any. An empty array:
+   * no header.
+   */
+  headerRows?: Array<TableRow> | null
+
+  /**
    * Rows shown below the table's rows, e.g. totals, which stay in place when the rows scroll or are sorted.
-   * Their cells are keyed by column id, like a row's. Child rows are not shown.
+   * Their cells are keyed by column id, like a row's, and can span columns. Child rows are not shown.
    */
   footerRows?: Array<TableRow>
 

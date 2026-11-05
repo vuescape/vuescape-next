@@ -103,6 +103,69 @@ describe('VuescapeTable.vue', () => {
     expect(footerCells[1].attributes('style')).toContain('background-color: rgb(144, 238, 144)')
   })
 
+  it(`should show header rows in place of the columns' header text, spanning columns`, () => {
+    // Arrange
+    const headerRows: Array<TableRow> = [
+      {
+        id: 'group',
+        cells: {
+          name: { displayValue: 'Total: 4', cssStyles: { backgroundColor: 'rgb(22, 165, 198)' } },
+          age: { displayValue: '', colspan: 2 },
+        },
+      },
+      {
+        id: 'columns',
+        cells: {
+          name: { displayValue: 'Organization' },
+          age: { displayValue: 'Years' },
+          address: { displayValue: 'Where' },
+        },
+      },
+    ]
+
+    // Act
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'header-table',
+        columns: columns.value,
+        rows: rows.value,
+        headerRows,
+        initialScrollPosition: 0,
+      },
+    })
+
+    // Assert
+    const [groupRow, columnsRow] = wrapper.findAll('thead tr')
+    const groupCells = groupRow.findAll('th')
+    expect(groupCells.map((cell) => [cell.text(), cell.attributes('colspan')])).toEqual([
+      ['Total: 4', '1'],
+      ['', '2'],
+    ])
+    expect(groupCells[0].attributes('style')).toContain('background-color: rgb(22, 165, 198)')
+    expect(columnsRow.findAll('th').map((cell) => cell.text())).toEqual([
+      'Organization',
+      'Years',
+      'Where',
+    ])
+    // The bottom row holds the sort controls, for the sortable columns
+    expect(columnsRow.findAll('th[data-p-sortable-column="true"]')).toHaveLength(2)
+    expect(groupRow.findAll('th[data-p-sortable-column="true"]')).toHaveLength(0)
+  })
+
+  it('should show no header when the table has no header rows', () => {
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'headless-table',
+        columns: columns.value,
+        rows: rows.value,
+        headerRows: [],
+        initialScrollPosition: 0,
+      },
+    })
+
+    expect(wrapper.find('.vuescape-table--headless').exists()).toBe(true)
+  })
+
   describe('scroll height', () => {
     it('should use a height provided by an ancestor, e.g. a dialog, instead of filling the page', async () => {
       // Arrange
@@ -233,6 +296,32 @@ describe('VuescapeTable.vue', () => {
     const sortedRows2 = wrapper.findAll('tbody tr')
     expect(sortedRows2[0].findAll('td')[0].text()).toBe(rows.value[0].cells['name'].displayValue)
     expect(sortedRows2[1].findAll('td')[0].text()).toBe(rows.value[1].cells['name'].displayValue)
+  })
+
+  it('should sort cells without a value, or without a cell, before values, so the other order puts them last', () => {
+    // Arrange
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'test-table-blank-cells',
+        columns: [{ id: 'quarter', headerText: 'Q1', isSortable: true }],
+        rows: [
+          { id: 'a', cells: { quarter: { displayValue: 'in' } } },
+          { id: 'b', cells: { quarter: {} } },
+          { id: 'c', cells: {} },
+        ],
+        initialScrollPosition: 0,
+      },
+    })
+
+    // Act
+    const enhanced = (wrapper.vm as any).enhancedRows as Array<TableRow>
+
+    // Assert
+    expect(enhanced.map((row) => row.cells.quarter.displayValue)).toEqual([
+      'in',
+      '\u0000',
+      '\u0000',
+    ])
   })
 
   it('handles empty string sorting with null character preprocessing', () => {

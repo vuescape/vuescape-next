@@ -25,10 +25,12 @@ export interface TableColumn {
   filterMode?: 'string' | 'category' | 'date' | 'boolean' | undefined
   /**
    * Header text of the column.
+   * @deprecated Use the table's headerRows. The table makes its header row from these only when it has no headerRows.
    */
   headerText?: string | undefined
   /**
    * Footer text of the column.
+   * @deprecated Use the table's footerRows.
    */
   footerText?: string | undefined
   /**
@@ -65,10 +67,12 @@ export interface TableColumn {
   cssFooterClass?: any
   /**
    * Number of columns to span for grouping.
+   * @deprecated Use the table's headerRows, whose cells span columns (TableCell.colspan).
    */
   colspan?: number | undefined
   /**
    * Number of rows to span for grouping.
+   * @deprecated Use the table's headerRows.
    */
   rowspan?: number | undefined
   /**
