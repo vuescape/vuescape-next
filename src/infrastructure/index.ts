@@ -10,12 +10,6 @@ export {
   toEnum,
   tryToEnum
 } from './converters'
-export {
-  acquireLock,
-  acquireLockWithRetryAsync,
-  executeWithLockAsync,
-  releaseLock
-} from './cookieUtil'
 export { formatUtcDateTimeString } from './dateTimeUtility'
 export { selectElementContents } from './dom'
 export { fastHash } from './fastHash'

@@ -5,7 +5,6 @@ export * from './BreadcrumbItem'
 // Chiclet name conflicts with new Chiclet in dynamic-ui so exclude from export since it's not used right now
 // export * from './Chiclet'
 export * from './componentProps'
-export * from './CookieLock'
 export * from './dynamic-ui'
 export * from './ErrorHandler'
 export * from './feature'
