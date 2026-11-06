@@ -30,9 +30,7 @@ export interface WizardStep {
 
   /**
    * A function that the wizard can call (or the step can call)
-   * to do final step-level validation. In some designs, you might
-   * rely solely on the zodSchema and not need this. But it's
-   * kept here if you want an explicit callback.
+   * to do final step-level validation.
    */
   onValidate?: (data: unknown) => boolean | Promise<boolean>;
 }
