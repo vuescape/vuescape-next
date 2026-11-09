@@ -26,6 +26,9 @@ function valueCell(value: string | number, uiObjectType: string): LegacyCell {
   })
 }
 
+/** A column that sizes to its content, as vuescape-dotnet's columns do unless given a width */
+const noMaxWidth = { '--vuescape-table-cell-max-width': 'none' }
+
 /** A cell covered by an earlier cell's span, as vuescape-dotnet makes it: visible, without a colspan */
 const covered: LegacyCell = { isVisible: true }
 
@@ -50,7 +53,10 @@ function section(
   return {
     id,
     treeTable: {
-      columnDefinitions: [{ isFrozen: true }, { isFrozen: false }],
+      columnDefinitions: [
+        { columnWidthBehavior: 'dynamicallySizeToContent', isFrozen: true },
+        { columnWidthBehavior: 'dynamicallySizeToContent', isFrozen: false },
+      ],
       content,
     },
     ...extra,
@@ -105,8 +111,8 @@ describe('toReportLayout', () => {
     expect(getTable(actual).payload).toEqual({
       id: 'report-running',
       columns: [
-        { id: 'c0', isSortable: true, isFrozen: true },
-        { id: 'c1', isSortable: false, isFrozen: false },
+        { id: 'c0', isSortable: true, isFrozen: true, style: noMaxWidth },
+        { id: 'c1', isSortable: false, isFrozen: false, style: noMaxWidth },
       ],
       headerRows: [
         {
@@ -135,8 +141,26 @@ describe('toReportLayout', () => {
 
     // Assert
     expect(getTable(actual).payload.columns).toEqual([
-      { id: 'c0', headerText: undefined, isSortable: false, isFrozen: true },
-      { id: 'c1', headerText: undefined, isSortable: false, isFrozen: false },
+      { id: 'c0', headerText: undefined, isSortable: false, isFrozen: true, style: noMaxWidth },
+      { id: 'c1', headerText: undefined, isSortable: false, isFrozen: false, style: noMaxWidth },
+    ])
+  })
+
+  it('should cut a column off at its width only when it is given one', () => {
+    // Arrange
+    const legacySection = section('running', { rows: [row([cell('6610458'), cell('stats_1')])] })
+    legacySection.treeTable.columnDefinitions = [
+      { columnWidthBehavior: 'useSpecifiedWidth', width: 120, isFrozen: false },
+      { columnWidthBehavior: 'dynamicallySizeToContent', width: null, isFrozen: false },
+    ]
+
+    // Act
+    const actual = toReportLayout(report([legacySection]), ReportPaneKind.CenterPane)
+
+    // Assert
+    expect(getTable(actual).payload.columns.map((column) => column.style)).toEqual([
+      { '--vuescape-table-cell-max-width': '120px' },
+      noMaxWidth,
     ])
   })
 

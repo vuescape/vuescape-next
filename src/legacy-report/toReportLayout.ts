@@ -14,6 +14,7 @@ import type { ReportPaneKind } from '../models/feature/ReportPaneKind'
 import type { LinkTarget } from '../reporting-domain/Link/LinkTarget'
 import type {
   LegacyCell,
+  LegacyColumnDefinition,
   LegacyHeaderCell,
   LegacyHeaderRow,
   LegacyLink,
@@ -124,6 +125,7 @@ function toTable(
     id: toColumnId(index),
     isSortable: columnHeaderRow?.cells[index]?.columnSorter != null,
     isFrozen: definition.isFrozen,
+    style: { '--vuescape-table-cell-max-width': toCellMaxWidth(definition) },
   }))
   const columnCount = columns.length
 
@@ -267,6 +269,16 @@ function toCssStyles(cell: LegacyCell): Record<string, string> | undefined {
     result.justifyContent = 'flex-end'
   }
   return Object.keys(result).length ? result : undefined
+}
+
+/**
+ * As the original table did, a column given a width cuts its text off there, and any other column sizes to its
+ * content, so text whose end matters (e.g. an id) isn't cut off at the table's default max width.
+ */
+function toCellMaxWidth(definition: LegacyColumnDefinition): string {
+  return definition.columnWidthBehavior === 'useSpecifiedWidth' && definition.width != null
+    ? `${definition.width}px`
+    : 'none'
 }
 
 /** Numbers sort as numbers. The table sorts a column by its comparable values only when every cell has one. */

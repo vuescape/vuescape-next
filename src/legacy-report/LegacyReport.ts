@@ -30,6 +30,10 @@ export interface LegacyTreeTable {
 }
 
 export interface LegacyColumnDefinition {
+  /** e.g. 'dynamicallySizeToContent', or 'useSpecifiedWidth' with a width */
+  columnWidthBehavior?: string | null
+  /** In pixels, the only unit vuescape-dotnet gives a width in */
+  width?: number | null
   isFrozen: boolean
 }
 
