@@ -1,11 +1,8 @@
 import type { Action } from '../models/dynamic-ui/actions/Action'
 import type { ComparableValue } from '../models/dynamic-ui/ComparableValue'
 import type { ActionButtonComponent } from '../models/dynamic-ui/pane-components/ActionButtonComponent'
-import type { PaneComponent } from '../models/dynamic-ui/pane-components/PaneComponent'
 import type { TableComponent } from '../models/dynamic-ui/pane-components/TableComponent'
-import type { TextComponent } from '../models/dynamic-ui/pane-components/TextComponent'
 import type { PaneSection } from '../models/dynamic-ui/PaneSection'
-import type { RenderTextAs } from '../models/dynamic-ui/RenderTextAs'
 import type { ReportLayout } from '../models/dynamic-ui/ReportLayout'
 import type { TableCell } from '../models/dynamic-ui/TableCell'
 import type { TableColumn } from '../models/dynamic-ui/TableColumn'
@@ -41,8 +38,8 @@ const RESOURCE_KIND_ICONS: Record<string, Array<string>> = {
  *
  * A section becomes a table, or a tab of one when the report has several sections. A single section's title joins the
  * report's title, after a " | ", rather than heading its table. Header rows become the table's header rows, and footer
- * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each span every column
- * are footnotes, shown as text below a single section's table. A hidden row is replaced by its child and summary rows,
+ * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each have only one cell are
+ * the table's footnotes, shown as text below it. A hidden row is replaced by its child and summary rows,
  * and a shown row's summary rows follow its child rows. A cell's own link becomes a link that dispatches its action: a
  * download, or a navigation whose target names the pane to load the linked report into.
  */
@@ -77,16 +74,9 @@ function getSectionTitle(section: LegacySection): string | undefined {
 
 /** A report's only section. Its title is in the report's title (see toReportLayout). */
 function toPaneSection(report: LegacyReport, section: LegacySection): PaneSection {
-  const { table, textBelow } = toTable(report, section)
-  const id = `${report.id}-${section.id}`
-  const components: Array<PaneComponent> = [
-    table,
-    ...textBelow.map((text, index) => toText(`${id}-below-${index}`, text)),
-  ]
-  return { id, items: [{ components }] }
+  return { id: `${report.id}-${section.id}`, items: [{ components: [toTable(report, section)] }] }
 }
 
-/** A tab holds only a table, so a tabbed section's footnotes aren't shown. */
 function toTabbedSection(report: LegacyReport): PaneSection {
   const id = `${report.id}-sections`
   return {
@@ -101,7 +91,7 @@ function toTabbedSection(report: LegacyReport): PaneSection {
               tabs: report.sections.map((section) => ({
                 id: section.id,
                 label: getSectionTitle(section) || section.id,
-                table: toTable(report, section).table,
+                table: toTable(report, section),
               })),
             },
           },
@@ -111,10 +101,7 @@ function toTabbedSection(report: LegacyReport): PaneSection {
   }
 }
 
-function toTable(
-  report: LegacyReport,
-  section: LegacySection,
-): { table: TableComponent; textBelow: Array<string> } {
+function toTable(report: LegacyReport, section: LegacySection): TableComponent {
   const { columnDefinitions, content } = section.treeTable
   const headers = content.headers ?? []
   const columnHeaderRow: LegacyHeaderRow | undefined = headers[headers.length - 1]
@@ -140,8 +127,9 @@ function toTable(
         ],
   )
 
-  // The footers' last rows that each span every column are footnotes, shown below the table; a blank one only spaces
-  // them out. The rows before them stay in the table, e.g. totals, leaving out blank ones.
+  // The footers' last rows that each have only one cell, spanning every column, are footnotes, shown as text below the
+  // table rather than staying in place with the footer rows; a blank one only spaces them out. The rows before them
+  // stay in the table, e.g. totals, leaving out blank ones, so a one-cell row heading other rows stays with them.
   let footnoteStart = footers.length
   while (footnoteStart > 0 && isFullWidth(footers[footnoteStart - 1], columnCount)) {
     footnoteStart--
@@ -156,23 +144,21 @@ function toTable(
           ),
         ]
   })
-  const textBelow = footers
+  const footnotes = footers
     .slice(footnoteStart)
     .flatMap((footer) => footer.cells.filter((cell) => isShown(cell) && cell.displayValue))
     .map((cell) => cell.displayValue!)
 
   return {
-    table: {
-      typeName: 'component.table',
-      payload: {
-        id,
-        columns,
-        headerRows,
-        rows: toTableRows(content.rows ?? [], `${id}-row`, columnCount),
-        ...(footerRows.length ? { footerRows } : {}),
-      },
+    typeName: 'component.table',
+    payload: {
+      id,
+      columns,
+      headerRows,
+      rows: toTableRows(content.rows ?? [], `${id}-row`, columnCount),
+      ...(footerRows.length ? { footerRows } : {}),
+      ...(footnotes.length ? { footnotes } : {}),
     },
-    textBelow,
   }
 }
 
@@ -339,10 +325,6 @@ function toDownloadButton(report: LegacyReport): ActionButtonComponent | undefin
       })),
     },
   }
-}
-
-function toText(id: string, text: string, renderTextAs: RenderTextAs = 'paragraph'): TextComponent {
-  return { typeName: 'component.text', payload: { id, text, renderTextAs } }
 }
 
 /**

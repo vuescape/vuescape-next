@@ -272,7 +272,7 @@ describe('toReportLayout', () => {
     expect(rows[1].childRows).toBeUndefined()
   })
 
-  it('should keep header rows and totals in the table, and show the last full-width footer rows as footnotes', () => {
+  it(`should keep header rows and totals in the table, and make the last one-cell footer rows the table's footnotes`, () => {
     // Arrange
     const legacyReport = report([
       section('section', {
@@ -293,12 +293,10 @@ describe('toReportLayout', () => {
     const actual = toReportLayout(legacyReport, ReportPaneKind.CenterPane)
 
     // Assert
-    const components = getComponents(actual)
-    expect(components.map((component) => component.typeName)).toEqual([
+    expect(getComponents(actual).map((component) => component.typeName)).toEqual([
       'component.table',
-      'component.text',
     ])
-    expect(components[1].payload).toMatchObject({ text: '* A footnote' })
+    expect(getTable(actual).payload.footnotes).toEqual(['* A footnote'])
     expect(getTable(actual).payload.headerRows).toEqual([
       {
         id: 'report-section-header-0',
@@ -334,9 +332,7 @@ describe('toReportLayout', () => {
     )
 
     // Assert
-    expect(getComponents(actual).map((component) => component.typeName)).toEqual([
-      'component.table',
-    ])
+    expect(getTable(actual).payload.footnotes).toBeUndefined()
     expect(getTable(actual).payload.footerRows?.map((footerRow) => footerRow.cells)).toEqual([
       { c0: { displayValue: 'Totals', colspan: 2 } },
       { c0: { displayValue: 'Total In' }, c1: { displayValue: '1' } },
@@ -423,10 +419,18 @@ describe('toReportLayout', () => {
     })
   })
 
-  it('should show several sections as tabs', () => {
+  it('should show several sections as tabs, each table with its own footnotes', () => {
     // Arrange
     const legacyReport = report([
-      section('running', { headers: [columnHeaders], rows: [] }, { title: 'Running' }),
+      section(
+        'running',
+        {
+          headers: [columnHeaders],
+          rows: [],
+          footers: [row([cell('* A footnote', { colspan: 2 }), covered])],
+        },
+        { title: 'Running' },
+      ),
       section(
         'completed',
         { headers: [columnHeaders], rows: [row([cell('Job'), cell('1')])] },
@@ -446,10 +450,10 @@ describe('toReportLayout', () => {
         components[0].payload as {
           tabs: Array<{ id: string; label: string; table?: TableComponent }>
         }
-      ).tabs.map((tab) => [tab.id, tab.label, tab.table?.payload.id]),
+      ).tabs.map((tab) => [tab.id, tab.label, tab.table?.payload.id, tab.table?.payload.footnotes]),
     ).toEqual([
-      ['running', 'Running', 'report-running'],
-      ['completed', 'Completed', 'report-completed'],
+      ['running', 'Running', 'report-running', ['* A footnote']],
+      ['completed', 'Completed', 'report-completed', undefined],
     ])
   })
 

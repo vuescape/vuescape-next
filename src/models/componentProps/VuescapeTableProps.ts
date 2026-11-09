@@ -39,6 +39,12 @@ export interface VuescapeTableProps {
   footerRows?: Array<TableRow>
 
   /**
+   * Notes shown as text below the table, top to bottom, e.g. how to read its numbers. They are not part of the table:
+   * they don't stay in place when the rows scroll. Undefined, null or empty: no notes.
+   */
+  footnotes?: Array<string> | null
+
+  /**
    * The initial scroll position of the table.
    * @default 0
    */

@@ -524,130 +524,144 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
 
     -->
 
-  <div class="vuescape-table__container" ref="tableWrapperRef">
-    <DataTable
-      ref="dtRef"
-      :class="{ 'vuescape-table--headless': isHeadless }"
-      :value="tableRows"
-      :lazy="isTreeTable"
-      :scrollable="true"
-      :scrollHeight="scrollHeight"
-      :stripedRows="true"
-      :showGridlines="true"
-      tableStyle="min-width: 100%;"
-      :virtualScrollerOptions="virtualScrollerOptions"
-      stateStorage="session"
-      :stateKey="localState.id"
-      :resizable-columns="false"
-      size="small"
-      @sort="setTreeSort"
-      @state-restore="setTreeSort"
-    >
-      <!-- v-model:sortField="sortingState.sortField"
+  <div class="vuescape-table">
+    <!-- The footnotes are below the table's container, so the table measures them as space below it (updateTableHeight) -->
+    <div class="vuescape-table__container" ref="tableWrapperRef">
+      <DataTable
+        ref="dtRef"
+        :class="{ 'vuescape-table--headless': isHeadless }"
+        :value="tableRows"
+        :lazy="isTreeTable"
+        :scrollable="true"
+        :scrollHeight="scrollHeight"
+        :stripedRows="true"
+        :showGridlines="true"
+        tableStyle="min-width: 100%;"
+        :virtualScrollerOptions="virtualScrollerOptions"
+        stateStorage="session"
+        :stateKey="localState.id"
+        :resizable-columns="false"
+        size="small"
+        @sort="setTreeSort"
+        @state-restore="setTreeSort"
+      >
+        <!-- v-model:sortField="sortingState.sortField"
       v-model:sortOrder="sortingState.sortOrder"
     @state-restore="stateRestore"
     @state-save="stateSave" -->
-      <template #empty>
-        <div class="text-center">
-          <p>No Results Found</p>
-        </div>
-      </template>
+        <template #empty>
+          <div class="text-center">
+            <p>No Results Found</p>
+          </div>
+        </template>
 
-      <template v-for="(column, columnIndex) in localState.columns" :key="column.id">
-        <Column
-          :field="column.id"
-          :sortable="column.isSortable"
-          :frozen="column.isFrozen"
-          :style="column.style"
-          :sortField="columnIdToSortFieldMap.get(column.id)"
-        >
-          <template #body="slotProps">
-            <div
-              :style="
-                slotProps.data.cells[column.id].component
-                  ? undefined
-                  : getCellStyle(slotProps.data, column.id)
-              "
-              class="cell-content"
-            >
-              <!-- A tree table's first column: the row's toggle, or room for one, indented by its depth -->
-              <span
-                v-if="isTreeTable && columnIndex === 0"
-                class="vuescape-table__row-toggle"
-                :style="{ '--vuescape-table-tree-depth': slotProps.data.depth }"
+        <template v-for="(column, columnIndex) in localState.columns" :key="column.id">
+          <Column
+            :field="column.id"
+            :sortable="column.isSortable"
+            :frozen="column.isFrozen"
+            :style="column.style"
+            :sortField="columnIdToSortFieldMap.get(column.id)"
+          >
+            <template #body="slotProps">
+              <div
+                :style="
+                  slotProps.data.cells[column.id].component
+                    ? undefined
+                    : getCellStyle(slotProps.data, column.id)
+                "
+                class="cell-content"
               >
-                <button
-                  v-if="slotProps.data.hasChildRows"
-                  type="button"
-                  :aria-expanded="slotProps.data.isExpanded"
-                  :aria-label="slotProps.data.isExpanded ? 'Collapse row' : 'Expand row'"
-                  @click="toggleRow(slotProps.data.id)"
+                <!-- A tree table's first column: the row's toggle, or room for one, indented by its depth -->
+                <span
+                  v-if="isTreeTable && columnIndex === 0"
+                  class="vuescape-table__row-toggle"
+                  :style="{ '--vuescape-table-tree-depth': slotProps.data.depth }"
                 >
-                  <i
-                    :class="[
-                      'fa-light',
-                      slotProps.data.isExpanded ? 'fa-chevron-down' : 'fa-chevron-right',
-                    ]"
-                    aria-hidden="true"
-                  />
-                </button>
-              </span>
-              <PaneComponentRenderer
-                v-if="slotProps.data.cells[column.id].component"
-                :component="slotProps.data.cells[column.id].component"
-              />
-              <!-- Kept to one line, so long text can't make a row taller than the virtual scroller's fixed row
+                  <button
+                    v-if="slotProps.data.hasChildRows"
+                    type="button"
+                    :aria-expanded="slotProps.data.isExpanded"
+                    :aria-label="slotProps.data.isExpanded ? 'Collapse row' : 'Expand row'"
+                    @click="toggleRow(slotProps.data.id)"
+                  >
+                    <i
+                      :class="[
+                        'fa-light',
+                        slotProps.data.isExpanded ? 'fa-chevron-down' : 'fa-chevron-right',
+                      ]"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </span>
+                <PaneComponentRenderer
+                  v-if="slotProps.data.cells[column.id].component"
+                  :component="slotProps.data.cells[column.id].component"
+                />
+                <!-- Kept to one line, so long text can't make a row taller than the virtual scroller's fixed row
                    height. Frozen columns (e.g. names) wrap instead of cutting off what identifies the row. -->
-              <span
-                v-else-if="!column.isFrozen"
-                class="vuescape-table__cell-text"
-                @mouseenter="setTitleIfTruncated"
-              >
-                {{ getDisplayValue(slotProps.data, column.id) }}
-              </span>
-              <span v-else class="vuescape-table__frozen-cell-text">
-                {{ getDisplayValue(slotProps.data, column.id) }}
-              </span>
-            </div>
-          </template>
-        </Column>
-      </template>
+                <span
+                  v-else-if="!column.isFrozen"
+                  class="vuescape-table__cell-text"
+                  @mouseenter="setTitleIfTruncated"
+                >
+                  {{ getDisplayValue(slotProps.data, column.id) }}
+                </span>
+                <span v-else class="vuescape-table__frozen-cell-text">
+                  {{ getDisplayValue(slotProps.data, column.id) }}
+                </span>
+              </div>
+            </template>
+          </Column>
+        </template>
 
-      <!-- The header's rows, in place of the columns' own headers.
+        <!-- The header's rows, in place of the columns' own headers.
            The column groups' keys are their own: DataTable takes a keyed child of its slot to hold every column with
            an ancestor of the same key, so v-if's automatic keys (0, 1, ...) could match one far up the page and show
            every column twice. -->
-      <ColumnGroup v-if="headerRows.length" key="vuescape-table-header-rows" type="header">
-        <Row v-for="(headerRow, rowIndex) in headerRows" :key="headerRow.id">
-          <Column
-            v-for="{ column, cell, colspan } in getSpannedCells(headerRow, localState.columns)"
-            :key="column.id"
-            :frozen="column.isFrozen"
-            :colspan="colspan"
-            :header="cell.displayValue ?? ''"
-            :headerStyle="cell.cssStyles"
-            v-bind="getSortProps(column, rowIndex, colspan)"
-          />
-        </Row>
-      </ColumnGroup>
+        <ColumnGroup v-if="headerRows.length" key="vuescape-table-header-rows" type="header">
+          <Row v-for="(headerRow, rowIndex) in headerRows" :key="headerRow.id">
+            <Column
+              v-for="{ column, cell, colspan } in getSpannedCells(headerRow, localState.columns)"
+              :key="column.id"
+              :frozen="column.isFrozen"
+              :colspan="colspan"
+              :header="cell.displayValue ?? ''"
+              :headerStyle="cell.cssStyles"
+              v-bind="getSortProps(column, rowIndex, colspan)"
+            />
+          </Row>
+        </ColumnGroup>
 
-      <ColumnGroup v-if="props.footerRows?.length" key="vuescape-table-footer-rows" type="footer">
-        <Row v-for="footerRow in props.footerRows" :key="footerRow.id">
-          <Column
-            v-for="{ column, cell, colspan } in getSpannedCells(footerRow, localState.columns)"
-            :key="column.id"
-            :frozen="column.isFrozen"
-            :colspan="colspan"
-            :footer="cell.displayValue ?? ''"
-            :footerStyle="cell.cssStyles"
-          />
-        </Row>
-      </ColumnGroup>
-    </DataTable>
+        <ColumnGroup v-if="props.footerRows?.length" key="vuescape-table-footer-rows" type="footer">
+          <Row v-for="footerRow in props.footerRows" :key="footerRow.id">
+            <Column
+              v-for="{ column, cell, colspan } in getSpannedCells(footerRow, localState.columns)"
+              :key="column.id"
+              :frozen="column.isFrozen"
+              :colspan="colspan"
+              :footer="cell.displayValue ?? ''"
+              :footerStyle="cell.cssStyles"
+            />
+          </Row>
+        </ColumnGroup>
+      </DataTable>
+    </div>
+    <div v-if="props.footnotes?.length" class="vuescape-table__footnotes">
+      <div v-for="(footnote, index) in props.footnotes" :key="index">{{ footnote }}</div>
+    </div>
   </div>
 </template>
 
 <style>
+.vuescape-table__footnotes {
+  margin-top: 0.5rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
+}
+.vuescape-table__footnotes > div + div {
+  margin-top: 0.25rem;
+}
 .p-datatable-scrollable .p-datatable-tbody > tr > td.p-datatable-frozen-column {
   background: inherit;
 }

@@ -103,6 +103,39 @@ describe('VuescapeTable.vue', () => {
     expect(footerCells[1].attributes('style')).toContain('background-color: rgb(144, 238, 144)')
   })
 
+  it('should show footnotes as text below the table, outside its scroll area', () => {
+    // Act
+    const wrapper = mount(VuescapeTable, {
+      props: {
+        id: 'footnotes-table',
+        columns: columns.value,
+        rows: rows.value,
+        footnotes: ['* The first note', '** The second note'],
+        initialScrollPosition: 0,
+      },
+    })
+
+    // Assert
+    const footnotes = wrapper.findAll('.vuescape-table__footnotes > div')
+    expect(footnotes.map((footnote) => footnote.text())).toEqual([
+      '* The first note',
+      '** The second note',
+    ])
+    expect(wrapper.find('.vuescape-table__container .vuescape-table__footnotes').exists()).toBe(
+      false,
+    )
+  })
+
+  it('should show no footnotes when the table has none', () => {
+    // Act
+    const wrapper = mount(VuescapeTable, {
+      props: { id: 'table', columns: columns.value, rows: rows.value, initialScrollPosition: 0 },
+    })
+
+    // Assert
+    expect(wrapper.find('.vuescape-table__footnotes').exists()).toBe(false)
+  })
+
   it(`should show header rows in place of the columns' header text, spanning columns`, () => {
     // Arrange
     const headerRows: Array<TableRow> = [
