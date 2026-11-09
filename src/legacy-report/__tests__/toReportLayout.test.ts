@@ -192,29 +192,84 @@ describe('toReportLayout', () => {
     })
   })
 
-  it('should show the children of a row that only groups them in its place', () => {
+  it('should show the children and summary rows of a hidden row in its place', () => {
     // Arrange
-    const groupingRow = row(
-      [cell(), cell()],
-      [row([cell('Org A'), cell()]), row([cell('Org B'), cell()])],
-    )
+    // As vuescape-dotnet makes a Who Is In report's row when the table has another
+    const hiddenRow: LegacyRow = {
+      ...row(
+        [cell(), cell()],
+        [row([cell('Org A'), cell('in')]), row([cell('Org B'), cell()])],
+        true,
+      ),
+      isVisible: false,
+      expandedSummaryRows: [row([cell('Total In'), cell('1')])],
+    }
     const parentRow = row([cell('Org C'), cell()], [row([cell('Org C1'), cell()])], true)
 
     // Act
     const actual = toReportLayout(
-      report([section('section', { headers: [columnHeaders], rows: [groupingRow, parentRow] })]),
+      report([section('section', { headers: [columnHeaders], rows: [hiddenRow, parentRow] })]),
       ReportPaneKind.CenterPane,
     )
 
     // Assert
     const rows = getTable(actual).payload.rows
-    expect(rows.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual([
-      'Org A',
-      'Org B',
-      'Org C',
+    expect(rows.map((tableRow) => [tableRow.id, tableRow.cells.c0.displayValue])).toEqual([
+      ['report-section-row-0-0', 'Org A'],
+      ['report-section-row-0-1', 'Org B'],
+      ['report-section-row-0-summary-0', 'Total In'],
+      ['report-section-row-1', 'Org C'],
     ])
-    expect(rows[2].isExpanded).toBe(true)
-    expect(rows[2].childRows?.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual(['Org C1'])
+    expect(rows[2].cells.c1).toEqual({ displayValue: '1' })
+    expect(rows[3].isExpanded).toBe(true)
+    expect(rows[3].childRows?.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual(['Org C1'])
+  })
+
+  it(`should keep a shown row with nothing in it, as the original table did`, () => {
+    // Act
+    const actual = toReportLayout(
+      report([
+        section('section', {
+          headers: [columnHeaders],
+          rows: [row([cell(), cell()], [row([cell('Org A'), cell()])])],
+        }),
+      ]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    const rows = getTable(actual).payload.rows
+    expect(rows).toHaveLength(1)
+    expect(rows[0].childRows?.map((tableRow) => tableRow.cells.c0.displayValue)).toEqual(['Org A'])
+  })
+
+  it(`should show a shown row's summary rows after its children, and none without children`, () => {
+    // Arrange
+    const parentRow: LegacyRow = {
+      ...row([cell('Region'), cell('2')], [row([cell('Org A'), cell('1')])]),
+      expandedSummaryRows: [row([cell('Region Total'), cell('2')])],
+    }
+    const childlessRow: LegacyRow = {
+      ...row([cell('Org B'), cell('1')]),
+      expandedSummaryRows: [row([cell('Org B Total'), cell('1')])],
+    }
+
+    // Act
+    const actual = toReportLayout(
+      report([section('section', { headers: [columnHeaders], rows: [parentRow, childlessRow] })]),
+      ReportPaneKind.CenterPane,
+    )
+
+    // Assert
+    const rows = getTable(actual).payload.rows
+    expect(rows[0].isExpanded).toBe(false)
+    expect(
+      rows[0].childRows?.map((tableRow) => [tableRow.id, tableRow.cells.c0.displayValue]),
+    ).toEqual([
+      ['report-section-row-0-0', 'Org A'],
+      ['report-section-row-0-summary-0', 'Region Total'],
+    ])
+    expect(rows[1].childRows).toBeUndefined()
   })
 
   it('should keep header rows and totals in the table, and show the last full-width footer rows as footnotes', () => {

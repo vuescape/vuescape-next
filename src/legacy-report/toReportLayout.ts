@@ -42,9 +42,9 @@ const RESOURCE_KIND_ICONS: Record<string, Array<string>> = {
  * A section becomes a table, or a tab of one when the report has several sections. A single section's title joins the
  * report's title, after a " | ", rather than heading its table. Header rows become the table's header rows, and footer
  * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each span every column
- * are footnotes, shown as text below a single section's table. A row with nothing to show that only groups child rows
- * is replaced by them. A cell's own link becomes a link that dispatches its action: a download, or a navigation whose target names
- * the pane to load the linked report into.
+ * are footnotes, shown as text below a single section's table. A hidden row is replaced by its child and summary rows,
+ * and a shown row's summary rows follow its child rows. A cell's own link becomes a link that dispatches its action: a
+ * download, or a navigation whose target names the pane to load the linked report into.
  */
 export function toReportLayout(
   report: LegacyReport,
@@ -198,6 +198,10 @@ function isFullWidth(row: LegacyRow, columnCount: number): boolean {
   return shownCells.length === 1 && shownCells[0].colspan! >= columnCount
 }
 
+/**
+ * A row's children are followed by its summary rows (e.g. totals), shown while it is expanded, as the original table
+ * did. A row with no children shows none of its summary rows, and a row's collapsed summary rows aren't shown.
+ */
 function toTableRows(
   rows: Array<LegacyRow>,
   idPrefix: string,
@@ -205,14 +209,17 @@ function toTableRows(
 ): Array<TableRow> {
   return rows.flatMap((row, index) => {
     const id = `${idPrefix}-${index}`
-    const children = row.children ?? []
-    // A row shown only to group its children, e.g. the organizations of a Who Is In report
-    if (children.length && isBlank(row)) {
-      return toTableRows(children, id, columnCount)
+    const children = toTableRows(row.children ?? [], id, columnCount)
+    const summaryRows = (row.expandedSummaryRows ?? []).map((summaryRow, summaryIndex) =>
+      toTableRow(summaryRow, `${id}-summary-${summaryIndex}`, columnCount),
+    )
+    // A hidden row, e.g. the one a Who Is In report puts its organizations and totals under, is replaced by them
+    if (row.isVisible === false) {
+      return [...children, ...summaryRows]
     }
     const result = toTableRow(row, id, columnCount)
     if (children.length) {
-      result.childRows = toTableRows(children, id, columnCount)
+      result.childRows = [...children, ...summaryRows]
       result.isExpanded = row.isExpanded ?? false
     }
     return [result]

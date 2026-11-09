@@ -56,8 +56,18 @@ export interface LegacyHeaderCell {
 
 export interface LegacyRow {
   cells: Array<LegacyCell>
+  /**
+   * False for a row the original table doesn't show, though it shows the row's children and summary rows, e.g. the
+   * row a Who Is In report puts its organizations and totals under
+   */
+  isVisible?: boolean
   isExpanded?: boolean
   children?: Array<LegacyRow> | null
+  /**
+   * Rows that follow the children while the row is expanded, e.g. totals. vuescape-dotnet moves a table's only row's
+   * summary rows to the footer rows instead.
+   */
+  expandedSummaryRows?: Array<LegacyRow> | null
 }
 
 export interface LegacyCell {
