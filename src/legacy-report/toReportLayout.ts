@@ -4,6 +4,8 @@ import type { ActionButtonComponent } from '../models/dynamic-ui/pane-components
 import type { TableComponent } from '../models/dynamic-ui/pane-components/TableComponent'
 import type { PaneSection } from '../models/dynamic-ui/PaneSection'
 import type { ReportLayout } from '../models/dynamic-ui/ReportLayout'
+import type { TableAppearance } from '../models/dynamic-ui/TableAppearance'
+import type { TableBorderKind } from '../models/dynamic-ui/TableBorderKind'
 import type { TableCell } from '../models/dynamic-ui/TableCell'
 import type { TableColumn } from '../models/dynamic-ui/TableColumn'
 import type { TableRow } from '../models/dynamic-ui/TableRow'
@@ -41,7 +43,8 @@ const RESOURCE_KIND_ICONS: Record<string, Array<string>> = {
  * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each have only one cell are
  * the table's footnotes, shown as text below it. A hidden row is replaced by its child and summary rows,
  * and a shown row's summary rows follow its child rows. A cell's own link becomes a link that dispatches its action: a
- * download, or a navigation whose target names the pane to load the linked report into.
+ * download, or a navigation whose target names the pane to load the linked report into. A table's borders come from
+ * its classes, except that a navigation report's tables have neither stripes nor borders.
  */
 export function toReportLayout(
   report: LegacyReport,
@@ -158,8 +161,32 @@ function toTable(report: LegacyReport, section: LegacySection): TableComponent {
       rows: toTableRows(content.rows ?? [], `${id}-row`, columnCount),
       ...(footerRows.length ? { footerRows } : {}),
       ...(footnotes.length ? { footnotes } : {}),
+      ...toAppearance(report, content.cssClass),
     },
   }
+}
+
+/** The classes vuescape-dotnet puts beside 'cell-border' (a line around every cell) for other borders */
+const CSS_CLASS_BORDERS: ReadonlyArray<[string, TableBorderKind]> = [
+  ['no-border', 'none'],
+  ['row-border', 'rows'],
+]
+
+/**
+ * The table's borders come from its classes, a line around every cell unless they say otherwise. A navigation report
+ * (its id ends in "navigation", as the original table tells them apart) is a list of links read down rather than
+ * across, so it has neither stripes nor borders.
+ */
+function toAppearance(
+  report: LegacyReport,
+  cssClass: string | null | undefined,
+): { appearance?: TableAppearance } {
+  if (report.id.toLowerCase().endsWith('navigation')) {
+    return { appearance: { isStriped: false, borders: 'none' } }
+  }
+  const classes = cssClass?.split(/\s+/) ?? []
+  const borders = CSS_CLASS_BORDERS.find(([name]) => classes.includes(name))?.[1]
+  return borders ? { appearance: { borders } } : {}
 }
 
 /** A header or footer row: a cell spans its columns, and the row leaves out the cells it covers */

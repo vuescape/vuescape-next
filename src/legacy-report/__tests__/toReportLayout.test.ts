@@ -146,6 +146,39 @@ describe('toReportLayout', () => {
     ])
   })
 
+  describe('appearance', () => {
+    function getAppearance(cssClass: string | null | undefined, reportId = 'report') {
+      const legacySection = section('section', { rows: [row([cell('Org A'), cell()])], cssClass })
+      return getTable(
+        toReportLayout(report([legacySection], { id: reportId }), ReportPaneKind.LeftPane),
+      ).payload.appearance
+    }
+
+    it(`should leave a navigation report's tables without stripes or borders`, () => {
+      expect(getAppearance('cell-border', 'who-is-in-navigation')).toEqual({
+        isStriped: false,
+        borders: 'none',
+      })
+      // As the original table tells them apart
+      expect(getAppearance('cell-border', 'WhoIsInNavigation')).toEqual({
+        isStriped: false,
+        borders: 'none',
+      })
+    })
+
+    it(`should take the table's borders from its classes`, () => {
+      expect(getAppearance('cell-border')).toBeUndefined()
+      expect(getAppearance('cell-border row-border')).toEqual({ borders: 'rows' })
+      expect(getAppearance('cell-border no-border')).toEqual({ borders: 'none' })
+    })
+
+    it('should give the table its usual borders when its classes give none', () => {
+      expect(getAppearance(undefined)).toBeUndefined()
+      expect(getAppearance(null)).toBeUndefined()
+      expect(getAppearance('wide')).toBeUndefined()
+    })
+  })
+
   it('should cut a column off at its width only when it is given one', () => {
     // Arrange
     const legacySection = section('running', { rows: [row([cell('6610458'), cell('stats_1')])] })

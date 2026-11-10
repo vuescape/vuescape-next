@@ -26,6 +26,11 @@ export interface LegacyTreeTable {
     headers?: Array<LegacyHeaderRow> | null
     rows?: Array<LegacyRow> | null
     footers?: Array<LegacyRow> | null
+    /**
+     * Classes for the table, separated by spaces: 'cell-border' (a line around every cell), with 'row-border' (lines
+     * between the rows only) or 'no-border' (no lines) beside it for other borders
+     */
+    cssClass?: string | null
   }
 }
 

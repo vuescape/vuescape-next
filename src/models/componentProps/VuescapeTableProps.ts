@@ -1,3 +1,4 @@
+import type { TableAppearance } from '../dynamic-ui/TableAppearance'
 import type { TableColumn } from '../dynamic-ui/TableColumn'
 import type { TableRow } from '../dynamic-ui/TableRow'
 
@@ -43,6 +44,12 @@ export interface VuescapeTableProps {
    * they don't stay in place when the rows scroll. Undefined, null or empty: no notes.
    */
   footnotes?: Array<string> | null
+
+  /**
+   * How the table looks as a whole, e.g. its borders.
+   * Undefined or null: striped rows with a line around every cell.
+   */
+  appearance?: TableAppearance | null
 
   /**
    * The initial scroll position of the table.

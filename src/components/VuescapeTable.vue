@@ -44,6 +44,9 @@ import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject, unr
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
 
+const isStriped = computed(() => props.appearance?.isStriped ?? true)
+const borders = computed(() => props.appearance?.borders ?? 'grid')
+
 // Inject deepWatch from parent (ReportLayoutRenderer provides it)
 // Prefer prop value if explicitly set, otherwise use injected value, fallback to true
 const injectedDeepWatch = inject(VuescapeTableDeepWatchKey, true)
@@ -529,13 +532,16 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
     <div class="vuescape-table__container" ref="tableWrapperRef">
       <DataTable
         ref="dtRef"
-        :class="{ 'vuescape-table--headless': isHeadless }"
+        :class="{
+          'vuescape-table--headless': isHeadless,
+          'vuescape-table--borderless': borders === 'none',
+        }"
         :value="tableRows"
         :lazy="isTreeTable"
         :scrollable="true"
         :scrollHeight="scrollHeight"
-        :stripedRows="true"
-        :showGridlines="true"
+        :stripedRows="isStriped"
+        :showGridlines="borders === 'grid'"
         tableStyle="min-width: 100%;"
         :virtualScrollerOptions="virtualScrollerOptions"
         stateStorage="session"
@@ -683,6 +689,15 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
   --p-datatable-header-cell-sm-padding: 0;
   --p-datatable-header-cell-background: transparent;
   --p-datatable-header-cell-border-color: transparent;
+}
+/*
+ * Without gridlines PrimeVue still draws a line under each cell, which is the 'rows' borders. Making it transparent
+ * rather than removing it keeps the rows' heights. Through PrimeVue's variables, as for the headless table.
+ */
+.vuescape-table--borderless {
+  --p-datatable-header-cell-border-color: transparent;
+  --p-datatable-body-cell-border-color: transparent;
+  --p-datatable-footer-cell-border-color: transparent;
 }
 .p-datatable.p-datatable-sm .p-datatable-tbody > tr > td {
   padding: 0 !important;

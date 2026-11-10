@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
-import type { TableColumn } from '../../models'
+import type { TableAppearance, TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
 import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
 import { VuescapeTableScrollHeightKey } from '../injectionKeys'
@@ -134,6 +134,57 @@ describe('VuescapeTable.vue', () => {
 
     // Assert
     expect(wrapper.find('.vuescape-table__footnotes').exists()).toBe(false)
+  })
+
+  describe('appearance', () => {
+    function mountWithAppearance(appearance: TableAppearance | undefined) {
+      const wrapper = mount(VuescapeTable, {
+        props: {
+          id: 'table',
+          columns: columns.value,
+          rows: rows.value,
+          appearance,
+          initialScrollPosition: 0,
+        },
+      })
+      const table = wrapper.findComponent(DataTable)
+      return {
+        isStriped: table.props('stripedRows'),
+        hasGridlines: table.props('showGridlines'),
+        isBorderless: table.classes().includes('vuescape-table--borderless'),
+      }
+    }
+
+    it('should stripe the rows and draw a line around every cell by default', () => {
+      expect(mountWithAppearance(undefined)).toEqual({
+        isStriped: true,
+        hasGridlines: true,
+        isBorderless: false,
+      })
+      expect(mountWithAppearance({})).toEqual({
+        isStriped: true,
+        hasGridlines: true,
+        isBorderless: false,
+      })
+    })
+
+    it('should leave the rows unstriped when told to', () => {
+      expect(mountWithAppearance({ isStriped: false }).isStriped).toBe(false)
+    })
+
+    it('should draw lines between the rows only for row borders', () => {
+      expect(mountWithAppearance({ borders: 'rows' })).toMatchObject({
+        hasGridlines: false,
+        isBorderless: false,
+      })
+    })
+
+    it('should draw no lines for no borders', () => {
+      expect(mountWithAppearance({ borders: 'none' })).toMatchObject({
+        hasGridlines: false,
+        isBorderless: true,
+      })
+    })
   })
 
   it(`should show header rows in place of the columns' header text, spanning columns`, () => {
