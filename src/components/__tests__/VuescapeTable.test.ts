@@ -598,20 +598,23 @@ describe('VuescapeTable.vue as a tree', () => {
   }
 
   // jsdom lays nothing out, so the virtual scroller would think it is hidden and render no rows. Make elements
-  // look visible and sized so it renders them. A test can change the width every element reports.
+  // look visible and sized so it renders them. A test can change the width every element reports, which, as in a
+  // browser, offsetWidth rounds to a whole pixel and getBoundingClientRect doesn't.
   let elementWidth = 500
   const layout: Record<string, () => unknown> = {
     offsetParent: () => document.body,
     offsetHeight: () => 500,
-    offsetWidth: () => elementWidth,
+    offsetWidth: () => Math.round(elementWidth),
   }
   const originalLayout = Object.keys(layout).map(
     (name) => [name, Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)!] as const,
   )
+  const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect
   beforeAll(() => {
     Object.entries(layout).forEach(([name, get]) =>
       Object.defineProperty(HTMLElement.prototype, name, { configurable: true, get }),
     )
+    Element.prototype.getBoundingClientRect = () => new DOMRect(0, 0, elementWidth, 500)
   })
   afterEach(() => {
     elementWidth = 500
@@ -621,6 +624,7 @@ describe('VuescapeTable.vue as a tree', () => {
     originalLayout.forEach(([name, descriptor]) =>
       Object.defineProperty(HTMLElement.prototype, name, descriptor),
     )
+    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect
   })
 
   it('should show the child rows of expanded rows and let the user toggle a row', async () => {
@@ -711,9 +715,11 @@ describe('VuescapeTable.vue as a tree', () => {
     expect(abbrHeader.style.insetInlineStart).toBe('300px')
   })
 
-  it('should keep the frozen cells in line with their columns when resizing the table changes the column widths', async () => {
-    // Arrange
-    // Other components observe their own elements, so keep each observer's callback by the element it observes
+  /**
+   * Mounts a table whose table resize observer a test can fire. Other components observe their own elements, so it
+   * keeps each observer's callback by the element it observes.
+   */
+  function mountFrozenResizable(frozenRows: Array<TableRow>) {
     const resizeCallbacks = new Map<Element, () => void>()
     vi.stubGlobal(
       'ResizeObserver',
@@ -726,8 +732,15 @@ describe('VuescapeTable.vue as a tree', () => {
         disconnect() {}
       },
     )
-    const wrapper = mountFrozen([frozenRow('a'), frozenRow('b')])
+    const wrapper = mountFrozen(frozenRows)
     const resizeTable = () => resizeCallbacks.get(wrapper.find('table').element)?.()
+
+    return { wrapper, resizeTable }
+  }
+
+  it('should keep the frozen cells in line with their columns when resizing the table changes the column widths', async () => {
+    // Arrange
+    const { wrapper, resizeTable } = mountFrozenResizable([frozenRow('a'), frozenRow('b')])
     await nextTick()
     const abbrCells = wrapper
       .findAll('tr')
@@ -749,6 +762,34 @@ describe('VuescapeTable.vue as a tree', () => {
       '300px',
       '300px',
     ])
+  })
+
+  it("should keep a frozen column's fractional offset when its body cells update, so they don't shift as the table starts scrolling", async () => {
+    // Arrange
+    elementWidth = 300.4
+    const { wrapper, resizeTable } = mountFrozenResizable([frozenRow('a'), frozenRow('b')])
+    await nextTick()
+    // As a browser's observer does once the table is laid out
+    resizeTable()
+    await nextTick()
+    const getAbbrBodyCellOffsets = () =>
+      wrapper
+        .findAll('tbody tr')
+        .map(
+          (row) =>
+            (row.findAll('.p-datatable-frozen-column')[1].element as HTMLElement).style
+              .insetInlineStart,
+        )
+
+    // Act
+    // A body cell that updates (e.g. for its row's data) works out PrimeVue's own whole-pixel offset again, without
+    // the table's rows changing
+    wrapper.findAllComponents({ name: 'BodyCell' }).forEach((cell) => cell.vm.$forceUpdate())
+    await nextTick()
+    await nextTick()
+
+    // Assert
+    expect(getAbbrBodyCellOffsets()).toEqual(['300.4px', '300.4px'])
   })
 
   describe('long text', () => {

@@ -40,7 +40,17 @@ import {
   VuescapeTableStartsAtRightKey,
 } from './injectionKeys'
 
-import { onBeforeUnmount, onMounted, reactive, ref, watch, computed, inject, unref } from 'vue'
+import {
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  shallowRef,
+  watch,
+  computed,
+  inject,
+  unref,
+} from 'vue'
 
 // Define props
 const props = defineProps<VuescapeTableProps & { initialScrollPosition: number | undefined }>()
@@ -93,17 +103,32 @@ const headerRows = computed(() => getHeaderRows(props.headerRows, localState.col
 // A table without header rows (e.g. a list of links) shows no header
 const isHeadless = computed(() => !headerRows.value.length)
 
+// Each frozen column's offset from the table's left edge, by column ID (see updateFrozenCellOffsets)
+const frozenColumnIdToOffsetMap = shallowRef(new Map<string, string>())
+
 // PrimeVue renders a body cell in every column and has no colspan for one, so each column sets its cells' attributes
 // row by row: a spanning cell's colspan, or hiding a cell its row's span covers. PrimeVue calls a column's bodyCell
-// with the cell's own props, whose rowData is the row. One per column, so the columns don't change on every render.
+// with the cell's own props, whose rowData is the row. A frozen column's cells also get its offset here, as PrimeVue
+// works out its own whenever a cell updates and the pass-through's style wins. One per column, so the columns don't
+// change on every render.
 const columnIdToPassThroughMap = computed(
   () =>
     new Map(
       localState.columns.map((column): [string, ColumnPassThroughOptions] => [
         column.id,
         {
-          bodyCell: ({ parent }: ColumnPassThroughMethodOptions) =>
-            getBodyCellAttributes(parent.props.rowData, localState.columns, column.id),
+          bodyCell: ({ parent }: ColumnPassThroughMethodOptions) => {
+            const attributes = getBodyCellAttributes(
+              parent.props.rowData,
+              localState.columns,
+              column.id,
+            )
+            const offset = frozenColumnIdToOffsetMap.value.get(column.id)
+
+            return offset === undefined
+              ? attributes
+              : { ...attributes, style: { insetInlineStart: offset } }
+          },
         },
       ]),
     ),
@@ -499,7 +524,9 @@ const tableRows = computed((): Array<TableRow | VisibleTableRow> => {
  * cells before it, but works out a cell's offset only when the cell renders. Column widths can change without that:
  * showing other rows (e.g. collapsing a tree row whose child rows were the widest in a column) or resizing the table
  * (e.g. the window narrowing until it scrolls horizontally), so frozen cells would keep their old offsets and overlap
- * or leave gaps. Matches PrimeVue's own calculation for columns frozen on the left, the only kind this table makes.
+ * or leave gaps. Matches PrimeVue's own calculation for columns frozen on the left, the only kind this table makes,
+ * except that it keeps the widths' fractions: PrimeVue's whole-pixel widths put a frozen cell up to a pixel left of
+ * where it sits unscrolled, so it jumps when the table starts scrolling.
  */
 function updateFrozenCellOffsets() {
   const tableEl: HTMLElement | undefined = dtRef.value?.$el?.querySelector('table')
@@ -516,7 +543,7 @@ function updateFrozenCellOffsets() {
     .querySelectorAll<HTMLElement>(':scope > th.p-datatable-frozen-column')
     .forEach((cell) => {
       offsets.push(`${offset}px`)
-      offset += cell.offsetWidth
+      offset += cell.getBoundingClientRect().width
     })
 
   tableEl
@@ -528,6 +555,25 @@ function updateFrozenCellOffsets() {
           cell.style.insetInlineStart = offsets[index] ?? cell.style.insetInlineStart
         })
     })
+
+  // The body cells' offsets, which PrimeVue would otherwise put back to its own when a cell updates. Only when they
+  // change, as each change renders the body cells again.
+  const frozenColumnIdToOffsetMapNext = new Map(
+    localState.columns
+      .filter((column) => column.isFrozen)
+      .flatMap((column, index): Array<[string, string]> =>
+        offsets[index] === undefined ? [] : [[column.id, offsets[index]]],
+      ),
+  )
+  const current = frozenColumnIdToOffsetMap.value
+  const isUnchanged =
+    current.size === frozenColumnIdToOffsetMapNext.size &&
+    [...frozenColumnIdToOffsetMapNext].every(
+      ([columnId, offset]) => current.get(columnId) === offset,
+    )
+  if (!isUnchanged) {
+    frozenColumnIdToOffsetMap.value = frozenColumnIdToOffsetMapNext
+  }
 }
 
 watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
@@ -688,6 +734,24 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
 }
 .p-datatable-scrollable .p-datatable-tbody > tr > td.p-datatable-frozen-column {
   background: inherit;
+}
+/*
+ * With gridlines PrimeVue gives each cell only a left border, so the line at the frozen columns' edge is the first
+ * scrolling column's, which slides under the frozen columns when the table scrolls. The last shown frozen cell draws
+ * that line itself, over the same pixel, so it stays put. A shadow rather than a border, so the cell keeps its width.
+ */
+.p-datatable-gridlines
+  .p-datatable-frozen-column:not(
+    :has(~ .p-datatable-frozen-column:not(.vuescape-table__covered-cell))
+  ) {
+  box-shadow: 1px 0 0 0
+    var(--vuescape-table-frozen-edge-color, var(--p-datatable-body-cell-border-color));
+}
+.p-datatable-gridlines .p-datatable-thead > tr > th.p-datatable-frozen-column {
+  --vuescape-table-frozen-edge-color: var(--p-datatable-header-cell-border-color);
+}
+.p-datatable-gridlines .p-datatable-tfoot > tr > td.p-datatable-frozen-column {
+  --vuescape-table-frozen-edge-color: var(--p-datatable-footer-cell-border-color);
 }
 /* A body cell in a column another cell's span covers (see getBodyCellAttributes) */
 .p-datatable-tbody > tr > td.vuescape-table__covered-cell {
