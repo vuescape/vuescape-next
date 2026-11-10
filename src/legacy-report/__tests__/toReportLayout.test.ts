@@ -225,6 +225,42 @@ describe('toReportLayout', () => {
     })
   })
 
+  describe('font', () => {
+    function getCssStyles(extra: Partial<LegacyCell>) {
+      const legacySection = section('section', { rows: [row([cell('Org A'), cell('in', extra)])] })
+      return getTable(toReportLayout(report([legacySection]), ReportPaneKind.CenterPane)).payload
+        .rows[0].cells.c1.cssStyles
+    }
+
+    const allFontStyles = { fontWeight: 'bold', fontStyle: 'italic', textDecoration: 'underline' }
+
+    it(`should take a cell's font from its format`, () => {
+      expect(getCssStyles({ cellFormat: { isBold: true } })).toEqual({ fontWeight: 'bold' })
+      expect(
+        getCssStyles({ cellFormat: { isBold: true, isItalic: true, isUnderlined: true } }),
+      ).toEqual(allFontStyles)
+    })
+
+    it(`should take a cell's font from its classes, as an API on an older vuescape-dotnet gives it`, () => {
+      expect(getCssStyles({ cssClasses: 'tree-table-cell__td font-weight__bold' })).toEqual({
+        fontWeight: 'bold',
+      })
+      expect(
+        getCssStyles({
+          cssClasses:
+            'tree-table-cell__td font-weight__bold font-style__italic text-decoration__underline',
+        }),
+      ).toEqual(allFontStyles)
+    })
+
+    it('should leave the font alone when neither the format nor the classes give it', () => {
+      expect(getCssStyles({ cssClasses: 'tree-table-cell__td white-space__wrap' })).toBeUndefined()
+      expect(
+        getCssStyles({ cellFormat: { isBold: false, isItalic: false, isUnderlined: false } }),
+      ).toBeUndefined()
+    })
+  })
+
   it('should show the children and summary rows of a hidden row in its place', () => {
     // Arrange
     // As vuescape-dotnet makes a Who Is In report's row when the table has another

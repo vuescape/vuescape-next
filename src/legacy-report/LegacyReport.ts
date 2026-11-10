@@ -86,12 +86,20 @@ export interface LegacyCell {
     slotNameToUiObjectMap: Record<string, { value: unknown; uiObjectType?: string }>
     defaultSlotName: string
   } | null
+  /**
+   * Classes separated by spaces, e.g. 'font-weight__bold'. An API on a vuescape-dotnet without the cell format's font
+   * options gives them only here.
+   */
+  cssClasses?: string | null
   cellFormat?: {
     fontHexColor?: string | null
     /** e.g. '12px' */
     fontSizeInPixels?: string | null
     backgroundHexColor?: string | null
     horizontalAlignment?: 'unknown' | 'left' | 'center' | 'right' | null
+    isBold?: boolean
+    isItalic?: boolean
+    isUnderlined?: boolean
   } | null
 }
 

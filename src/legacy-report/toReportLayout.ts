@@ -288,6 +288,16 @@ function toCssStyles(cell: LegacyCell): Record<string, string> | undefined {
   } else if (format?.horizontalAlignment === 'right') {
     result.justifyContent = 'flex-end'
   }
+  const classes = cell.cssClasses?.split(/\s+/) ?? []
+  if (format?.isBold || classes.includes('font-weight__bold')) {
+    result.fontWeight = 'bold'
+  }
+  if (format?.isItalic || classes.includes('font-style__italic')) {
+    result.fontStyle = 'italic'
+  }
+  if (format?.isUnderlined || classes.includes('text-decoration__underline')) {
+    result.textDecoration = 'underline'
+  }
   return Object.keys(result).length ? result : undefined
 }
 
