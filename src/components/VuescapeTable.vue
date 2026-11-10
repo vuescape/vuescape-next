@@ -21,7 +21,8 @@ import type { TableRow } from '../models/dynamic-ui/TableRow'
 
 import PaneComponentRenderer from './PaneComponentRenderer.vue'
 import { APPEND_ONLY_MAX_CELLS, getSpaceBelow, SPLIT_PANE_CLASS } from '../utils/tableLayout'
-import { getHeaderRows, getSpannedCells } from '../utils/tableHeaderRows'
+import type { ColumnPassThroughMethodOptions, ColumnPassThroughOptions } from 'primevue/column'
+import { getBodyCellAttributes, getHeaderRows, getSpannedCells } from '../utils/tableHeaderRows'
 import type { TableCell } from '../models/dynamic-ui/TableCell'
 import type { TableColumn } from '../models/dynamic-ui/TableColumn'
 import {
@@ -91,6 +92,22 @@ const localState = reactive({
 const headerRows = computed(() => getHeaderRows(props.headerRows, localState.columns))
 // A table without header rows (e.g. a list of links) shows no header
 const isHeadless = computed(() => !headerRows.value.length)
+
+// PrimeVue renders a body cell in every column and has no colspan for one, so each column sets its cells' attributes
+// row by row: a spanning cell's colspan, or hiding a cell its row's span covers. PrimeVue calls a column's bodyCell
+// with the cell's own props, whose rowData is the row. One per column, so the columns don't change on every render.
+const columnIdToPassThroughMap = computed(
+  () =>
+    new Map(
+      localState.columns.map((column): [string, ColumnPassThroughOptions] => [
+        column.id,
+        {
+          bodyCell: ({ parent }: ColumnPassThroughMethodOptions) =>
+            getBodyCellAttributes(parent.props.rowData, localState.columns, column.id),
+        },
+      ]),
+    ),
+)
 
 // The bottom header row's cell over a single column holds that column's sort control
 function getSortProps(column: TableColumn, rowIndex: number, colspan: number) {
@@ -568,11 +585,12 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
             :frozen="column.isFrozen"
             :style="column.style"
             :sortField="columnIdToSortFieldMap.get(column.id)"
+            :pt="columnIdToPassThroughMap.get(column.id)"
           >
             <template #body="slotProps">
               <div
                 :style="
-                  slotProps.data.cells[column.id].component
+                  slotProps.data.cells[column.id]?.component
                     ? undefined
                     : getCellStyle(slotProps.data, column.id)
                 "
@@ -601,7 +619,7 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
                   </button>
                 </span>
                 <PaneComponentRenderer
-                  v-if="slotProps.data.cells[column.id].component"
+                  v-if="slotProps.data.cells[column.id]?.component"
                   :component="slotProps.data.cells[column.id].component"
                 />
                 <!-- Kept to one line, so long text can't make a row taller than the virtual scroller's fixed row
@@ -670,6 +688,10 @@ watch(tableRows, updateFrozenCellOffsets, { flush: 'post' })
 }
 .p-datatable-scrollable .p-datatable-tbody > tr > td.p-datatable-frozen-column {
   background: inherit;
+}
+/* A body cell in a column another cell's span covers (see getBodyCellAttributes) */
+.p-datatable-tbody > tr > td.vuescape-table__covered-cell {
+  display: none;
 }
 /*
  * PrimeVue leaves footer cells without a background, so the cells scrolling under a frozen footer cell would show

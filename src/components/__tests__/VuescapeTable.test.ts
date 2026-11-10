@@ -3,6 +3,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 import { nextTick, ref } from 'vue'
 import type { TableAppearance, TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
+import { COVERED_BODY_CELL_CLASS } from '../../utils/tableHeaderRows'
 import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
 import { VuescapeTableScrollHeightKey } from '../injectionKeys'
 import DataTable from 'primevue/datatable'
@@ -813,5 +814,49 @@ describe('VuescapeTable.vue as a tree', () => {
     expect(wrapper.findComponent(DataTable).props('lazy')).toBe(false)
     expect(wrapper.findAll('tbody tr')).toHaveLength(2)
     expect(wrapper.find('.vuescape-table__row-toggle').exists()).toBe(false)
+  })
+
+  it(`should span a body cell's columns and hide the cells it covers, even a row without them`, async () => {
+    // Arrange
+    const spanColumns: Array<TableColumn> = [
+      { id: 'name', headerText: 'Name', isFrozen: true },
+      { id: 'q1', headerText: 'Q1' },
+      { id: 'q2', headerText: 'Q2' },
+    ]
+    const spanRows: Array<TableRow> = [
+      { id: 'org', cells: { name: { displayValue: 'Org A' }, q1: { displayValue: 'in' }, q2: {} } },
+      {
+        id: 'total',
+        cells: { name: { displayValue: 'Total In', colspan: 2 }, q2: { displayValue: '1' } },
+      },
+    ]
+
+    // Act
+    const wrapper = mount(VuescapeTable, {
+      props: { id: 'span-table', columns: spanColumns, rows: spanRows, initialScrollPosition: 0 },
+    })
+    await nextTick()
+
+    // Assert
+    const [orgCells, totalCells] = wrapper.findAll('tbody tr').map((row) => row.findAll('td'))
+    // A cell in every column, so the frozen cells keep their offsets
+    expect(orgCells.map((cell) => cell.attributes('colspan'))).toEqual([
+      undefined,
+      undefined,
+      undefined,
+    ])
+    expect(totalCells.map((cell) => cell.attributes('colspan'))).toEqual([
+      '2',
+      undefined,
+      undefined,
+    ])
+    expect(totalCells.map((cell) => cell.classes(COVERED_BODY_CELL_CLASS))).toEqual([
+      false,
+      true,
+      false,
+    ])
+    // PrimeVue's own classes stay
+    expect(totalCells[0].classes('p-datatable-frozen-column')).toBe(true)
+    expect(totalCells[2].text()).toBe('1')
   })
 })

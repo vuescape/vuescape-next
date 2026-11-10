@@ -29,8 +29,9 @@ export interface TableCell {
    */
   cssStyles?: Record<string, string>
   /**
-   * How many columns a header or footer row's cell spans, from its own column. The row leaves out the cells of the
-   * columns it covers. A span stays on one side of the frozen columns' edge. Body rows' cells don't span.
+   * How many columns the cell spans, from its own column. A header or footer row leaves out the cells of the columns it
+   * covers; a body row's cells in those columns, if it has them, aren't shown. A span stays on one side of the frozen
+   * columns' edge.
    * @default 1
    */
   colspan?: number | null

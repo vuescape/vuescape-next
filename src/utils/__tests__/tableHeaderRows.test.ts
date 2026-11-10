@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import type { TableColumn } from '../../models/dynamic-ui/TableColumn'
-import { getHeaderRows, getSpannedCells } from '../tableHeaderRows'
+import {
+  COVERED_BODY_CELL_CLASS,
+  getBodyCellAttributes,
+  getHeaderRows,
+  getSpannedCells,
+} from '../tableHeaderRows'
 
 const columns: Array<TableColumn> = [
   { id: 'name', headerText: 'Name' },
@@ -36,6 +41,43 @@ describe('getSpannedCells', () => {
     const row = { id: 'note', cells: { q2: { displayValue: 'Note', colspan: 5 } } }
 
     expect(getSpannedCells(row, columns).map((spanned) => spanned.colspan)).toEqual([1, 1, 2])
+  })
+})
+
+describe('getBodyCellAttributes', () => {
+  it(`should give a spanning cell its colspan and hide the cells of the columns it covers`, () => {
+    // Arrange
+    // As a summary row's label spanning the columns before its totals, keeping the covered columns' cells
+    const row = {
+      id: 'total',
+      cells: {
+        name: { displayValue: 'Total In', colspan: 2 },
+        q1: {},
+        q2: { displayValue: '12' },
+        status: {},
+      },
+    }
+    const systemUnderTest = getBodyCellAttributes
+
+    // Act
+    const actual = columns.map((column) => systemUnderTest(row, columns, column.id))
+
+    // Assert
+    expect(actual).toEqual([{ colspan: 2 }, { class: COVERED_BODY_CELL_CLASS }, {}, {}])
+  })
+
+  it('should leave the cells alone when none spans', () => {
+    const row = {
+      id: 'org',
+      cells: { name: { displayValue: 'Org A' }, q1: { displayValue: 'in' } },
+    }
+
+    expect(columns.map((column) => getBodyCellAttributes(row, columns, column.id))).toEqual([
+      {},
+      {},
+      {},
+      {},
+    ])
   })
 })
 

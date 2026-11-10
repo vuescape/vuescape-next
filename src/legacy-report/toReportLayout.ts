@@ -40,7 +40,7 @@ const RESOURCE_KIND_ICONS: Record<string, Array<string>> = {
  *
  * A section becomes a table, or a tab of one when the report has several sections. A single section's title joins the
  * report's title, after a " | ", rather than heading its table. Header rows become the table's header rows, and footer
- * rows its footer rows, their cells spanning columns as they did; the footers' last rows that each have only one cell are
+ * rows its footer rows, and every row's cells span columns as they did; the footers' last rows that each have only one cell are
  * the table's footnotes, shown as text below it. A hidden row is replaced by its child and summary rows,
  * and a shown row's summary rows follow its child rows. A cell's own link becomes a link that dispatches its action: a
  * download, or a navigation whose target names the pane to load the linked report into. A table's borders come from
@@ -239,12 +239,19 @@ function toTableRows(
   })
 }
 
-/** A body row, whose cells don't span: a column covered by another cell's span gets an empty cell */
+/**
+ * A body row, with a cell in every column: a cell spans its columns, and a column covered by another cell's span gets an
+ * empty cell, which the table hides
+ */
 function toTableRow(row: LegacyRow, id: string, columnCount: number): TableRow {
   const cells: Record<string, TableCell> = {}
   for (let index = 0; index < columnCount; index++) {
     const cell = row.cells[index]
-    cells[toColumnId(index)] = cell && isShown(cell) ? toTableCell(cell, `${id}-${index}`) : {}
+    const colspan = cell?.colspan ?? 1
+    cells[toColumnId(index)] =
+      cell && isShown(cell)
+        ? { ...toTableCell(cell, `${id}-${index}`), ...(colspan > 1 ? { colspan } : {}) }
+        : {}
   }
   return { id, cells }
 }

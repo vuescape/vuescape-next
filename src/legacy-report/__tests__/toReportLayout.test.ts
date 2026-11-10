@@ -424,7 +424,7 @@ describe('toReportLayout', () => {
     expect(getTable(actual).payload.headerRows).toEqual([])
   })
 
-  it(`should give a column covered by another cell's span an empty cell`, () => {
+  it(`should keep a body cell's span, and give a column it covers an empty cell`, () => {
     // Act
     const actual = toReportLayout(
       report([
@@ -438,7 +438,7 @@ describe('toReportLayout', () => {
 
     // Assert
     expect(getTable(actual).payload.rows[0].cells).toEqual({
-      c0: { displayValue: 'Org A' },
+      c0: { displayValue: 'Org A', colspan: 2 },
       c1: {},
     })
   })
