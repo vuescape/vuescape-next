@@ -4,7 +4,7 @@ import { nextTick, ref } from 'vue'
 import type { TableAppearance, TableColumn } from '../../models'
 import type { TableRow } from '../../models/dynamic-ui/TableRow'
 import { COVERED_BODY_CELL_CLASS } from '../../utils/tableHeaderRows'
-import { APPEND_ONLY_MAX_CELLS } from '../../utils/tableLayout'
+import { APPEND_ONLY_MAX_CELLS, FALLBACK_SPACE_BELOW_TABLE } from '../../utils/tableLayout'
 import { VuescapeTableScrollHeightKey } from '../injectionKeys'
 import DataTable from 'primevue/datatable'
 import VuescapeTable from '../VuescapeTable.vue'
@@ -252,6 +252,63 @@ describe('VuescapeTable.vue', () => {
   })
 
   describe('scroll height', () => {
+    describe('measured on mount --', () => {
+      const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect
+      const originalGetClientRects = Element.prototype.getClientRects
+
+      afterEach(() => {
+        Element.prototype.getBoundingClientRect = originalGetBoundingClientRect
+        Element.prototype.getClientRects = originalGetClientRects
+        vi.useRealTimers()
+      })
+
+      /** Lays every element out at the top given (jsdom lays nothing out), shown or not */
+      const layOut = (top: number, isShown: boolean) => {
+        Element.prototype.getBoundingClientRect = () => new DOMRect(0, top, 1000, 400)
+        Element.prototype.getClientRects = function () {
+          return (isShown ? [new DOMRect(0, top, 1000, 400)] : []) as unknown as DOMRectList
+        }
+      }
+
+      const mountTable = () =>
+        mount(VuescapeTable, {
+          props: {
+            id: 'test-table',
+            columns: columns.value,
+            rows: rows.value,
+            initialScrollPosition: 0,
+          },
+        })
+
+      it('should fit the page before the first paint, not after a delay', async () => {
+        // Arrange: the deferred measure never runs
+        vi.useFakeTimers()
+        layOut(381, true)
+
+        // Act
+        const wrapper = mountTable()
+        await nextTick()
+
+        // Assert: what's left below the table's top, not the 576px default
+        expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe(
+          `${window.innerHeight - 381 - FALLBACK_SPACE_BELOW_TABLE}px`,
+        )
+      })
+
+      it('should wait for the deferred measure when the table is not laid out yet, e.g. in a hidden tab', async () => {
+        // Arrange
+        vi.useFakeTimers()
+        layOut(0, false)
+
+        // Act
+        const wrapper = mountTable()
+        await nextTick()
+
+        // Assert
+        expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe('576px')
+      })
+    })
+
     it('should use a height provided by an ancestor, e.g. a dialog, instead of filling the page', async () => {
       // Arrange
       const wrapper = mount(VuescapeTable, {

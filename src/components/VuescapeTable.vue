@@ -272,8 +272,13 @@ onMounted(() => {
     }
   }
 
-  // Calculate table height on mount
-  // Use setTimeout to ensure DOM is fully rendered
+  // Measure now, so the first paint already fits the page: painted at the default height first, a table low on the page
+  // (e.g. one a tab has just shown) runs past the bottom, and the page's scroll bar flashes and shifts it sideways. Not
+  // when the table isn't laid out yet (e.g. in a hidden tab), where the measure would be meaningless.
+  if (tableWrapperRef.value?.getClientRects().length) {
+    updateTableHeight()
+  }
+  // And again once the rest of the page has rendered
   setTimeout(() => {
     updateTableHeight()
   }, 0)
