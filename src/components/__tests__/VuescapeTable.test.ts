@@ -289,7 +289,7 @@ describe('VuescapeTable.vue', () => {
         const wrapper = mountTable()
         await nextTick()
 
-        // Assert: what's left below the table's top, not the 576px default
+        // Assert: what's left below the table's top, not the viewport-high default
         expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe(
           `${window.innerHeight - 381 - FALLBACK_SPACE_BELOW_TABLE}px`,
         )
@@ -305,7 +305,7 @@ describe('VuescapeTable.vue', () => {
         await nextTick()
 
         // Assert
-        expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe('576px')
+        expect(wrapper.findComponent({ name: 'DataTable' }).props('scrollHeight')).toBe('100vh')
       })
     })
 

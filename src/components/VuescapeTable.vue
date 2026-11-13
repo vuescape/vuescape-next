@@ -86,7 +86,13 @@ const dtRef = ref<any>(null)
 const tableWrapperRef = ref<HTMLElement | null>(null)
 // The table's own "fill the rest of the page" height in px, measured by updateTableHeight on mount and window resize.
 // Unused (left at this default) when an ancestor provides tableScrollHeight.
-const dynamicScrollHeight = ref('576px')
+//
+// Starts at the viewport's height, which every measured height fits within. The DataTable sizes its virtual scroller
+// only with an inline style, and the scroller's auto-size, which runs whenever it reinitializes (e.g. its rows change
+// count), caps that style at the scroller's first height. Starting lower (it was 576px), a measured height above it
+// was cut back to it until something re-rendered the scroller, e.g. scrolling: the table stopped short of the footer,
+// then grew partway down the page. Measured before the first paint, this default is never seen.
+const dynamicScrollHeight = ref('100vh')
 // What the DataTable actually gets: the ancestor's height when one is provided, otherwise the measured one.
 const scrollHeight = computed(() =>
   injectedScrollHeight === undefined ? dynamicScrollHeight.value : unref(injectedScrollHeight),
